@@ -1,0 +1,99 @@
+{
+  "name": "CommercialTask",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "T\u00edtulo"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha l\u00edmite"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "pendiente",
+        "completada"
+      ],
+      "default": "pendiente"
+    },
+    "opportunity_id": {
+      "type": "string",
+      "title": "Oportunidad asociada"
+    },
+    "assignee": {
+      "type": "string",
+      "title": "Responsable"
+    },
+    "auto_generated": {
+      "type": "boolean",
+      "title": "Generada autom\u00e1ticamente",
+      "default": false
+    }
+  },
+  "required": [
+    "title",
+    "due_date"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

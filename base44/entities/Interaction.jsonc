@@ -1,0 +1,102 @@
+{
+  "name": "Interaction",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "title": "Cliente"
+    },
+    "type": {
+      "type": "string",
+      "title": "Tipo",
+      "enum": [
+        "llamada",
+        "email",
+        "reunion",
+        "nota",
+        "visita",
+        "whatsapp"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha"
+    },
+    "content": {
+      "type": "string",
+      "title": "Contenido"
+    },
+    "external_id": {
+      "type": "string",
+      "title": "ID externo"
+    },
+    "source": {
+      "type": "string",
+      "title": "Origen"
+    }
+  },
+  "required": [
+    "client_id",
+    "type",
+    "date"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

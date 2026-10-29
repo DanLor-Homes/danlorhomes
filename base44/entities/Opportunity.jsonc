@@ -1,0 +1,159 @@
+{
+  "name": "Opportunity",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Nombre"
+    },
+    "amount": {
+      "type": "number",
+      "title": "Valor estimado"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Cliente"
+    },
+    "stage": {
+      "type": "string",
+      "title": "Etapa",
+      "enum": [
+        "nuevo_lead",
+        "reunion_agendada",
+        "visita",
+        "presupuesto",
+        "presupuesto_enviado",
+        "ganado",
+        "en_ejecucion",
+        "ejecutado",
+        "perdido"
+      ],
+      "default": "nuevo_lead"
+    },
+    "probability": {
+      "type": "number",
+      "title": "Probabilidad",
+      "default": 10
+    },
+    "product": {
+      "type": "string",
+      "title": "Producto",
+      "enum": [
+        "servicios_inmobiliarios",
+        "venta_viviendas",
+        "alquiler_turistico"
+      ]
+    },
+    "channel_id": {
+      "type": "string",
+      "title": "Canal"
+    },
+    "loss_reason": {
+      "type": "string",
+      "title": "Motivo de p\u00e9rdida",
+      "enum": [
+        "precio",
+        "competencia",
+        "timing",
+        "otro"
+      ]
+    },
+    "expected_closing_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha cierre estimada"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "open",
+        "won",
+        "lost"
+      ],
+      "default": "open"
+    },
+    "stage_changed_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de cambio de etapa"
+    },
+    "last_interaction_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "\u00daltima interacci\u00f3n"
+    },
+    "archived": {
+      "type": "boolean",
+      "title": "Archivada",
+      "default": false
+    },
+    "archived_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de archivado"
+    }
+  },
+  "required": [
+    "name",
+    "stage"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

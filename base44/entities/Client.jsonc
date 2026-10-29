@@ -1,0 +1,124 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Nombre"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono"
+    },
+    "web": {
+      "type": "string",
+      "title": "Web"
+    },
+    "contact_person": {
+      "type": "string",
+      "title": "Persona de contacto"
+    },
+    "second_contact": {
+      "type": "string",
+      "title": "Segundo contacto"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    },
+    "attachments": {
+      "type": "array",
+      "title": "Adjuntos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file_uri": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "geographic_zone": {
+      "type": "string",
+      "title": "Zona geogr\u00e1fica"
+    },
+    "employees_count": {
+      "type": "number",
+      "title": "N\u00famero de empleados"
+    },
+    "daily_property_search": {
+      "type": "boolean",
+      "title": "B\u00fasqueda diaria de inmuebles en venta o alquiler",
+      "default": false
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
