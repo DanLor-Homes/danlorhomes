@@ -96,7 +96,7 @@ export default function Channels() {
           action={<Button size="sm" onClick={() => setDialogOpen(true)}>Añadir canal</Button>}
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {channels.map((channel) => {
             const data = stats[channel.id] || { count: 0, value: 0, won: 0 };
             return (

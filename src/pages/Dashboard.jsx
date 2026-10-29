@@ -158,8 +158,8 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <div className="space-y-4 lg:col-span-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="min-w-0 space-y-4 lg:col-span-2">
           <section className="card-surface p-5">
             <div className="mb-4 flex items-center justify-between">
               <div>
@@ -238,7 +238,7 @@ export default function Dashboard() {
           </section>
         </div>
 
-        <section className="card-surface p-5">
+        <section className="min-w-0 card-surface p-5">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-heading text-sm font-bold">Próximas tareas</h3>
             <Link to="/tareas" className="text-xs font-medium text-primary hover:underline">

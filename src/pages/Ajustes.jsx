@@ -106,7 +106,7 @@ export default function Ajustes() {
         description="Preferencias de la app, reglas del embudo, automatizaciones e integraciones."
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="card-surface p-5">
           <h3 className="font-heading text-sm font-bold">Apariencia</h3>
           <p className="mb-4 text-xs text-muted-foreground">El modo oscuro viene activado por defecto.</p>

@@ -25,14 +25,24 @@ const tooltipStyle = {
 
 export default function Reports() {
   const [opportunities, setOpportunities] = useState([]);
+  const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    base44.entities.Opportunity.filter({}, { sort: '-updated_date', limit: 500 }).then((res) => {
-      setOpportunities(res.items || []);
+    Promise.all([
+      base44.entities.Opportunity.filter({}, { sort: '-updated_date', limit: 500 }),
+      base44.entities.Channel.list(),
+    ]).then(([oppRes, channelRes]) => {
+      setOpportunities(oppRes.items || []);
+      setChannels(Array.isArray(channelRes) ? channelRes : channelRes?.items || []);
       setLoading(false);
     });
   }, []);
+
+  const channelSlugById = useMemo(
+    () => channels.reduce((acc, channel) => ({ ...acc, [channel.id]: channel.name }), {}),
+    [channels]
+  );
 
   const funnel = useMemo(
     () =>
@@ -52,7 +62,7 @@ export default function Reports() {
   const channelData = useMemo(
     () =>
       CHANNELS.map((channel) => {
-        const list = opportunities.filter((op) => op.channel_id === channel.id);
+        const list = opportunities.filter((op) => channelSlugById[op.channel_id] === channel.id);
         const won = list.filter((op) => op.status === 'won');
         return {
           id: channel.id,
@@ -64,7 +74,7 @@ export default function Reports() {
           rate: list.length ? Math.round((won.length / list.length) * 100) : 0,
         };
       }).filter((row) => row.count > 0),
-    [opportunities]
+    [opportunities, channelSlugById]
   );
 
   const totals = useMemo(() => {
@@ -106,7 +116,7 @@ export default function Reports() {
         />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="card-surface p-5">
           <h3 className="font-heading text-sm font-bold">Embudo de ventas</h3>
           <p className="mb-3 text-xs text-muted-foreground">Valor acumulado por etapa</p>

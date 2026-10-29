@@ -39,6 +39,11 @@ export default function Pipeline() {
     [clients]
   );
 
+  const channelLabelMap = useMemo(
+    () => channels.reduce((acc, channel) => ({ ...acc, [channel.id]: CHANNEL_LABELS[channel.name] || channel.name }), {}),
+    [channels]
+  );
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return opportunities;
@@ -154,7 +159,7 @@ export default function Pipeline() {
                             opportunity={op}
                             index={index}
                             clientName={clientMap[op.client_id]}
-                            channelName={CHANNEL_LABELS[op.channel_id] || ''}
+                            channelName={channelLabelMap[op.channel_id] || ''}
                             onClick={(selected) => {
                               setEditing(selected);
                               setDialogOpen(true);
