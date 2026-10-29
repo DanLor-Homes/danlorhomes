@@ -21,7 +21,7 @@ import CalendarPage from '@/pages/Calendar';
 import Reports from '@/pages/Reports';
 import Channels from '@/pages/Channels';
 import Archive from '@/pages/Archive';
-import Settings from '@/pages/Settings';
+import Ajustes from '@/pages/Ajustes';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -63,7 +63,7 @@ const AuthenticatedApp = () => {
           <Route path="/informes" element={<Reports />} />
           <Route path="/canales" element={<Channels />} />
           <Route path="/archivo" element={<Archive />} />
-          <Route path="/ajustes" element={<Settings />} />
+          <Route path="/ajustes" element={<Ajustes />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
