@@ -1,0 +1,139 @@
+{
+  "name": "PortalSource",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string",
+      "title": "Nombre de la b\u00fasqueda"
+    },
+    "portal": {
+      "type": "string",
+      "title": "Portal",
+      "enum": [
+        "idealista",
+        "fotocasa",
+        "habitaclia",
+        "pisos_com",
+        "milanuncios",
+        "kyero",
+        "think_spain",
+        "otro"
+      ]
+    },
+    "portal_url": {
+      "type": "string",
+      "title": "URL de la b\u00fasqueda"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler"
+      ],
+      "default": "venta"
+    },
+    "property_type": {
+      "type": "string",
+      "title": "Tipo de inmueble",
+      "enum": [
+        "cualquiera",
+        "piso",
+        "chalet",
+        "adosado",
+        "atico",
+        "local",
+        "oficina",
+        "terreno"
+      ],
+      "default": "cualquiera"
+    },
+    "budget_max": {
+      "type": "number",
+      "title": "Presupuesto m\u00e1ximo"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "B\u00fasqueda activa",
+      "default": true
+    },
+    "last_run": {
+      "type": "string",
+      "format": "date-time",
+      "title": "\u00daltima revisi\u00f3n"
+    },
+    "last_result_count": {
+      "type": "number",
+      "title": "Nuevos en la \u00faltima revisi\u00f3n",
+      "default": 0
+    }
+  },
+  "required": [
+    "label",
+    "portal",
+    "zone",
+    "operation"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

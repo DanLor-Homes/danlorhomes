@@ -1,0 +1,171 @@
+{
+  "name": "PortalListing",
+  "type": "object",
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "title": "B\u00fasqueda de origen"
+    },
+    "portal": {
+      "type": "string",
+      "title": "Portal"
+    },
+    "title": {
+      "type": "string",
+      "title": "T\u00edtulo del anuncio"
+    },
+    "url": {
+      "type": "string",
+      "title": "Enlace al anuncio"
+    },
+    "price": {
+      "type": "number",
+      "title": "Precio"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler"
+      ]
+    },
+    "property_type": {
+      "type": "string",
+      "title": "Tipo de inmueble"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "surface": {
+      "type": "number",
+      "title": "Superficie (m\u00b2)"
+    },
+    "rooms": {
+      "type": "number",
+      "title": "Habitaciones"
+    },
+    "bathrooms": {
+      "type": "number",
+      "title": "Ba\u00f1os"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descripci\u00f3n"
+    },
+    "contact_name": {
+      "type": "string",
+      "title": "Persona de contacto"
+    },
+    "contact_phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono"
+    },
+    "contact_email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "publisher_type": {
+      "type": "string",
+      "title": "Anunciante",
+      "enum": [
+        "inmobiliaria",
+        "particular",
+        "desconocido"
+      ],
+      "default": "desconocido"
+    },
+    "published_hint": {
+      "type": "string",
+      "title": "Publicado"
+    },
+    "first_seen": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Detectado el"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "nuevo",
+        "revisado",
+        "contactado",
+        "descartado",
+        "convertido"
+      ],
+      "default": "nuevo"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Cliente creado"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    }
+  },
+  "required": [
+    "portal",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

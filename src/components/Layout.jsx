@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   LayoutGrid,
+  Globe,
   ListChecks,
   Users,
   CalendarDays,
@@ -23,6 +24,7 @@ import { cn } from '@/lib/utils';
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
+  { to: '/portales', label: 'Portales', icon: Globe },
   { to: '/tareas', label: 'Tareas', icon: ListChecks },
   { to: '/clientes', label: 'Clientes', icon: Users },
   { to: '/calendario', label: 'Calendario', icon: CalendarDays },
