@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
+import AssistantPanel from '@/components/agent/AssistantPanel';
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -172,6 +173,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      <AssistantPanel />
     </div>
   );
 }
