@@ -1,0 +1,315 @@
+{
+  "name": "Property",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "T\u00edtulo del inmueble"
+    },
+    "reference": {
+      "type": "string",
+      "title": "Referencia"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler"
+      ],
+      "default": "venta"
+    },
+    "property_type": {
+      "type": "string",
+      "title": "Tipo de inmueble",
+      "enum": [
+        "piso",
+        "atico",
+        "adosado",
+        "chalet",
+        "local",
+        "oficina",
+        "garaje",
+        "nave",
+        "terreno"
+      ],
+      "default": "piso"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "captacion",
+        "disponible",
+        "reservado",
+        "vendido",
+        "retirado"
+      ],
+      "default": "disponible"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "address": {
+      "type": "string",
+      "title": "Direcci\u00f3n"
+    },
+    "price": {
+      "type": "number",
+      "title": "Precio"
+    },
+    "surface": {
+      "type": "number",
+      "title": "Superficie construida (m\u00b2)"
+    },
+    "useful_surface": {
+      "type": "number",
+      "title": "Superficie \u00fatil (m\u00b2)"
+    },
+    "rooms": {
+      "type": "number",
+      "title": "Habitaciones"
+    },
+    "bathrooms": {
+      "type": "number",
+      "title": "Ba\u00f1os"
+    },
+    "floor": {
+      "type": "string",
+      "title": "Planta"
+    },
+    "year_built": {
+      "type": "number",
+      "title": "A\u00f1o de construcci\u00f3n"
+    },
+    "condition": {
+      "type": "string",
+      "title": "Estado de conservaci\u00f3n",
+      "enum": [
+        "nuevo",
+        "reformado",
+        "buen_estado",
+        "a_reformar"
+      ]
+    },
+    "energy_rating": {
+      "type": "string",
+      "title": "Certificado energ\u00e9tico",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "en_tramite"
+      ]
+    },
+    "features": {
+      "type": "array",
+      "title": "Extras",
+      "items": {
+        "type": "string"
+      }
+    },
+    "description": {
+      "type": "string",
+      "title": "Descripci\u00f3n"
+    },
+    "legal_status": {
+      "type": "string",
+      "title": "Situaci\u00f3n legal",
+      "enum": [
+        "nota_simple",
+        "escritura",
+        "en_tramite",
+        "herencia",
+        "proindiviso",
+        "otro"
+      ]
+    },
+    "legal_notes": {
+      "type": "string",
+      "title": "Notas legales"
+    },
+    "ibi_annual": {
+      "type": "number",
+      "title": "IBI anual"
+    },
+    "community_fees": {
+      "type": "number",
+      "title": "Comunidad mensual"
+    },
+    "commission_percent": {
+      "type": "number",
+      "title": "Honorarios (%)"
+    },
+    "commission_notes": {
+      "type": "string",
+      "title": "Condiciones de honorarios"
+    },
+    "exclusive": {
+      "type": "boolean",
+      "title": "En exclusiva",
+      "default": false
+    },
+    "owner_client_id": {
+      "type": "string",
+      "title": "Propietario (ficha de cliente)"
+    },
+    "owner_name": {
+      "type": "string",
+      "title": "Propietario"
+    },
+    "owner_phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono del propietario"
+    },
+    "photos": {
+      "type": "array",
+      "title": "Fotos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "videos": {
+      "type": "array",
+      "title": "V\u00eddeos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "floorplans": {
+      "type": "array",
+      "title": "Planos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "title": "Documentos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file_uri": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "published_portals": {
+      "type": "array",
+      "title": "Publicado en",
+      "items": {
+        "type": "string"
+      }
+    },
+    "published_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Fecha de publicaci\u00f3n"
+    },
+    "capture_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de captaci\u00f3n"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas internas"
+    }
+  },
+  "required": [
+    "title",
+    "operation",
+    "property_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

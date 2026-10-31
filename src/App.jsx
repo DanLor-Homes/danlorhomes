@@ -15,6 +15,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import Pipeline from '@/pages/Pipeline';
+import Properties from '@/pages/Properties';
 import Tasks from '@/pages/Tasks';
 import Clients from '@/pages/Clients';
 import CalendarPage from '@/pages/Calendar';
@@ -58,6 +59,7 @@ const AuthenticatedApp = () => {
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/pipeline" element={<Pipeline />} />
+          <Route path="/inmuebles" element={<Properties />} />
           <Route path="/portales" element={<Portales />} />
           <Route path="/tareas" element={<Tasks />} />
           <Route path="/clientes" element={<Clients />} />

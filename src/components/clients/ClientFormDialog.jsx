@@ -6,8 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Upload, X, Loader2, Paperclip } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
+import { PROPERTY_TYPES } from '@/lib/properties';
+import { cn } from '@/lib/utils';
 
 const EMPTY = {
   name: '',
@@ -21,6 +24,12 @@ const EMPTY = {
   geographic_zone: '',
   employees_count: '',
   daily_property_search: false,
+  operation_interest: 'venta',
+  property_types: [],
+  budget_min: '',
+  budget_max: '',
+  min_rooms: '',
+  search_zones: '',
 };
 
 export default function ClientFormDialog({ open, onOpenChange, client, onSaved }) {
@@ -33,10 +42,31 @@ export default function ClientFormDialog({ open, onOpenChange, client, onSaved }
   useEffect(() => {
     if (!open) return;
     setError('');
-    setForm(client ? { ...EMPTY, ...client, employees_count: client.employees_count ?? '' } : EMPTY);
+    setForm(
+      client
+        ? {
+            ...EMPTY,
+            ...client,
+            employees_count: client.employees_count ?? '',
+            budget_min: client.budget_min ?? '',
+            budget_max: client.budget_max ?? '',
+            min_rooms: client.min_rooms ?? '',
+            property_types: client.property_types || [],
+          }
+        : EMPTY
+    );
   }, [open, client]);
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+
+  const toggleType = (id) =>
+    setForm((prev) => {
+      const current = prev.property_types || [];
+      return {
+        ...prev,
+        property_types: current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+      };
+    });
 
   const handleUpload = async (event) => {
     const files = Array.from(event.target.files || []);
@@ -77,6 +107,12 @@ export default function ClientFormDialog({ open, onOpenChange, client, onSaved }
       geographic_zone: form.geographic_zone?.trim() || '',
       employees_count: Number(form.employees_count) || 0,
       daily_property_search: Boolean(form.daily_property_search),
+      operation_interest: form.operation_interest || 'venta',
+      property_types: form.property_types || [],
+      budget_min: Number(form.budget_min) || 0,
+      budget_max: Number(form.budget_max) || 0,
+      min_rooms: Number(form.min_rooms) || 0,
+      search_zones: form.search_zones?.trim() || '',
     };
     try {
       if (client?.id) {
@@ -147,6 +183,90 @@ export default function ClientFormDialog({ open, onOpenChange, client, onSaved }
           <div>
             <Label htmlFor="c-notes">Notas</Label>
             <Textarea id="c-notes" rows={3} value={form.notes} onChange={(e) => set('notes', e.target.value)} placeholder="Contexto, preferencias, historial…" />
+          </div>
+
+          <div className="rounded-xl border border-border/70 bg-muted/20 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Perfil de búsqueda</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Con estos datos el CRM cruza automáticamente los inmuebles que encajan.
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Busca</Label>
+                <Select value={form.operation_interest || 'venta'} onValueChange={(value) => set('operation_interest', value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="venta">Comprar</SelectItem>
+                    <SelectItem value="alquiler">Alquilar</SelectItem>
+                    <SelectItem value="ambas">Ambas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="c-zones">Zonas de interés</Label>
+                <Input
+                  id="c-zones"
+                  value={form.search_zones}
+                  onChange={(e) => set('search_zones', e.target.value)}
+                  placeholder="Estepona, Marbella"
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-budget-min">Presupuesto mínimo (€)</Label>
+                <Input
+                  id="c-budget-min"
+                  type="number"
+                  min="0"
+                  value={form.budget_min}
+                  onChange={(e) => set('budget_min', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-budget-max">Presupuesto máximo (€)</Label>
+                <Input
+                  id="c-budget-max"
+                  type="number"
+                  min="0"
+                  value={form.budget_max}
+                  onChange={(e) => set('budget_max', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="c-rooms">Habitaciones mínimas</Label>
+                <Input
+                  id="c-rooms"
+                  type="number"
+                  min="0"
+                  value={form.min_rooms}
+                  onChange={(e) => set('min_rooms', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="mt-3">
+              <Label>Tipos de inmueble</Label>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {PROPERTY_TYPES.map((type) => {
+                  const active = (form.property_types || []).includes(type.id);
+                  return (
+                    <button
+                      key={type.id}
+                      type="button"
+                      onClick={() => toggleType(type.id)}
+                      className={cn(
+                        'rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors',
+                        active
+                          ? 'border-primary bg-primary/15 text-primary'
+                          : 'border-border/70 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                      )}
+                    >
+                      {type.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <div>

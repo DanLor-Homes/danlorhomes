@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
+  Building2,
   LayoutDashboard,
   LayoutGrid,
   Globe,
@@ -25,6 +26,7 @@ import AssistantPanel from '@/components/agent/AssistantPanel';
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
+  { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
   { to: '/portales', label: 'Portales', icon: Globe },
   { to: '/tareas', label: 'Tareas', icon: ListChecks },
   { to: '/clientes', label: 'Clientes', icon: Users },

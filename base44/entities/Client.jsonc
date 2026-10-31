@@ -58,6 +58,39 @@
       "type": "boolean",
       "title": "B\u00fasqueda diaria de inmuebles en venta o alquiler",
       "default": false
+    },
+    "operation_interest": {
+      "type": "string",
+      "title": "Busca",
+      "enum": [
+        "venta",
+        "alquiler",
+        "ambas"
+      ],
+      "default": "venta"
+    },
+    "property_types": {
+      "type": "array",
+      "title": "Tipos de inmueble buscados",
+      "items": {
+        "type": "string"
+      }
+    },
+    "budget_min": {
+      "type": "number",
+      "title": "Presupuesto m\u00ednimo"
+    },
+    "budget_max": {
+      "type": "number",
+      "title": "Presupuesto m\u00e1ximo"
+    },
+    "min_rooms": {
+      "type": "number",
+      "title": "Habitaciones m\u00ednimas"
+    },
+    "search_zones": {
+      "type": "string",
+      "title": "Zonas de inter\u00e9s"
     }
   },
   "required": [

@@ -117,6 +117,25 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
               </div>
             )}
 
+            {(client.budget_max || client.search_zones || client.property_types?.length > 0) && (
+              <div>
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Perfil de búsqueda
+                </p>
+                <p className="rounded-xl border border-border/70 bg-card px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                  {client.operation_interest === 'alquiler'
+                    ? 'Alquiler'
+                    : client.operation_interest === 'ambas'
+                      ? 'Compra o alquiler'
+                      : 'Compra'}
+                  {client.budget_max ? ` · hasta ${formatCurrency(client.budget_max)}` : ''}
+                  {client.search_zones ? ` · ${client.search_zones}` : ''}
+                  {client.property_types?.length ? ` · ${client.property_types.join(', ')}` : ''}
+                  {client.min_rooms ? ` · ${client.min_rooms}+ hab.` : ''}
+                </p>
+              </div>
+            )}
+
             {client.attachments?.length > 0 && (
               <div>
                 <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Adjuntos</p>
