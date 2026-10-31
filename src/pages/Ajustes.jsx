@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CalendarDays, Check, Loader2, LogOut, Mail, Moon, Sparkles, Sun } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
+import AssignmentRules from '@/components/settings/AssignmentRules';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { STAGES, STATUS_LABELS } from '@/lib/crm';
@@ -162,6 +163,8 @@ export default function Ajustes() {
             </div>
           ))}
         </section>
+
+        <AssignmentRules />
 
         <section className="card-surface p-5">
           <div className="flex items-start justify-between gap-3">

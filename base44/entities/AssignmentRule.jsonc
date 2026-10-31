@@ -1,0 +1,86 @@
+{
+  "name": "AssignmentRule",
+  "type": "object",
+  "properties": {
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "assignee": {
+      "type": "string",
+      "title": "Responsable"
+    },
+    "priority": {
+      "type": "number",
+      "title": "Prioridad",
+      "default": 0
+    },
+    "active": {
+      "type": "boolean",
+      "title": "Activa",
+      "default": true
+    }
+  },
+  "required": [
+    "zone",
+    "assignee"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

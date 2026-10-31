@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -13,13 +13,16 @@ import {
   Phone,
   Plus,
   StickyNote,
+  UserCheck,
   Users,
   Loader2,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import StageBadge from '@/components/crm/StageBadge';
+import LeadScoreBadge from '@/components/clients/LeadScoreBadge';
 import InteractionDialog from '@/components/interactions/InteractionDialog';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/crm';
+import { scoreLead } from '@/lib/leadScoring';
 
 const TYPE_ICONS = {
   llamada: Phone,
@@ -51,6 +54,17 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
   useEffect(() => {
     if (open && client?.id) load();
   }, [open, client?.id, load]);
+
+  const scoring = useMemo(() => {
+    const openOpportunities = opportunities.filter((op) => op.status === 'open');
+    return scoreLead({
+      client,
+      interactionCount: interactions.length,
+      lastInteraction: interactions[0]?.date || null,
+      openValue: openOpportunities.reduce((total, op) => total + (Number(op.amount) || 0), 0),
+      openCount: openOpportunities.length,
+    });
+  }, [client, interactions, opportunities]);
 
   const openAttachment = async (file) => {
     const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({
@@ -106,6 +120,36 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
                   {client.daily_property_search ? ' · Búsqueda diaria activa' : ''}
                 </span>
               </div>
+              <div className="flex items-center gap-2.5">
+                <UserCheck className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <span className="truncate">{client.assigned_to || 'Sin responsable asignado'}</span>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Score del lead
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">Contacto, perfil, actividad y pipeline.</p>
+                </div>
+                <LeadScoreBadge score={scoring.score} showLabel className="px-2 py-1 text-[11px]" />
+              </div>
+              {scoring.items.length === 0 ? (
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Aún sin datos: completa el contacto y el perfil de búsqueda.
+                </p>
+              ) : (
+                <ul className="mt-2 space-y-1">
+                  {scoring.items.map((item) => (
+                    <li key={item.label} className="flex items-center justify-between gap-2 text-[11px]">
+                      <span className="text-muted-foreground">{item.label}</span>
+                      <span className="font-semibold tabular-nums">+{item.points}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {client.notes && (

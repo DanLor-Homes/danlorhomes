@@ -91,6 +91,10 @@
     "search_zones": {
       "type": "string",
       "title": "Zonas de inter\u00e9s"
+    },
+    "assigned_to": {
+      "type": "string",
+      "title": "Responsable asignado"
     }
   },
   "required": [

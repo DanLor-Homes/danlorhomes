@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { PROPERTY_TYPES } from '@/lib/properties';
+import { ruleForZone } from '@/lib/assignment';
 import { cn } from '@/lib/utils';
 
 const EMPTY = {
@@ -30,14 +31,21 @@ const EMPTY = {
   budget_max: '',
   min_rooms: '',
   search_zones: '',
+  assigned_to: '',
 };
 
 export default function ClientFormDialog({ open, onOpenChange, client, onSaved }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [rules, setRules] = useState([]);
   const [error, setError] = useState('');
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!open) return;
+    base44.entities.AssignmentRule.list({ sort: 'zone', limit: 100 }).then((res) => setRules(res.items || []));
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -113,7 +121,14 @@ export default function ClientFormDialog({ open, onOpenChange, client, onSaved }
       budget_max: Number(form.budget_max) || 0,
       min_rooms: Number(form.min_rooms) || 0,
       search_zones: form.search_zones?.trim() || '',
+      assigned_to: form.assigned_to?.trim() || '',
     };
+
+    if (!payload.assigned_to) {
+      const rule = ruleForZone(payload.geographic_zone, rules);
+      if (rule) payload.assigned_to = rule.assignee;
+    }
+
     try {
       if (client?.id) {
         await base44.entities.Client.update(client.id, payload);
@@ -170,6 +185,15 @@ export default function ClientFormDialog({ open, onOpenChange, client, onSaved }
             <div>
               <Label htmlFor="c-employees">Número de empleados</Label>
               <Input id="c-employees" type="number" min="0" value={form.employees_count} onChange={(e) => set('employees_count', e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="c-assignee">Responsable asignado</Label>
+              <Input
+                id="c-assignee"
+                value={form.assigned_to}
+                onChange={(e) => set('assigned_to', e.target.value)}
+                placeholder={ruleForZone(form.geographic_zone, rules)?.assignee || 'Se asigna por zona'}
+              />
             </div>
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-muted/30 px-3 py-2.5">
               <div>
