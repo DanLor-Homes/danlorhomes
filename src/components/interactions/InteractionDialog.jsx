@@ -49,6 +49,9 @@ export default function InteractionDialog({ open, onOpenChange, clients = [], de
         content: form.content.trim(),
         source: 'manual',
       });
+      if (form.type === 'visita') {
+        base44.analytics.track({ eventName: 'property_visit_logged' });
+      }
       toast({ title: 'Interacción registrada' });
       onOpenChange(false);
       onSaved?.();

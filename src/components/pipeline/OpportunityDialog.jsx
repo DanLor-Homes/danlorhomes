@@ -81,8 +81,12 @@ export default function OpportunityDialog({ open, onOpenChange, opportunity, cli
     try {
       if (opportunity?.id) {
         await base44.entities.Opportunity.update(opportunity.id, payload);
+        if (payload.status === 'won' && opportunity.status !== 'won') {
+          base44.analytics.track({ eventName: 'opportunity_won' });
+        }
       } else {
         await base44.entities.Opportunity.create({ ...payload, archived: false });
+        base44.analytics.track({ eventName: 'opportunity_created' });
       }
       toast({ title: opportunity?.id ? 'Oportunidad actualizada' : 'Oportunidad creada' });
       onOpenChange(false);

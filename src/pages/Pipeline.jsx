@@ -79,6 +79,9 @@ export default function Pipeline() {
         status: statusForStage(stage),
         stage_changed_date: new Date().toISOString(),
       });
+      if (statusForStage(stage) === 'won') {
+        base44.analytics.track({ eventName: 'opportunity_won' });
+      }
     } catch (error) {
       setOpportunities(previous);
     }
