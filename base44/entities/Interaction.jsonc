@@ -27,6 +27,21 @@
       "type": "string",
       "title": "Contenido"
     },
+    "property_id": {
+      "type": "string",
+      "title": "Inmueble visitado"
+    },
+    "result": {
+      "type": "string",
+      "title": "Resultado de la visita",
+      "enum": [
+        "pendiente",
+        "interesado",
+        "dudoso",
+        "no_interesado"
+      ],
+      "default": "pendiente"
+    },
     "external_id": {
       "type": "string",
       "title": "ID externo"

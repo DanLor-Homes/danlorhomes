@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { INTERACTION_TYPES, toInputDate } from '@/lib/crm';
+import { VISIT_RESULTS } from '@/lib/visits';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function InteractionDialog({ open, onOpenChange, clients = [], defaultClientId, defaultDate, onSaved }) {
-  const [form, setForm] = useState({ client_id: '', type: 'llamada', date: '', content: '' });
+  const [form, setForm] = useState({ client_id: '', type: 'llamada', date: '', content: '', property_id: '', result: 'pendiente' });
+  const [properties, setProperties] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const { toast } = useToast();
@@ -24,7 +26,12 @@ export default function InteractionDialog({ open, onOpenChange, clients = [], de
       type: 'llamada',
       date: toInputDate(defaultDate || new Date().toISOString()),
       content: '',
+      property_id: '',
+      result: 'pendiente',
     });
+    base44.entities.Property.filter({}, { sort: '-created_date', limit: 300 }).then((res) =>
+      setProperties(res.items || [])
+    );
   }, [open, defaultClientId, defaultDate]);
 
   const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
@@ -48,6 +55,7 @@ export default function InteractionDialog({ open, onOpenChange, clients = [], de
         date: new Date(form.date).toISOString(),
         content: form.content.trim(),
         source: 'manual',
+        ...(form.type === 'visita' ? { property_id: form.property_id || '', result: form.result } : {}),
       });
       if (form.type === 'visita') {
         base44.analytics.track({ eventName: 'property_visit_logged' });
@@ -106,6 +114,41 @@ export default function InteractionDialog({ open, onOpenChange, clients = [], de
               <Input id="i-date" type="datetime-local" value={form.date} onChange={(e) => set('date', e.target.value)} />
             </div>
           </div>
+          {form.type === 'visita' && (
+            <div className="grid gap-3 rounded-xl border border-primary/25 bg-primary/5 p-3 sm:grid-cols-2">
+              <div>
+                <Label>Inmueble visitado</Label>
+                <Select value={form.property_id || 'none'} onValueChange={(v) => set('property_id', v === 'none' ? '' : v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona inmueble" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sin inmueble</SelectItem>
+                    {properties.map((property) => (
+                      <SelectItem key={property.id} value={property.id}>
+                        {property.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Resultado de la visita</Label>
+                <Select value={form.result} onValueChange={(v) => set('result', v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VISIT_RESULTS.map((result) => (
+                      <SelectItem key={result.id} value={result.id}>
+                        {result.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
           <div>
             <Label htmlFor="i-content">Contenido</Label>
             <Textarea id="i-content" rows={4} value={form.content} onChange={(e) => set('content', e.target.value)} placeholder="Resumen de la conversación, acuerdos…" />

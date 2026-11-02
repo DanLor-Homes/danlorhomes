@@ -23,6 +23,8 @@ import LeadScoreBadge from '@/components/clients/LeadScoreBadge';
 import InteractionDialog from '@/components/interactions/InteractionDialog';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/crm';
 import { scoreLead } from '@/lib/leadScoring';
+import { VISIT_RESULT_CLASSES, visitResultLabel } from '@/lib/visits';
+import { cn } from '@/lib/utils';
 
 const TYPE_ICONS = {
   llamada: Phone,
@@ -251,6 +253,16 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
                           <Icon className="h-2.5 w-2.5 text-primary" />
                         </span>
                         <p className="text-[11px] text-muted-foreground">{formatDateTime(item.date)}</p>
+                        {item.type === 'visita' && item.result && (
+                          <span
+                            className={cn(
+                              'mt-0.5 inline-block rounded-full border px-1.5 py-0.5 text-[10px] font-medium',
+                              VISIT_RESULT_CLASSES[item.result] || VISIT_RESULT_CLASSES.pendiente
+                            )}
+                          >
+                            {visitResultLabel(item.result)}
+                          </span>
+                        )}
                         <p className="whitespace-pre-wrap text-sm leading-snug">{item.content}</p>
                       </li>
                     );

@@ -159,6 +159,27 @@
       "title": "En exclusiva",
       "default": false
     },
+    "mandate_type": {
+      "type": "string",
+      "title": "Tipo de mandato",
+      "enum": [
+        "sin_mandato",
+        "abierta",
+        "compartida",
+        "exclusiva"
+      ],
+      "default": "sin_mandato"
+    },
+    "mandate_start": {
+      "type": "string",
+      "format": "date",
+      "title": "Firma del mandato"
+    },
+    "mandate_end": {
+      "type": "string",
+      "format": "date",
+      "title": "Vencimiento del mandato"
+    },
     "owner_client_id": {
       "type": "string",
       "title": "Propietario (ficha de cliente)"

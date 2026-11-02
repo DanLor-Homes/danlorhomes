@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   Building2,
+  KeyRound,
   LayoutDashboard,
   LayoutGrid,
   Globe,
@@ -29,6 +30,7 @@ const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
   { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
+  { to: '/propietarios', label: 'Propietarios', icon: KeyRound },
   { to: '/portales', label: 'Portales', icon: Globe },
   { to: '/particulares', label: 'Particulares', icon: UserRound },
   { to: '/tareas', label: 'Tareas', icon: ListChecks },

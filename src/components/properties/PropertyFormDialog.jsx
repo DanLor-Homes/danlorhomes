@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -32,6 +31,7 @@ import {
   propertyStatusLabel,
   propertyTypeLabel,
 } from '@/lib/properties';
+import { MANDATE_TYPES } from '@/lib/mandates';
 import MediaUploader from './MediaUploader';
 import CatastroLookup from './CatastroLookup';
 
@@ -62,6 +62,9 @@ const EMPTY = {
   commission_percent: '',
   commission_notes: '',
   exclusive: false,
+  mandate_type: 'sin_mandato',
+  mandate_start: '',
+  mandate_end: '',
   owner_client_id: '',
   owner_name: '',
   owner_phone: '',
@@ -128,6 +131,9 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
         base[key] = property[key] ?? '';
       });
       base.capture_date = property.capture_date ? String(property.capture_date).slice(0, 10) : '';
+      base.mandate_start = property.mandate_start ? String(property.mandate_start).slice(0, 10) : '';
+      base.mandate_end = property.mandate_end ? String(property.mandate_end).slice(0, 10) : '';
+      if (!property.mandate_type && property.exclusive) base.mandate_type = 'exclusiva';
       setForm(base);
     } else {
       setForm(EMPTY);
@@ -191,6 +197,9 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
       owner_phone: form.owner_phone?.trim() || '',
       notes: form.notes?.trim() || '',
       energy_rating: form.energy_rating || undefined,
+      exclusive: form.mandate_type === 'exclusiva',
+      mandate_start: form.mandate_start || undefined,
+      mandate_end: form.mandate_end || undefined,
       capture_date: form.capture_date || undefined,
       published_portals: form.published_portals,
     };
@@ -425,12 +434,35 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
                 <Label htmlFor="p-legal-notes">Notas legales</Label>
                 <Textarea id="p-legal-notes" rows={2} value={form.legal_notes} onChange={(e) => set('legal_notes', e.target.value)} />
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-muted/30 px-3 py-2.5 sm:col-span-3">
-                <div>
-                  <p className="text-sm font-medium leading-tight">En exclusiva</p>
-                  <p className="text-[11px] text-muted-foreground">Encargo de venta firmado en exclusiva</p>
+              <div className="sm:col-span-3">
+                <Label>Mandato del propietario</Label>
+                <div className="mt-1.5 grid gap-3 sm:grid-cols-3">
+                  <Select value={form.mandate_type} onValueChange={(value) => set('mandate_type', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MANDATE_TYPES.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    type="date"
+                    value={form.mandate_start}
+                    onChange={(e) => set('mandate_start', e.target.value)}
+                    aria-label="Fecha de firma del mandato"
+                  />
+                  <Input
+                    type="date"
+                    value={form.mandate_end}
+                    onChange={(e) => set('mandate_end', e.target.value)}
+                    aria-label="Fecha de vencimiento del mandato"
+                  />
                 </div>
-                <Switch checked={Boolean(form.exclusive)} onCheckedChange={(value) => set('exclusive', value)} />
+                <p className="mt-1 text-[11px] text-muted-foreground">Firma y vencimiento del encargo. Avísate 30 días antes desde Propietarios.</p>
               </div>
             </div>
           </Section>

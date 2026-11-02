@@ -27,6 +27,8 @@ import {
   propertyTypeLabel,
 } from '@/lib/properties';
 import MatchList from './MatchList';
+import PropertyVisits from './PropertyVisits';
+import { mandateLabel, mandateStatus } from '@/lib/mandates';
 
 const ROW = 'flex items-center justify-between gap-3 py-1.5 text-sm';
 
@@ -229,6 +231,13 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
                 <span className="font-medium">{conditionLabel(property.condition)}</span>
               </div>
               <div className={ROW}>
+                <span className="text-muted-foreground">Mandato</span>
+                <span className="font-medium">
+                  {mandateLabel(mandateStatus(property).type)}
+                  {property.mandate_end ? ` · hasta ${formatDate(property.mandate_end)}` : ''}
+                </span>
+              </div>
+              <div className={ROW}>
                 <span className="text-muted-foreground">Honorarios</span>
                 <span className="font-medium">
                   {property.commission_percent ? `${property.commission_percent} %` : '—'}
@@ -259,6 +268,14 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
                 {property.legal_notes}
               </p>
             )}
+          </div>
+
+          <Separator />
+          <div>
+            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <MapPin className="h-3 w-3" /> Visitas registradas
+            </p>
+            <PropertyVisits propertyId={property.id} clients={clients} />
           </div>
 
           {(media.length > 0 || property.documents?.length > 0) && (

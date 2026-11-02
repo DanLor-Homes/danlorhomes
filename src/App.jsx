@@ -25,6 +25,7 @@ import Archive from '@/pages/Archive';
 import Ajustes from '@/pages/Ajustes';
 import Portales from '@/pages/Portales';
 import Particulares from '@/pages/Particulares';
+import Owners from '@/pages/Owners';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,6 +62,7 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/inmuebles" element={<Properties />} />
+          <Route path="/propietarios" element={<Owners />} />
           <Route path="/portales" element={<Portales />} />
           <Route path="/particulares" element={<Particulares />} />
           <Route path="/tareas" element={<Tasks />} />
