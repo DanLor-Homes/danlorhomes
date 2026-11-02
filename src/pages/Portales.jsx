@@ -225,7 +225,7 @@ export default function Portales() {
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-heading text-sm font-bold">Búsquedas de portales</h2>
           <p className="text-[11px] text-muted-foreground">
-            Programa «portalMonitor» en Workflows para revisarlas cada día a primera hora.
+            Revisión automática cada día a las 07:00 (hora peninsular) · También puedes lanzarla con «Revisar ahora»
           </p>
         </div>
 

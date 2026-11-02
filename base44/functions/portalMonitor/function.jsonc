@@ -1,0 +1,22 @@
+{
+  "name": "portalMonitor",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "name": "revision_diaria_portales",
+      "description": "Cada mañana revisa las búsquedas activas de portales de venta y alquiler y registra los inmuebles nuevos.",
+      "function_args": {
+        "run": "daily_review",
+        "token": "danlor-revision-diaria-7f3a"
+      },
+      "is_active": true,
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "06:00",
+      "ends_type": "never"
+    }
+  ]
+}

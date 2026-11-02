@@ -64,6 +64,7 @@ const LISTING_SCHEMA = {
 
 const MAX_SOURCES = 6;
 const MAX_LISTINGS = 12;
+const DAILY_REVIEW_TOKEN = 'danlor-revision-diaria-7f3a';
 
 const text = (value) => (typeof value === 'string' ? value.trim() : '');
 
@@ -116,10 +117,10 @@ function parseListings(result) {
   return Array.isArray(list) ? list : [];
 }
 
-async function scanSource(base44, source) {
+async function scanSource(base44, db, source) {
   const operation = source.operation === 'alquiler' ? 'alquiler' : 'venta';
 
-  const previous = await base44.entities.PortalListing.filter({ source_id: source.id }, { limit: 500 });
+  const previous = await db.entities.PortalListing.filter({ source_id: source.id }, { limit: 500 });
   const existing = new Set(
     (previous?.items || []).map((item) => dedupeKey(item.url, item.title, item.price))
   );
@@ -174,9 +175,9 @@ async function scanSource(base44, source) {
 
   const toCreate = records.slice(0, MAX_LISTINGS);
   if (toCreate.length) {
-    await base44.entities.PortalListing.bulkCreate(toCreate);
+    await db.entities.PortalListing.bulkCreate(toCreate);
   }
-  await base44.entities.PortalSource.update(source.id, {
+  await db.entities.PortalSource.update(source.id, {
     last_run: now,
     last_result_count: toCreate.length,
   });
@@ -187,21 +188,25 @@ async function scanSource(base44, source) {
 export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me().catch((error) => (error.status === 401 ? null : Promise.reject(error)));
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
-
     const body = await req.json().catch(() => ({}));
-    const sourceId = text(body?.source_id);
+    const user = await base44.auth.me().catch((error) => (error.status === 401 ? null : Promise.reject(error)));
+
+    const args = body?.args && typeof body.args === 'object' ? body.args : {};
+    const scheduled = !user && (args.token === DAILY_REVIEW_TOKEN || body?.token === DAILY_REVIEW_TOKEN);
+    if (!user && !scheduled) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const db = scheduled ? base44.asServiceRole : base44;
+    const sourceId = scheduled ? '' : text(body?.source_id || args.source_id);
 
     let sources = [];
     if (sourceId) {
-      const single = await base44.entities.PortalSource
+      const single = await db.entities.PortalSource
         .get(sourceId)
         .catch((error) => (error.status === 404 ? null : Promise.reject(error)));
       if (!single) return Response.json({ error: 'Búsqueda no encontrada' }, { status: 404 });
       sources = [single];
     } else {
-      const page = await base44.entities.PortalSource.filter(
+      const page = await db.entities.PortalSource.filter(
         { active: true },
         { sort: '-created_date', limit: MAX_SOURCES }
       );
@@ -212,7 +217,7 @@ export default async function (req) {
       return Response.json({ scanned: 0, created: 0, sources: [] });
     }
 
-    const results = await Promise.allSettled(sources.map((source) => scanSource(base44, source)));
+    const results = await Promise.allSettled(sources.map((source) => scanSource(base44, db, source)));
 
     const detail = results.map((result, index) => {
       const label = sources[index].label;
@@ -221,6 +226,7 @@ export default async function (req) {
     });
 
     return Response.json({
+      run: scheduled ? 'daily_review' : 'manual',
       scanned: sources.length,
       created: detail.reduce((total, item) => total + item.created, 0),
       sources: detail,
