@@ -11,6 +11,7 @@ import SourceDialog from '@/components/portals/SourceDialog';
 import ListingCard from '@/components/portals/ListingCard';
 import ContactDialog from '@/components/portals/ContactDialog';
 import { asArray } from '@/lib/portals';
+import { convertListingToClient, discardListing, markListingContacted } from '@/lib/listingActions';
 import { cn } from '@/lib/utils';
 
 const FILTERS = [
@@ -20,12 +21,6 @@ const FILTERS = [
   { id: 'descartado', label: 'Descartados' },
   { id: 'todos', label: 'Todos' },
 ];
-
-const isoInDays = (days) => {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
-};
 
 export default function Portales() {
   const { toast } = useToast();
@@ -97,16 +92,7 @@ export default function Portales() {
 
   const handleConvert = async (listing) => {
     try {
-      const fallbackName = `${listing.publisher_type === 'inmobiliaria' ? 'Inmobiliaria' : 'Particular'} ${listing.zone || ''}`.trim();
-      const client = await base44.entities.Client.create({
-        name: (listing.contact_name || fallbackName || listing.title).slice(0, 90),
-        email: listing.contact_email || '',
-        phone: listing.contact_phone || '',
-        web: listing.url || '',
-        geographic_zone: listing.zone || '',
-        notes: `Captado en ${listing.portal}: ${listing.title}${listing.price ? ` · ${listing.price} €` : ''}`,
-      });
-      await base44.entities.PortalListing.update(listing.id, { status: 'convertido', client_id: client.id });
+      await convertListingToClient(listing);
       toast({ title: 'Cliente creado', description: 'Ya está disponible en la ficha de clientes.' });
       await load();
     } catch (error) {
@@ -115,20 +101,13 @@ export default function Portales() {
   };
 
   const handleDiscard = async (listing) => {
-    await base44.entities.PortalListing.update(listing.id, { status: 'descartado' });
+    await discardListing(listing);
     await load();
   };
 
   const handleContacted = async (listing) => {
     try {
-      await base44.entities.PortalListing.update(listing.id, { status: 'contactado' });
-      await base44.entities.CommercialTask.create({
-        title: `Seguimiento del anuncio: ${listing.title}`.slice(0, 90),
-        due_date: isoInDays(3),
-        status: 'pendiente',
-        auto_generated: true,
-        assignee: user?.email || '',
-      });
+      await markListingContacted(listing, user?.email || '');
       toast({ title: 'Contacto registrado', description: 'Tienes una tarea de seguimiento en 3 días.' });
       setContactListing(null);
       await load();

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/crm';
 import { LISTING_STATUS, portalLabel } from '@/lib/portals';
 
-export default function ListingCard({ listing, onContact, onConvert, onDiscard }) {
+export default function ListingCard({ listing, publisherHint, onContact, onConvert, onDiscard }) {
   const status = LISTING_STATUS[listing.status] || LISTING_STATUS.nuevo;
   const meta = [
     listing.zone,
@@ -37,6 +37,7 @@ export default function ListingCard({ listing, onContact, onConvert, onDiscard }
       {listing.description && (
         <p className="mt-2 max-h-10 overflow-hidden text-xs text-muted-foreground">{listing.description}</p>
       )}
+      {publisherHint && <p className="mt-2 text-[10px] font-medium uppercase tracking-wide text-primary">{publisherHint}</p>}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
         {listing.contact_name && <span className="truncate">{listing.contact_name}</span>}

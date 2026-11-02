@@ -24,6 +24,7 @@ import Channels from '@/pages/Channels';
 import Archive from '@/pages/Archive';
 import Ajustes from '@/pages/Ajustes';
 import Portales from '@/pages/Portales';
+import Particulares from '@/pages/Particulares';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,6 +62,7 @@ const AuthenticatedApp = () => {
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/inmuebles" element={<Properties />} />
           <Route path="/portales" element={<Portales />} />
+          <Route path="/particulares" element={<Particulares />} />
           <Route path="/tareas" element={<Tasks />} />
           <Route path="/clientes" element={<Clients />} />
           <Route path="/calendario" element={<CalendarPage />} />
