@@ -10,6 +10,7 @@ import {
   Target,
   TrendingUp,
   CalendarClock,
+  KeyRound,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
@@ -25,19 +26,23 @@ import {
   formatDate,
   todayISO,
 } from '@/lib/crm';
+import { mandateLabel, mandateTypeOf } from '@/lib/mandates';
 
 export default function Dashboard() {
   const [opportunities, setOpportunities] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const [oppRes, taskRes] = await Promise.all([
+    const [oppRes, taskRes, propertyRes] = await Promise.all([
       base44.entities.Opportunity.filter({ archived: false }, { sort: '-updated_date', limit: 500 }),
       base44.entities.CommercialTask.filter({}, { sort: 'due_date', limit: 500 }),
+      base44.entities.Property.filter({}, { sort: 'mandate_end', limit: 500 }),
     ]);
     setOpportunities(oppRes.items || []);
     setTasks(taskRes.items || []);
+    setProperties(propertyRes.items || []);
     setLoading(false);
   }, []);
 
@@ -90,8 +95,14 @@ export default function Dashboard() {
 
     const overdue = tasks.filter((t) => t.status === 'pendiente' && t.due_date && t.due_date < todayISO());
 
-    return { staleQuotes, risky, overdue };
-  }, [opportunities, tasks]);
+    const mandatesThisWeek = properties
+      .filter((p) => p.mandate_end && mandateTypeOf(p) !== 'sin_mandato')
+      .map((p) => ({ ...p, days: daysUntil(p.mandate_end), mandato: mandateTypeOf(p) }))
+      .filter((p) => p.days !== null && p.days >= 0 && p.days <= 7)
+      .sort((a, b) => a.days - b.days);
+
+    return { staleQuotes, risky, overdue, mandatesThisWeek };
+  }, [opportunities, tasks, properties]);
 
   const maxStageValue = Math.max(...metrics.byStage.map((s) => s.value), 1);
   const upcomingTasks = tasks
@@ -198,12 +209,29 @@ export default function Dashboard() {
               <AlertTriangle className="h-4 w-4 text-amber-400" />
               <h3 className="font-heading text-sm font-bold">Avisos automáticos</h3>
             </div>
-            {alerts.staleQuotes.length + alerts.risky.length + alerts.overdue.length === 0 ? (
+            {alerts.staleQuotes.length + alerts.risky.length + alerts.overdue.length + alerts.mandatesThisWeek.length === 0 ? (
               <p className="rounded-xl border border-border/60 bg-muted/20 px-4 py-6 text-center text-xs text-muted-foreground">
-                Todo al día: sin presupuestos sin respuesta, cierres inminentes ni tareas vencidas.
+                Todo al día: sin mandatos por vencer, presupuestos sin respuesta, cierres inminentes ni tareas vencidas.
               </p>
             ) : (
               <div className="space-y-2">
+                {alerts.mandatesThisWeek.map((property) => (
+                  <Link
+                    key={`mandate-${property.id}`}
+                    to="/propietarios"
+                    className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2.5 transition-colors hover:border-amber-500/50"
+                  >
+                    <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{property.title}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {mandateLabel(property.mandato)} caduca el {formatDate(property.mandate_end)}
+                        {property.days === 0 ? ' · hoy' : ` · en ${property.days} ${property.days === 1 ? 'día' : 'días'}`}
+                        {property.owner_name ? ` · ${property.owner_name}` : ''}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
                 {alerts.staleQuotes.map((op) => (
                   <div key={`quote-${op.id}`} className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2.5">
                     <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
