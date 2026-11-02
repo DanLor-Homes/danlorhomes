@@ -9,6 +9,7 @@ import StatCard from '@/components/crm/StatCard';
 import EmptyState from '@/components/crm/EmptyState';
 import OwnerRow from '@/components/owners/OwnerRow';
 import MandateDialog from '@/components/owners/MandateDialog';
+import ExpiredMandatesSummary from '@/components/owners/ExpiredMandatesSummary';
 import { STATE_RANK, mandateStatus } from '@/lib/mandates';
 import { formatDate } from '@/lib/crm';
 import { cn } from '@/lib/utils';
@@ -66,6 +67,8 @@ export default function Owners() {
     [rows]
   );
 
+  const expiredRows = useMemo(() => rows.filter(({ status }) => status.state === 'caducado'), [rows]);
+
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
     return rows
@@ -112,19 +115,31 @@ export default function Owners() {
         <StatCard label="Sin mandato" value={counts.sinMandato} hint="Inmuebles sin nota de encargo" icon={ShieldAlert} tone="violet" />
       </div>
 
-      {(counts.porVencer > 0 || counts.caducados > 0) && (
-        <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 sm:flex-row sm:items-center">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+      {counts.caducados > 0 && (
+        <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-3.5 sm:flex-row sm:items-center">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-rose-400" />
           <p className="flex-1 text-sm">
-            {counts.porVencer > 0 && `${counts.porVencer} ${counts.porVencer === 1 ? 'mandato vence' : 'mandatos vencen'} en los próximos 30 días`}
-            {counts.porVencer > 0 && counts.caducados > 0 && ' y '}
-            {counts.caducados > 0 && `${counts.caducados} ${counts.caducados === 1 ? 'ya ha caducado' : 'ya han caducado'}`}. Renueva o cierra el encargo antes de perder al propietario.
+            {counts.caducados} {counts.caducados === 1 ? 'mandato ya ha caducado' : 'mandatos ya han caducado'} sin renovar. El inmueble puede seguir publicado pero sin encargo vigente: renueva o cierra la captación.
+          </p>
+          <Button size="sm" variant="outline" onClick={() => setFilter('caducadas')}>
+            Ver los caducados
+          </Button>
+        </div>
+      )}
+
+      {counts.porVencer > 0 && (
+        <div className="mt-2 flex flex-col gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 sm:flex-row sm:items-center">
+          <CalendarClock className="h-4 w-4 shrink-0 text-amber-400" />
+          <p className="flex-1 text-sm">
+            {counts.porVencer} {counts.porVencer === 1 ? 'mandato vence' : 'mandatos vencen'} en los próximos 30 días. Renueva antes de perder al propietario.
           </p>
           <Button size="sm" variant="outline" onClick={() => setFilter('por_vencer')}>
             Ver los que vencen
           </Button>
         </div>
       )}
+
+      <ExpiredMandatesSummary rows={expiredRows} />
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-1.5">

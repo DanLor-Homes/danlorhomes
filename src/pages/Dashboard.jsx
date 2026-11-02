@@ -10,7 +10,6 @@ import {
   Target,
   TrendingUp,
   CalendarClock,
-  KeyRound,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
@@ -26,7 +25,10 @@ import {
   formatDate,
   todayISO,
 } from '@/lib/crm';
-import { mandateLabel, mandateTypeOf } from '@/lib/mandates';
+import { mandateTypeOf } from '@/lib/mandates';
+import MandateAlertRow from '@/components/owners/MandateAlertRow';
+
+const MANDATE_ALERT_LIMIT = 4;
 
 export default function Dashboard() {
   const [opportunities, setOpportunities] = useState([]);
@@ -95,13 +97,17 @@ export default function Dashboard() {
 
     const overdue = tasks.filter((t) => t.status === 'pendiente' && t.due_date && t.due_date < todayISO());
 
-    const mandatesThisWeek = properties
+    const mandateRows = properties
       .filter((p) => p.mandate_end && mandateTypeOf(p) !== 'sin_mandato')
       .map((p) => ({ ...p, days: daysUntil(p.mandate_end), mandato: mandateTypeOf(p) }))
-      .filter((p) => p.days !== null && p.days >= 0 && p.days <= 7)
+      .filter((p) => p.days !== null);
+
+    const mandatesExpired = mandateRows.filter((p) => p.days < 0).sort((a, b) => a.days - b.days);
+    const mandatesThisWeek = mandateRows
+      .filter((p) => p.days >= 0 && p.days <= 7)
       .sort((a, b) => a.days - b.days);
 
-    return { staleQuotes, risky, overdue, mandatesThisWeek };
+    return { staleQuotes, risky, overdue, mandatesExpired, mandatesThisWeek };
   }, [opportunities, tasks, properties]);
 
   const maxStageValue = Math.max(...metrics.byStage.map((s) => s.value), 1);
@@ -209,29 +215,33 @@ export default function Dashboard() {
               <AlertTriangle className="h-4 w-4 text-amber-400" />
               <h3 className="font-heading text-sm font-bold">Avisos automáticos</h3>
             </div>
-            {alerts.staleQuotes.length + alerts.risky.length + alerts.overdue.length + alerts.mandatesThisWeek.length === 0 ? (
+            {alerts.staleQuotes.length +
+              alerts.risky.length +
+              alerts.overdue.length +
+              alerts.mandatesExpired.length +
+              alerts.mandatesThisWeek.length ===
+            0 ? (
               <p className="rounded-xl border border-border/60 bg-muted/20 px-4 py-6 text-center text-xs text-muted-foreground">
-                Todo al día: sin mandatos por vencer, presupuestos sin respuesta, cierres inminentes ni tareas vencidas.
+                Todo al día: sin mandatos caducados ni por vencer, presupuestos sin respuesta, cierres inminentes ni tareas vencidas.
               </p>
             ) : (
               <div className="space-y-2">
-                {alerts.mandatesThisWeek.map((property) => (
-                  <Link
-                    key={`mandate-${property.id}`}
-                    to="/propietarios"
-                    className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2.5 transition-colors hover:border-amber-500/50"
-                  >
-                    <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{property.title}</p>
-                      <p className="truncate text-[11px] text-muted-foreground">
-                        {mandateLabel(property.mandato)} caduca el {formatDate(property.mandate_end)}
-                        {property.days === 0 ? ' · hoy' : ` · en ${property.days} ${property.days === 1 ? 'día' : 'días'}`}
-                        {property.owner_name ? ` · ${property.owner_name}` : ''}
-                      </p>
-                    </div>
-                  </Link>
+                {alerts.mandatesExpired.slice(0, MANDATE_ALERT_LIMIT).map((property) => (
+                  <MandateAlertRow key={`expired-${property.id}`} property={property} />
                 ))}
+                {alerts.mandatesExpired.length > MANDATE_ALERT_LIMIT && (
+                  <p className="px-1 text-[11px] text-muted-foreground">
+                    y {alerts.mandatesExpired.length - MANDATE_ALERT_LIMIT} mandatos caducados más
+                  </p>
+                )}
+                {alerts.mandatesThisWeek.slice(0, MANDATE_ALERT_LIMIT).map((property) => (
+                  <MandateAlertRow key={`week-${property.id}`} property={property} />
+                ))}
+                {alerts.mandatesThisWeek.length > MANDATE_ALERT_LIMIT && (
+                  <p className="px-1 text-[11px] text-muted-foreground">
+                    y {alerts.mandatesThisWeek.length - MANDATE_ALERT_LIMIT} mandatos más que vencen esta semana
+                  </p>
+                )}
                 {alerts.staleQuotes.map((op) => (
                   <div key={`quote-${op.id}`} className="flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2.5">
                     <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
