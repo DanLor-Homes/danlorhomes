@@ -33,10 +33,12 @@ import {
   propertyTypeLabel,
 } from '@/lib/properties';
 import MediaUploader from './MediaUploader';
+import CatastroLookup from './CatastroLookup';
 
 const EMPTY = {
   title: '',
   reference: '',
+  cadastral_reference: '',
   operation: 'venta',
   property_type: 'piso',
   status: 'disponible',
@@ -150,6 +152,23 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
     }));
   };
 
+  const applyCatastro = (data) => {
+    setForm((prev) => ({
+      ...prev,
+      cadastral_reference: data.rc,
+      address: data.address || prev.address,
+      zone: prev.zone || data.municipality || '',
+      surface: data.surface ?? prev.surface,
+      year_built: data.yearBuilt ?? prev.year_built,
+      floor: data.floor || prev.floor,
+      property_type: data.propertyType || prev.property_type,
+    }));
+    toast({
+      title: 'Datos del Catastro aplicados',
+      description: [data.rc, data.use, data.surface ? `${data.surface} m²` : ''].filter(Boolean).join(' · '),
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!form.title.trim()) {
@@ -203,6 +222,8 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <CatastroLookup onApply={applyCatastro} />
+
           <Section title="Datos del inmueble">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
@@ -217,6 +238,16 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
               <div>
                 <Label htmlFor="p-ref">Referencia</Label>
                 <Input id="p-ref" value={form.reference} onChange={(e) => set('reference', e.target.value)} placeholder="DL-0142" />
+              </div>
+              <div>
+                <Label htmlFor="p-cadastral">Referencia catastral</Label>
+                <Input
+                  id="p-cadastral"
+                  value={form.cadastral_reference}
+                  onChange={(e) => set('cadastral_reference', e.target.value)}
+                  placeholder="Se rellena al consultar el Catastro"
+                  className="font-mono text-xs"
+                />
               </div>
               <div>
                 <Label>Operación</Label>

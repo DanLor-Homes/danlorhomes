@@ -10,6 +10,10 @@
       "type": "string",
       "title": "Referencia"
     },
+    "cadastral_reference": {
+      "type": "string",
+      "title": "Referencia catastral"
+    },
     "operation": {
       "type": "string",
       "title": "Operaci\u00f3n",

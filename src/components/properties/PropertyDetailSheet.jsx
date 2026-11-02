@@ -243,6 +243,10 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
                 </span>
               </div>
               <div className={ROW}>
+                <span className="text-muted-foreground">Ref. catastral</span>
+                <span className="truncate font-mono text-[11px] font-medium">{property.cadastral_reference || '—'}</span>
+              </div>
+              <div className={ROW}>
                 <span className="text-muted-foreground">Propietario</span>
                 <span className="truncate font-medium">
                   {property.owner_name || '—'}
