@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -25,8 +25,9 @@ import {
   formatDate,
   todayISO,
 } from '@/lib/crm';
-import { mandateTypeOf } from '@/lib/mandates';
+import { mandateStatus, mandateTypeOf } from '@/lib/mandates';
 import MandateAlertRow from '@/components/owners/MandateAlertRow';
+import MandatesSummary from '@/components/owners/MandatesSummary';
 
 const MANDATE_ALERT_LIMIT = 4;
 
@@ -35,6 +36,7 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const load = useCallback(async () => {
     const [oppRes, taskRes, propertyRes] = await Promise.all([
@@ -109,6 +111,20 @@ export default function Dashboard() {
 
     return { staleQuotes, risky, overdue, mandatesExpired, mandatesThisWeek };
   }, [opportunities, tasks, properties]);
+
+  const mandateRows = useMemo(
+    () => properties.map((property) => ({ property, status: mandateStatus(property) })),
+    [properties]
+  );
+
+  const openMandateGroup = (selection) => {
+    const params = new URLSearchParams({
+      grupo: selection.dimension,
+      clave: selection.key,
+      etiqueta: selection.label,
+    });
+    navigate(`/propietarios?${params.toString()}`);
+  };
 
   const maxStageValue = Math.max(...metrics.byStage.map((s) => s.value), 1);
   const upcomingTasks = tasks
@@ -274,6 +290,8 @@ export default function Dashboard() {
               </div>
             )}
           </section>
+
+          <MandatesSummary rows={mandateRows} title="Resumen de mandatos" onSelect={openMandateGroup} />
         </div>
 
         <section className="min-w-0 card-surface p-5">

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BadgeCheck, CalendarClock, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, BadgeCheck, CalendarClock, ShieldAlert, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { base44 } from '@/api/base44Client';
@@ -9,7 +9,7 @@ import StatCard from '@/components/crm/StatCard';
 import EmptyState from '@/components/crm/EmptyState';
 import OwnerRow from '@/components/owners/OwnerRow';
 import MandateDialog from '@/components/owners/MandateDialog';
-import ExpiredMandatesSummary from '@/components/owners/ExpiredMandatesSummary';
+import MandatesSummary from '@/components/owners/MandatesSummary';
 import { STATE_RANK, mandateStatus } from '@/lib/mandates';
 import { formatDate } from '@/lib/crm';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,21 @@ const FILTERS = [
   { id: 'caducadas', label: 'Caducados' },
   { id: 'sin_mandato', label: 'Sin mandato' },
 ];
+
+const matchesGroup = (property, group) => {
+  if (group.dimension === 'owner') return (property.owner_name || '') === group.key;
+  if (group.dimension === 'type') return (property.property_type || '') === group.key;
+  if (group.dimension === 'month') return String(property.mandate_end || '').slice(0, 7) === group.key;
+  return true;
+};
+
+const groupFromUrl = () => {
+  const params = new URLSearchParams(window.location.search);
+  const dimension = params.get('grupo');
+  const key = params.get('clave');
+  if (!dimension || key === null) return null;
+  return { dimension, key, label: params.get('etiqueta') || 'Propietarios' };
+};
 
 const nextYear = (value) => {
   const current = value ? new Date(value) : null;
@@ -35,6 +50,7 @@ export default function Owners() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('todos');
   const [search, setSearch] = useState('');
+  const [group, setGroup] = useState(groupFromUrl);
   const [editing, setEditing] = useState(null);
   const { toast } = useToast();
 
@@ -67,11 +83,17 @@ export default function Owners() {
     [rows]
   );
 
-  const expiredRows = useMemo(() => rows.filter(({ status }) => status.state === 'caducado'), [rows]);
+  const selectGroup = (next) => {
+    setGroup((current) =>
+      current && current.dimension === next.dimension && current.key === next.key ? null : next
+    );
+    setFilter('todos');
+  };
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
     return rows
+      .filter(({ property }) => !group || matchesGroup(property, group))
       .filter(({ status }) => {
         if (filter === 'exclusivas') return status.type === 'exclusiva' && status.state !== 'caducado';
         if (filter === 'por_vencer') return status.state === 'por_vencer';
@@ -86,7 +108,7 @@ export default function Owners() {
           .some((value) => String(value).toLowerCase().includes(term))
       )
       .sort((a, b) => STATE_RANK[a.status.state] - STATE_RANK[b.status.state] || (a.status.daysLeft ?? 9999) - (b.status.daysLeft ?? 9999));
-  }, [rows, filter, search]);
+  }, [rows, filter, search, group]);
 
   const renew = async (property) => {
     const type = property.mandate_type || (property.exclusive ? 'exclusiva' : 'abierta');
@@ -139,7 +161,9 @@ export default function Owners() {
         </div>
       )}
 
-      <ExpiredMandatesSummary rows={expiredRows} />
+      <div className="mt-3">
+        <MandatesSummary rows={rows} onSelect={selectGroup} selection={group} />
+      </div>
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-1.5">
@@ -158,6 +182,16 @@ export default function Owners() {
               {option.label}
             </button>
           ))}
+          {group && (
+            <button
+              type="button"
+              onClick={() => setGroup(null)}
+              className="flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2.5 py-1 text-[11px] font-medium text-primary"
+            >
+              {group.label}
+              <X className="h-3 w-3" />
+            </button>
+          )}
         </div>
         <Input
           value={search}
