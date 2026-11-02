@@ -1,13 +1,28 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 
 const OPEN_STAGES = ['nuevo_lead', 'reunion_agendada', 'visita', 'presupuesto', 'presupuesto_enviado'];
+const STAGE_LABELS = {
+  nuevo_lead: 'Nuevo lead',
+  reunion_agendada: 'Reunión agendada',
+  visita: 'Visita',
+  presupuesto: 'Presupuesto',
+  presupuesto_enviado: 'Presupuesto enviado',
+};
 const CLOSED_STATUSES = ['won', 'lost'];
 const DAY_MS = 86400000;
+const STALL_DAYS = 7;
+const CLOSING_SOON_DAYS = 3;
 
 function toTime(value) {
   if (!value) return null;
   const time = new Date(value).getTime();
   return Number.isNaN(time) ? null : time;
+}
+
+function taskKind(title) {
+  if (title.startsWith('Cierre previsto')) return 'cierre';
+  if (title.startsWith('Desbloquear')) return 'etapa';
+  return 'retomar';
 }
 
 export default async function (req) {
@@ -34,13 +49,18 @@ export default async function (req) {
       if (!current || time > current) lastInteractionByClient[interaction.client_id] = time;
     }
 
-    const autoTaskOpportunities = new Set(
-      pendingTasks.filter((task) => task.auto_generated && task.opportunity_id).map((task) => task.opportunity_id)
-    );
+    const autoTaskKeys = new Set();
+    for (const task of pendingTasks) {
+      if (!task.auto_generated || !task.opportunity_id) continue;
+      autoTaskKeys.add(`${task.opportunity_id}:${taskKind(task.title || '')}`);
+    }
 
     const now = Date.now();
+    const today = new Date(now).toISOString().slice(0, 10);
     const tasksToCreate = [];
     const interactionUpdates = [];
+    let closingSoon = 0;
+    let stalled = 0;
 
     for (const opportunity of opportunities) {
       const lastInteraction = lastInteractionByClient[opportunity.client_id] || null;
@@ -50,11 +70,45 @@ export default async function (req) {
 
       if (!OPEN_STAGES.includes(opportunity.stage)) continue;
 
+      const closingTime = toTime(opportunity.expected_closing_date);
+      const remainingDays = closingTime === null ? null : Math.ceil((closingTime - now) / DAY_MS);
+      if (remainingDays !== null && remainingDays < CLOSING_SOON_DAYS && !autoTaskKeys.has(`${opportunity.id}:cierre`)) {
+        closingSoon += 1;
+        tasksToCreate.push({
+          title: `Cierre previsto: ${opportunity.name}`,
+          due_date: opportunity.expected_closing_date,
+          status: 'pendiente',
+          opportunity_id: opportunity.id,
+          assignee: user.email || '',
+          auto_generated: true,
+        });
+        autoTaskKeys.add(`${opportunity.id}:cierre`);
+      }
+
+      const stageAnchor = toTime(opportunity.stage_changed_date) || toTime(opportunity.created_date) || now;
+      const stageDays = Math.floor((now - stageAnchor) / DAY_MS);
+
+      if (stageDays >= STALL_DAYS) {
+        if (!autoTaskKeys.has(`${opportunity.id}:etapa`)) {
+          stalled += 1;
+          tasksToCreate.push({
+            title: `Desbloquear ${opportunity.name}: ${stageDays} días en ${STAGE_LABELS[opportunity.stage] || 'la etapa actual'}`,
+            due_date: today,
+            status: 'pendiente',
+            opportunity_id: opportunity.id,
+            assignee: user.email || '',
+            auto_generated: true,
+          });
+          autoTaskKeys.add(`${opportunity.id}:etapa`);
+        }
+        continue;
+      }
+
       const reference =
         lastInteraction || toTime(opportunity.stage_changed_date) || toTime(opportunity.created_date) || now;
       const idleDays = Math.floor((now - reference) / DAY_MS);
 
-      if (idleDays >= 7 && !autoTaskOpportunities.has(opportunity.id)) {
+      if (idleDays >= 7 && !autoTaskKeys.has(`${opportunity.id}:retomar`)) {
         tasksToCreate.push({
           title: `Retomar contacto con ${opportunity.name}`,
           due_date: new Date(now + 2 * DAY_MS).toISOString().slice(0, 10),
@@ -63,7 +117,7 @@ export default async function (req) {
           assignee: user.email || '',
           auto_generated: true,
         });
-        autoTaskOpportunities.add(opportunity.id);
+        autoTaskKeys.add(`${opportunity.id}:retomar`);
       }
     }
 
@@ -93,6 +147,8 @@ export default async function (req) {
     return Response.json({
       checked: opportunities.length,
       tasksCreated: tasksToCreate.length,
+      closingSoon,
+      stalled,
       archived: toArchive.length,
     });
   } catch (error) {

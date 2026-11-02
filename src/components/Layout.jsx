@@ -22,6 +22,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import AssistantPanel from '@/components/agent/AssistantPanel';
+import NotificationsBell from '@/components/notifications/NotificationsBell';
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -156,6 +157,7 @@ export default function Layout() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            <NotificationsBell />
             <Button
               variant="ghost"
               size="icon"

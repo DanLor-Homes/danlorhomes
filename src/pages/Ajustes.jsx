@@ -14,12 +14,16 @@ const AUTOMATIONS = [
     description: 'Si una oportunidad abierta lleva 7 días sin interacción con el cliente, se genera una tarea de seguimiento.',
   },
   {
-    title: 'Alerta de presupuesto sin respuesta',
-    description: 'En el dashboard se avisa cuando una oportunidad en «Presupuesto enviado» supera 5 días sin respuesta.',
+    title: 'Aviso de etapa estancada',
+    description: 'Si una oportunidad abierta lleva 7 días en la misma etapa, aparece en la campana de avisos y se genera una tarea para desbloquearla.',
   },
   {
-    title: 'Riesgo de cierre',
-    description: 'Se marca con aviso toda oportunidad cuya fecha de cierre estimada está a menos de 3 días.',
+    title: 'Aviso de cierre inminente',
+    description: 'Las oportunidades con fecha de cierre a menos de 3 días aparecen en la campana y generan una tarea con la fecha de cierre.',
+  },
+  {
+    title: 'Alerta de presupuesto sin respuesta',
+    description: 'En el dashboard se avisa cuando una oportunidad en «Presupuesto enviado» supera 5 días sin respuesta.',
   },
   {
     title: 'Archivado a los 30 días',
