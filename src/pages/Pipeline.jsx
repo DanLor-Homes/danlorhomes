@@ -152,7 +152,7 @@ export default function Pipeline() {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`min-h-[140px] flex-1 space-y-2 rounded-2xl border border-dashed p-2 transition-colors ${
+                        className={`min-h-[140px] max-h-[calc(100vh-19rem)] flex-1 space-y-2 overflow-y-auto rounded-2xl border border-dashed p-2 transition-colors ${
                           snapshot.isDraggingOver ? 'border-primary/60 bg-primary/5' : 'border-border/60 bg-muted/20'
                         }`}
                       >
