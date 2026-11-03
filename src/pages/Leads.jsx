@@ -17,7 +17,11 @@ import { scoreLead, SCORE_BANDS } from '@/lib/leadScoring';
 const FILTERS = [
   { id: 'todos', label: 'Todos' },
   ...SCORE_BANDS.map((band) => ({ id: band.id, label: band.label })),
+  { id: 'stale', label: 'Calientes sin contacto' },
 ];
+
+const isStaleHot = (lead) =>
+  lead.band.id === 'hot' && (!lead.last || (daysSince(lead.last) ?? 999) > 30);
 
 export default function Leads() {
   const [clients, setClients] = useState([]);
@@ -94,14 +98,17 @@ export default function Leads() {
       stalled: leads.filter(
         (lead) => lead.band.id !== 'cold' && (!lead.last || (daysSince(lead.last) ?? 999) > 30)
       ).length,
+      stale: leads.filter(isStaleHot).length,
     }),
     [leads]
   );
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return leads.filter(({ client, band }) => {
-      if (filter !== 'todos' && band.id !== filter) return false;
+    return leads.filter((lead) => {
+      if (filter === 'stale' && !isStaleHot(lead)) return false;
+      if (filter !== 'todos' && filter !== 'stale' && lead.band.id !== filter) return false;
+      const { client } = lead;
       if (!term) return true;
       return [client.name, client.email, client.geographic_zone, client.search_zones, client.assigned_to]
         .filter(Boolean)
