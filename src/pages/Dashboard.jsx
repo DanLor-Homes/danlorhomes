@@ -28,6 +28,8 @@ import {
 import { mandateStatus, mandateTypeOf } from '@/lib/mandates';
 import MandateAlertRow from '@/components/owners/MandateAlertRow';
 import MandatesSummary from '@/components/owners/MandatesSummary';
+import HotStaleLeads from '@/components/leads/HotStaleLeads';
+import { scoreLead } from '@/lib/leadScoring';
 
 const MANDATE_ALERT_LIMIT = 4;
 
@@ -35,18 +37,30 @@ export default function Dashboard() {
   const [opportunities, setOpportunities] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [properties, setProperties] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [activity, setActivity] = useState({});
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const load = useCallback(async () => {
-    const [oppRes, taskRes, propertyRes] = await Promise.all([
+    const [oppRes, taskRes, propertyRes, clientRes, interactionAgg] = await Promise.all([
       base44.entities.Opportunity.filter({ archived: false }, { sort: '-updated_date', limit: 500 }),
       base44.entities.CommercialTask.filter({}, { sort: 'due_date', limit: 500 }),
       base44.entities.Property.filter({}, { sort: 'mandate_end', limit: 500 }),
+      base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
+      base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }),
     ]);
+
+    const activityMap = {};
+    (interactionAgg.rows || []).forEach((row) => {
+      activityMap[row.client_id] = { count: row.count || 0, last: row.max_date || row.date_max || null };
+    });
+
     setOpportunities(oppRes.items || []);
     setTasks(taskRes.items || []);
     setProperties(propertyRes.items || []);
+    setClients(clientRes.items || []);
+    setActivity(activityMap);
     setLoading(false);
   }, []);
 
@@ -116,6 +130,35 @@ export default function Dashboard() {
     () => properties.map((property) => ({ property, status: mandateStatus(property) })),
     [properties]
   );
+
+  const hotLeads = useMemo(() => {
+    const openByClient = {};
+    opportunities
+      .filter((o) => o.status === 'open')
+      .forEach((o) => {
+        const entry = openByClient[o.client_id] || { count: 0, value: 0 };
+        entry.count += 1;
+        entry.value += Number(o.amount) || 0;
+        openByClient[o.client_id] = entry;
+      });
+
+    return clients
+      .map((client) => {
+        const act = activity[client.id] || {};
+        const opp = openByClient[client.id] || {};
+        const lead = scoreLead({
+          client,
+          interactionCount: act.count || 0,
+          lastInteraction: act.last || null,
+          openValue: opp.value || 0,
+          openCount: opp.count || 0,
+        });
+        return { client, ...lead, days: daysSince(act.last) };
+      })
+      .filter((lead) => lead.band.id === 'hot' && (lead.days === null || lead.days > 30))
+      .sort((a, b) => (b.days ?? 9999) - (a.days ?? 9999))
+      .slice(0, 4);
+  }, [clients, activity, opportunities]);
 
   const openMandateGroup = (selection) => {
     const params = new URLSearchParams({
@@ -290,6 +333,8 @@ export default function Dashboard() {
               </div>
             )}
           </section>
+
+          <HotStaleLeads leads={hotLeads} />
 
           <MandatesSummary rows={mandateRows} title="Resumen de mandatos" onSelect={openMandateGroup} />
         </div>
