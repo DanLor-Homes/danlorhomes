@@ -15,6 +15,7 @@ import PageHeader from '@/components/crm/PageHeader';
 import StatCard from '@/components/crm/StatCard';
 import { Loader2, Percent, Target, Trophy } from 'lucide-react';
 import { CHANNELS, CHANNEL_LABELS, STAGES, formatCurrency } from '@/lib/crm';
+import MonthlyOutcomeChart from '@/components/reports/MonthlyOutcomeChart';
 
 const tooltipStyle = {
   background: 'hsl(var(--popover))',
@@ -115,6 +116,8 @@ export default function Reports() {
           tone="violet"
         />
       </div>
+
+      <MonthlyOutcomeChart opportunities={opportunities} channelSlugById={channelSlugById} />
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="card-surface p-5">
