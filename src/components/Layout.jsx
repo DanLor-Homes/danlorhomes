@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import AssistantPanel from '@/components/agent/AssistantPanel';
 import NotificationsBell from '@/components/notifications/NotificationsBell';
 import QuickLeadDialog from '@/components/leads/QuickLeadDialog';
+import brandLogo from '@/assets/danlor-logo.webp';
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -49,9 +50,11 @@ const NAV = [
 function Brand() {
   return (
     <Link to="/" className="flex items-center gap-3 px-2 py-1">
-      <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-sm font-bold tracking-tight text-primary-foreground shadow-lg shadow-primary/25">
-        DL
-      </span>
+      <img
+        src={brandLogo}
+        alt="DAN&LOR"
+        className="h-10 w-10 shrink-0 rounded-xl object-contain shadow-lg shadow-primary/20"
+      />
       <span className="leading-tight">
         <span className="block font-heading text-[15px] font-extrabold tracking-tight">DAN&amp;LOR</span>
         <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
