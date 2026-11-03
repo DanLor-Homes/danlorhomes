@@ -16,11 +16,13 @@ import {
   UserCheck,
   Users,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import StageBadge from '@/components/crm/StageBadge';
 import LeadScoreBadge from '@/components/clients/LeadScoreBadge';
 import InteractionDialog from '@/components/interactions/InteractionDialog';
+import MessageDraftDialog from '@/components/clients/MessageDraftDialog';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/crm';
 import { scoreLead } from '@/lib/leadScoring';
 import { VISIT_RESULT_CLASSES, visitResultLabel } from '@/lib/visits';
@@ -40,6 +42,7 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [interactionOpen, setInteractionOpen] = useState(false);
+  const [draftOpen, setDraftOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!client?.id) return;
@@ -88,9 +91,14 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
                 <SheetTitle className="truncate font-heading text-xl">{client.name}</SheetTitle>
                 <SheetDescription>{client.geographic_zone || 'Sin zona asignada'}</SheetDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={() => onEdit?.(client)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
-              </Button>
+              <div className="flex shrink-0 items-center gap-1.5">
+                <Button variant="outline" size="sm" onClick={() => setDraftOpen(true)}>
+                  <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Borrador IA
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => onEdit?.(client)}>
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
+                </Button>
+              </div>
             </div>
           </SheetHeader>
 
@@ -284,6 +292,8 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
           onChanged?.();
         }}
       />
+
+      <MessageDraftDialog client={client} open={draftOpen} onOpenChange={setDraftOpen} />
     </>
   );
 }
