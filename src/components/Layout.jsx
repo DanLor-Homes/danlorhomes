@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   Building2,
+  Flame,
   KeyRound,
   LayoutDashboard,
   LayoutGrid,
@@ -35,6 +36,7 @@ const NAV = [
   { to: '/particulares', label: 'Particulares', icon: UserRound },
   { to: '/tareas', label: 'Tareas', icon: ListChecks },
   { to: '/clientes', label: 'Clientes', icon: Users },
+  { to: '/leads', label: 'Leads', icon: Flame },
   { to: '/calendario', label: 'Calendario', icon: CalendarDays },
   { to: '/informes', label: 'Informes', icon: BarChart3 },
   { to: '/canales', label: 'Canales', icon: Megaphone },

@@ -18,6 +18,7 @@ import Pipeline from '@/pages/Pipeline';
 import Properties from '@/pages/Properties';
 import Tasks from '@/pages/Tasks';
 import Clients from '@/pages/Clients';
+import Leads from '@/pages/Leads';
 import CalendarPage from '@/pages/Calendar';
 import Reports from '@/pages/Reports';
 import Channels from '@/pages/Channels';
@@ -67,6 +68,7 @@ const AuthenticatedApp = () => {
           <Route path="/particulares" element={<Particulares />} />
           <Route path="/tareas" element={<Tasks />} />
           <Route path="/clientes" element={<Clients />} />
+          <Route path="/leads" element={<Leads />} />
           <Route path="/calendario" element={<CalendarPage />} />
           <Route path="/informes" element={<Reports />} />
           <Route path="/canales" element={<Channels />} />
