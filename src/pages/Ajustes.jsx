@@ -129,7 +129,7 @@ export default function Ajustes() {
           <div className="mt-4 rounded-xl border border-border/70 bg-muted/20 p-3 text-xs">
             <p className="font-medium">Identidad visual</p>
             <p className="mt-1 text-muted-foreground">
-              Azul corporativo <span className="font-mono text-foreground">#1c71b7</span> · Inter y Plus Jakarta Sans
+              Verde bosque <span className="font-mono text-foreground">#2D6A4F</span> · Playfair Display y Plus Jakarta Sans
             </p>
           </div>
         </section>
