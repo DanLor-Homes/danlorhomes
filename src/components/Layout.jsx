@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Globe,
   UserRound,
+  UserPlus,
   ListChecks,
   Users,
   CalendarDays,
@@ -26,6 +27,7 @@ import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import AssistantPanel from '@/components/agent/AssistantPanel';
 import NotificationsBell from '@/components/notifications/NotificationsBell';
+import QuickLeadDialog from '@/components/leads/QuickLeadDialog';
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -101,6 +103,7 @@ export default function Layout() {
   const [dark, setDark] = useState(() => (localStorage.getItem('danlor-theme') || 'dark') === 'dark');
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
+  const [leadOpen, setLeadOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -163,6 +166,22 @@ export default function Layout() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            <Button
+              size="sm"
+              className="hidden gap-1.5 rounded-full sm:inline-flex"
+              onClick={() => setLeadOpen(true)}
+            >
+              <UserPlus className="h-4 w-4" /> Nuevo lead
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="rounded-full sm:hidden"
+              onClick={() => setLeadOpen(true)}
+              aria-label="Nuevo lead"
+            >
+              <UserPlus className="h-[18px] w-[18px]" />
+            </Button>
             <NotificationsBell />
             <Button
               variant="ghost"
@@ -183,6 +202,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      <QuickLeadDialog open={leadOpen} onOpenChange={setLeadOpen} />
       <AssistantPanel />
     </div>
   );
