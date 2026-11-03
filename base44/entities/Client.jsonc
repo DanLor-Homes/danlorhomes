@@ -15,6 +15,27 @@
       "type": "string",
       "title": "Tel\u00e9fono"
     },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "nuevo",
+        "contactado",
+        "en_seguimiento",
+        "visita",
+        "cliente",
+        "descartado"
+      ],
+      "enumColors": [
+        "gray",
+        "blue",
+        "yellow",
+        "purple",
+        "green",
+        "red"
+      ],
+      "default": "nuevo"
+    },
     "web": {
       "type": "string",
       "title": "Web"

@@ -18,18 +18,21 @@ const FILTERS = [
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
   const [opportunities, setOpportunities] = useState([]);
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pendiente');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
   const load = useCallback(async () => {
-    const [taskRes, oppRes] = await Promise.all([
+    const [taskRes, oppRes, clientRes] = await Promise.all([
       base44.entities.CommercialTask.filter({}, { sort: 'due_date', limit: 500 }),
       base44.entities.Opportunity.filter({ archived: false }, { sort: '-updated_date', limit: 500 }),
+      base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
     ]);
     setTasks(taskRes.items || []);
     setOpportunities(oppRes.items || []);
+    setClients(clientRes.items || []);
     setLoading(false);
   }, []);
 
@@ -40,6 +43,11 @@ export default function Tasks() {
   const oppMap = useMemo(
     () => opportunities.reduce((acc, op) => ({ ...acc, [op.id]: op.name }), {}),
     [opportunities]
+  );
+
+  const clientMap = useMemo(
+    () => clients.reduce((acc, client) => ({ ...acc, [client.id]: client.name }), {}),
+    [clients]
   );
 
   const visible = useMemo(() => {
@@ -140,6 +148,7 @@ export default function Tasks() {
                       {formatDate(task.due_date)}
                     </span>
                     {task.opportunity_id && <span>· {oppMap[task.opportunity_id] || 'Oportunidad'}</span>}
+                    {task.client_id && <span>· {clientMap[task.client_id] || 'Cliente'}</span>}
                     {task.assignee && <span>· {task.assignee}</span>}
                     {task.auto_generated && (
                       <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">Auto</span>

@@ -18,11 +18,19 @@
         "pendiente",
         "completada"
       ],
+      "enumColors": [
+        "yellow",
+        "green"
+      ],
       "default": "pendiente"
     },
     "opportunity_id": {
       "type": "string",
       "title": "Oportunidad asociada"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Cliente asociado"
     },
     "assignee": {
       "type": "string",

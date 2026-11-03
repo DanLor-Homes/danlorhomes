@@ -8,6 +8,10 @@ import ClientDetailSheet from '@/components/clients/ClientDetailSheet';
 import LeadScoreBadge from '@/components/clients/LeadScoreBadge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import BulkClientBar from '@/components/clients/BulkClientBar';
+import BulkTaskDialog from '@/components/clients/BulkTaskDialog';
+import BulkEmailDialog from '@/components/clients/BulkEmailDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
@@ -22,6 +26,8 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { ruleForZone } from '@/lib/assignment';
 import { scoreLead } from '@/lib/leadScoring';
+import { statusMeta } from '@/lib/clientStatus';
+import { cn } from '@/lib/utils';
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
@@ -37,6 +43,10 @@ export default function Clients() {
   const [selected, setSelected] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [toDelete, setToDelete] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkTaskOpen, setBulkTaskOpen] = useState(false);
+  const [bulkEmailOpen, setBulkEmailOpen] = useState(false);
+  const [applyingStatus, setApplyingStatus] = useState(false);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
@@ -153,6 +163,34 @@ export default function Clients() {
     toast({ title: 'Cliente eliminado' });
   };
 
+  const selectedClients = useMemo(
+    () => clients.filter((client) => selectedIds.includes(client.id)),
+    [clients, selectedIds]
+  );
+
+  const toggleSelect = (id) =>
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+
+  const allVisibleSelected = visible.length > 0 && visible.every((client) => selectedIds.includes(client.id));
+
+  const toggleSelectAll = () => setSelectedIds(allVisibleSelected ? [] : visible.map((client) => client.id));
+
+  const applyStatus = async (status) => {
+    if (selectedIds.length === 0) return;
+    setApplyingStatus(true);
+    try {
+      await base44.entities.Client.bulkUpdate(selectedIds.map((id) => ({ id, status })));
+      setClients((list) => list.map((client) => (selectedIds.includes(client.id) ? { ...client, status } : client)));
+      toast({
+        title: 'Estado actualizado',
+        description: `${selectedIds.length} clientes marcados como ${statusMeta(status).label.toLowerCase()}`,
+      });
+      setSelectedIds([]);
+    } finally {
+      setApplyingStatus(false);
+    }
+  };
+
   const unassigned = clients.filter((client) => !client.assigned_to).length;
 
   return (
@@ -199,6 +237,17 @@ export default function Clients() {
         </Button>
       </PageHeader>
 
+      {selectedIds.length > 0 && (
+        <BulkClientBar
+          count={selectedIds.length}
+          busy={applyingStatus}
+          onStatusChange={applyStatus}
+          onAssignTask={() => setBulkTaskOpen(true)}
+          onSendEmail={() => setBulkEmailOpen(true)}
+          onClear={() => setSelectedIds([])}
+        />
+      )}
+
       {loading ? (
         <div className="flex h-[40vh] items-center justify-center">
           <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
@@ -222,7 +271,8 @@ export default function Clients() {
         />
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border/70 bg-card">
-          <div className="hidden grid-cols-[1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+          <div className="hidden grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+            <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} aria-label="Seleccionar todos" />
             <span>Cliente</span>
             <span>Contacto</span>
             <span>Zona</span>
@@ -234,10 +284,27 @@ export default function Clients() {
             <div
               key={client.id}
               onClick={() => openDetail(client)}
-              className="group grid cursor-pointer grid-cols-1 gap-1 border-b border-border/50 px-4 py-3 transition-colors last:border-0 hover:bg-accent/40 md:grid-cols-[1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] md:items-center md:gap-4"
+              className="group grid cursor-pointer grid-cols-1 gap-1 border-b border-border/50 px-4 py-3 transition-colors last:border-0 hover:bg-accent/40 md:grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] md:items-center md:gap-4"
             >
+              <div onClick={(event) => event.stopPropagation()} className="flex items-center">
+                <Checkbox
+                  checked={selectedIds.includes(client.id)}
+                  onCheckedChange={() => toggleSelect(client.id)}
+                  aria-label={`Seleccionar ${client.name}`}
+                />
+              </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{client.name}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate text-sm font-medium">{client.name}</p>
+                  <span
+                    className={cn(
+                      'shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium',
+                      statusMeta(client.status).className
+                    )}
+                  >
+                    {statusMeta(client.status).label}
+                  </span>
+                </div>
                 <p className="truncate text-[11px] text-muted-foreground">{client.email || 'Sin email'}</p>
               </div>
               <div className="min-w-0 text-xs text-muted-foreground">
@@ -287,6 +354,21 @@ export default function Clients() {
       )}
 
       <ClientFormDialog open={formOpen} onOpenChange={setFormOpen} client={editing} onSaved={load} />
+
+      <BulkTaskDialog
+        open={bulkTaskOpen}
+        onOpenChange={setBulkTaskOpen}
+        clients={selectedClients}
+        onDone={() => setSelectedIds([])}
+      />
+
+      <BulkEmailDialog
+        open={bulkEmailOpen}
+        onOpenChange={setBulkEmailOpen}
+        clientIds={selectedIds}
+        clients={selectedClients}
+        onDone={() => setSelectedIds([])}
+      />
 
       <ClientDetailSheet
         client={selected}
