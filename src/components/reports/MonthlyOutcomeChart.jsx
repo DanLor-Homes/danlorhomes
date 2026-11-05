@@ -5,13 +5,13 @@ import { CHANNELS } from '@/lib/crm';
 const MONTHS_BACK = 12;
 
 const CHANNEL_COLORS = {
-  web: '#2D6A4F',
-  referido: '#40916C',
-  linkedin: '#52B788',
-  whatsapp: '#74C69D',
-  campana_email: '#95D5B2',
-  publicidad: '#B7E4C7',
-  sin_origen: '#A3B1AA',
+  web: '#0052CC',
+  referido: '#14b8a6',
+  linkedin: '#0ea5e9',
+  whatsapp: '#22c55e',
+  campana_email: '#8b5cf6',
+  publicidad: '#f59e0b',
+  sin_origen: '#94a3b8',
 };
 
 const SERIES = [
