@@ -49,14 +49,18 @@ export default function AgentChat() {
     let active = true;
     let conversationId = null;
 
-    startConversation(false).then((id) => {
-      conversationId = id;
-      if (!active) return;
-      unsubscribe = base44.agents.subscribeToConversation(id, (data) => {
-        setMessages(data.messages || []);
-        setConversation((prev) => (prev ? { ...prev, messages: data.messages || [] } : prev));
+    startConversation(false)
+      .then((id) => {
+        conversationId = id;
+        if (!active) return;
+        unsubscribe = base44.agents.subscribeToConversation(id, (data) => {
+          setMessages(data.messages || []);
+          setConversation((prev) => (prev ? { ...prev, messages: data.messages || [] } : prev));
+        });
+      })
+      .catch(() => {
+        if (active) setError('No se ha podido iniciar la conversación. Inténtalo de nuevo en unos minutos.');
       });
-    });
 
     return () => {
       active = false;

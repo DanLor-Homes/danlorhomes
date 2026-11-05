@@ -19,7 +19,6 @@ import {
   Menu,
   Moon,
   Sun,
-  LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -29,6 +28,7 @@ import AssistantPanel from '@/components/agent/AssistantPanel';
 import NotificationsBell from '@/components/notifications/NotificationsBell';
 import QuickLeadDialog from '@/components/leads/QuickLeadDialog';
 import brandLogo from '@/assets/danlor-logo.webp';
+import SessionCard from '@/components/SessionCard';
 
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -135,15 +135,8 @@ export default function Layout() {
           </p>
           <NavItems />
         </div>
-        <div className="mt-4 rounded-xl border border-border/60 bg-background/40 p-3">
-          <p className="text-[11px] font-medium text-muted-foreground">Sesión</p>
-          <p className="truncate text-sm font-medium">{user?.full_name || user?.email || 'Cargando…'}</p>
-          <button
-            onClick={() => base44.auth.logout('/login')}
-            className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <LogOut className="h-3 w-3" /> Cerrar sesión
-          </button>
+        <div className="mt-4">
+          <SessionCard user={user} />
         </div>
       </aside>
 
@@ -160,6 +153,9 @@ export default function Layout() {
                 <Brand />
                 <div className="mt-8">
                   <NavItems onNavigate={() => setOpen(false)} />
+                  <div className="mt-6">
+                    <SessionCard user={user} />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
