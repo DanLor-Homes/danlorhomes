@@ -187,7 +187,7 @@ export default function Dashboard() {
     <div>
       <PageHeader
         eyebrow="Resumen comercial"
-        title="Dashboard"
+        title="Panel de control"
         description="Estado del embudo, rendimiento del equipo y avisos automáticos de seguimiento."
       >
         <Button asChild variant="outline">
