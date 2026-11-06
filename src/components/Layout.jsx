@@ -52,11 +52,11 @@ function Brand() {
     <Link to="/" className="flex items-center gap-3 px-2 py-1">
       <img
         src={brandLogo}
-        alt="DAN&LOR"
+        alt="DAN&LOR HOMES"
         className="h-10 w-10 shrink-0 rounded-xl object-contain shadow-lg shadow-primary/20"
       />
       <span className="leading-tight">
-        <span className="block font-heading text-[15px] font-extrabold tracking-tight">DAN&amp;LOR</span>
+        <span className="block font-heading text-[15px] font-extrabold tracking-tight">DAN&amp;LOR HOMES</span>
         <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
           Servicios inmobiliarios
         </span>
@@ -160,7 +160,7 @@ export default function Layout() {
               </SheetContent>
             </Sheet>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">DAN&amp;LOR</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">DAN&amp;LOR HOMES</p>
               <h2 className="font-heading text-base font-semibold leading-tight">{current?.label || 'Dashboard'}</h2>
             </div>
           </div>
