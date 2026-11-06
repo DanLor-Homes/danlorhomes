@@ -11,6 +11,7 @@ import {
   MapPin,
   Maximize,
   Pencil,
+  Printer,
   TrendingUp,
   Zap,
 } from 'lucide-react';
@@ -110,9 +111,18 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
                 {operationLabel(property.operation)}
               </SheetDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={() => onEdit?.(property)}>
-              <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
-            </Button>
+            <div className="flex shrink-0 gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/inmuebles/${property.id}/ficha`, '_blank')}
+              >
+                <Printer className="mr-1.5 h-3.5 w-3.5" /> Ficha
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => onEdit?.(property)}>
+                <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
+              </Button>
+            </div>
           </div>
         </SheetHeader>
 

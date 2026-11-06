@@ -8,6 +8,10 @@ const PORTAL_LABELS = {
   milanuncios: 'Milanuncios',
   kyero: 'Kyero',
   think_spain: 'ThinkSpain',
+  yaencontre: 'Yaencontre',
+  enalquiler: 'Enalquiler',
+  tucasa: 'Tucasa',
+  spainhouses: 'Spainhouses',
   otro: 'el portal indicado',
 };
 
@@ -19,6 +23,10 @@ const PORTAL_DOMAINS = {
   milanuncios: 'milanuncios.com',
   kyero: 'kyero.com',
   think_spain: 'thinkspain.com',
+  yaencontre: 'yaencontre.com',
+  enalquiler: 'enalquiler.com',
+  tucasa: 'tucasa.com',
+  spainhouses: 'spainhouses.net',
 };
 
 const PROPERTY_LABELS = {

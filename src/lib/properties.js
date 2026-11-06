@@ -64,6 +64,10 @@ export const PORTALS = [
   { id: 'milanuncios', label: 'Milanuncios' },
   { id: 'kyero', label: 'Kyero' },
   { id: 'think_spain', label: 'Think Spain' },
+  { id: 'yaencontre', label: 'Yaencontre' },
+  { id: 'enalquiler', label: 'Enalquiler' },
+  { id: 'tucasa', label: 'Tucasa' },
+  { id: 'spainhouses', label: 'Spainhouses' },
   { id: 'web_propia', label: 'Web propia' },
 ];
 
@@ -84,6 +88,10 @@ export const propertyStatusLabel = (id) => STATUS_LABELS[id] || '—';
 export const conditionLabel = (id) => CONDITION_LABELS[id] || '—';
 export const legalStatusLabel = (id) => LEGAL_LABELS[id] || '—';
 export const portalLabel = (id) => PORTAL_LABELS[id] || id;
+export const energyLabel = (id) => {
+  if (!id) return '—';
+  return id === 'en_tramite' ? 'En trámite' : String(id).toUpperCase();
+};
 
 export const operationLabel = (id) => (id === 'alquiler' ? 'Alquiler' : 'Venta');
 

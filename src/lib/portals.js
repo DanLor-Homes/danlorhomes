@@ -6,6 +6,10 @@ export const PORTALS = [
   { id: 'milanuncios', label: 'Milanuncios', url: 'https://www.milanuncios.com' },
   { id: 'kyero', label: 'Kyero', url: 'https://www.kyero.com' },
   { id: 'think_spain', label: 'ThinkSpain', url: 'https://www.thinkspain.com' },
+  { id: 'yaencontre', label: 'Yaencontre', url: 'https://www.yaencontre.com' },
+  { id: 'enalquiler', label: 'Enalquiler', url: 'https://www.enalquiler.com' },
+  { id: 'tucasa', label: 'Tucasa', url: 'https://www.tucasa.com' },
+  { id: 'spainhouses', label: 'Spainhouses', url: 'https://www.spainhouses.net' },
   { id: 'otro', label: 'Otro portal', url: '' },
 ];
 

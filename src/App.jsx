@@ -28,6 +28,9 @@ import Portales from '@/pages/Portales';
 import Particulares from '@/pages/Particulares';
 import Owners from '@/pages/Owners';
 import Captacion from '@/pages/Captacion';
+import Contracts from '@/pages/Contracts';
+import PropertySheet from '@/pages/PropertySheet';
+import PropertyPanel from '@/pages/Panel';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,10 +64,13 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/captacion" element={<Captacion />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/panel" element={<PropertyPanel />} />
+        <Route path="/inmuebles/:id/ficha" element={<PropertySheet />} />
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/inmuebles" element={<Properties />} />
+          <Route path="/contratos" element={<Contracts />} />
           <Route path="/propietarios" element={<Owners />} />
           <Route path="/portales" element={<Portales />} />
           <Route path="/particulares" element={<Particulares />} />

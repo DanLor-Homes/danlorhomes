@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Building2, Loader2, Plus, Search, Trash2 } from 'lucide-react';
+import { Building2, Loader2, MonitorPlay, Plus, Search, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
 import EmptyState from '@/components/crm/EmptyState';
@@ -109,6 +109,9 @@ export default function Properties() {
             className="w-full pl-8 sm:w-56"
           />
         </div>
+        <Button variant="outline" onClick={() => window.open('/panel', '_blank')}>
+          <MonitorPlay className="mr-1.5 h-4 w-4" /> Panel LED
+        </Button>
         <Button
           onClick={() => {
             setEditing(null);

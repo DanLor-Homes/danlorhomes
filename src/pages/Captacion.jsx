@@ -1,6 +1,7 @@
 import React from 'react';
 import { Building2, Clock, ShieldCheck, Sparkles } from 'lucide-react';
 import LeadCaptureForm from '@/components/captacion/LeadCaptureForm';
+import MortgageCalculator from '@/components/public/MortgageCalculator';
 
 const BENEFITS = [
   { icon: Sparkles, title: 'Selección personalizada', text: 'Filtramos el mercado y te enviamos solo lo que encaja con tu búsqueda.' },
@@ -64,6 +65,10 @@ export default function Captacion() {
           </div>
         </main>
       </div>
+
+      <section className="mx-auto max-w-6xl px-5 pb-16 sm:px-8">
+        <MortgageCalculator />
+      </section>
 
       <footer className="border-t border-border/60 py-6 text-center text-[11px] text-muted-foreground">
         DAN&LOR · Gestión inmobiliaria · Tus datos se usan solo para responder a tu consulta.

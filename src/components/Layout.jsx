@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import {
   Building2,
+  FileSignature,
   Flame,
   KeyRound,
   LayoutDashboard,
@@ -34,6 +35,7 @@ const NAV = [
   { to: '/', label: 'Panel de control', icon: LayoutDashboard },
   { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
   { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
+  { to: '/contratos', label: 'Contratos', icon: FileSignature },
   { to: '/propietarios', label: 'Propietarios', icon: KeyRound },
   { to: '/portales', label: 'Portales', icon: Globe },
   { to: '/particulares', label: 'Particulares', icon: UserRound },
@@ -127,7 +129,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-sidebar-border bg-sidebar px-4 py-6 lg:flex print:hidden">
         <Brand />
         <div className="mt-8 flex-1 overflow-y-auto">
           <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
@@ -140,8 +142,8 @@ export default function Layout() {
         </div>
       </aside>
 
-      <div className="lg:pl-[264px]">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+      <div className="lg:pl-[264px] print:pl-0">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl sm:px-6 lg:px-8 print:hidden">
           <div className="flex items-center gap-3">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -197,7 +199,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8 print:max-w-none print:p-0">
           <Outlet />
         </main>
       </div>
