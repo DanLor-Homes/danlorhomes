@@ -43,6 +43,7 @@ const EMPTY = {
   property_type: 'piso',
   status: 'disponible',
   zone: '',
+  reference_zone: '',
   address: '',
   price: '',
   surface: '',
@@ -188,6 +189,7 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
       title: form.title.trim(),
       reference: form.reference?.trim() || '',
       zone: form.zone?.trim() || '',
+      reference_zone: form.reference_zone?.trim() || '',
       address: form.address?.trim() || '',
       floor: form.floor?.trim() || '',
       description: form.description?.trim() || '',
@@ -311,6 +313,15 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
               <div>
                 <Label htmlFor="p-zone">Zona</Label>
                 <Input id="p-zone" value={form.zone} onChange={(e) => set('zone', e.target.value)} placeholder="Estepona centro" />
+              </div>
+              <div>
+                <Label htmlFor="p-reference-zone">Zona de referencia</Label>
+                <Input
+                  id="p-reference-zone"
+                  value={form.reference_zone}
+                  onChange={(e) => set('reference_zone', e.target.value)}
+                  placeholder="Zona para comparar la tasación"
+                />
               </div>
               <div>
                 <Label htmlFor="p-address">Dirección</Label>
