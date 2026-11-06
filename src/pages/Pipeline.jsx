@@ -7,6 +7,16 @@ import PipelineCard from '@/components/pipeline/PipelineCard';
 import OpportunityDialog from '@/components/pipeline/OpportunityDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { CHANNEL_LABELS, STAGES, formatCurrency, probabilityForStage, statusForStage } from '@/lib/crm';
 
 export default function Pipeline() {
@@ -17,6 +27,7 @@ export default function Pipeline() {
   const [search, setSearch] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [toDelete, setToDelete] = useState(null);
 
   const load = useCallback(async () => {
     const [oppRes, clientRes, channelRes] = await Promise.all([
@@ -90,6 +101,13 @@ export default function Pipeline() {
   const openNew = () => {
     setEditing(null);
     setDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!toDelete) return;
+    await base44.entities.Opportunity.delete(toDelete.id);
+    setOpportunities((list) => list.filter((op) => op.id !== toDelete.id));
+    setToDelete(null);
   };
 
   return (
@@ -167,6 +185,7 @@ export default function Pipeline() {
                               setEditing(selected);
                               setDialogOpen(true);
                             }}
+                            onDelete={setToDelete}
                           />
                         ))}
                         {provided.placeholder}
@@ -188,6 +207,26 @@ export default function Pipeline() {
         channels={channels}
         onSaved={load}
       />
+
+      <AlertDialog open={Boolean(toDelete)} onOpenChange={(next) => !next && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar {toDelete?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminará esta oportunidad del pipeline. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

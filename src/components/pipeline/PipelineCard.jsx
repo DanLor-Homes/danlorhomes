@@ -1,10 +1,10 @@
 import React from 'react';
 import { Draggable } from '@hello-pangea/dnd';
-import { AlertTriangle, CalendarClock, User } from 'lucide-react';
+import { AlertTriangle, CalendarClock, Trash2, User } from 'lucide-react';
 import { daysUntil, formatCurrency, formatDate } from '@/lib/crm';
 import { cn } from '@/lib/utils';
 
-export default function PipelineCard({ opportunity, index, clientName, channelName, onClick }) {
+export default function PipelineCard({ opportunity, index, clientName, channelName, onClick, onDelete }) {
   const remaining = daysUntil(opportunity.expected_closing_date);
   const atRisk = opportunity.status === 'open' && remaining !== null && remaining >= 0 && remaining < 3;
 
@@ -17,13 +17,29 @@ export default function PipelineCard({ opportunity, index, clientName, channelNa
           {...provided.dragHandleProps}
           onClick={() => onClick?.(opportunity)}
           className={cn(
-            'cursor-grab rounded-xl border border-border/70 bg-card p-3 transition-all duration-200 hover:border-primary/40 active:cursor-grabbing',
+            'group relative cursor-grab rounded-xl border border-border/70 bg-card p-3 transition-all duration-200 hover:border-primary/40 active:cursor-grabbing',
             snapshot.isDragging && 'rotate-[1deg] border-primary/60 shadow-xl shadow-primary/10'
           )}
         >
           <div className="flex items-start justify-between gap-2">
             <p className="line-clamp-2 text-[13px] font-semibold leading-snug">{opportunity.name}</p>
-            {atRisk && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-400" />}
+            <div className="flex shrink-0 items-center gap-1">
+              {atRisk && <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-rose-400" />}
+              {onDelete && (
+                <button
+                  type="button"
+                  aria-label={`Eliminar ${opportunity.name}`}
+                  onMouseDown={(event) => event.stopPropagation()}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete(opportunity);
+                  }}
+                  className="rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
           <p className="mt-1 flex items-center gap-1 truncate text-[11px] text-muted-foreground">
             <User className="h-3 w-3" /> {clientName || 'Sin cliente'}
