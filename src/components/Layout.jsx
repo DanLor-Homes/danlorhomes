@@ -31,7 +31,7 @@ import brandLogo from '@/assets/danlor-logo.webp';
 import SessionCard from '@/components/SessionCard';
 
 const NAV = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/', label: 'Panel de control', icon: LayoutDashboard },
   { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
   { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
   { to: '/propietarios', label: 'Propietarios', icon: KeyRound },
