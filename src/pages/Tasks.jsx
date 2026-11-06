@@ -4,8 +4,10 @@ import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
 import EmptyState from '@/components/crm/EmptyState';
 import TaskDialog from '@/components/tasks/TaskDialog';
+import PriorityBadge from '@/components/tasks/PriorityBadge';
 import { Button } from '@/components/ui/button';
 import { formatDate, todayISO } from '@/lib/crm';
+import { sortByPriority, taskPriority } from '@/lib/taskPriority';
 import { cn } from '@/lib/utils';
 
 const FILTERS = [
@@ -45,6 +47,11 @@ export default function Tasks() {
     [opportunities]
   );
 
+  const oppById = useMemo(
+    () => opportunities.reduce((acc, op) => ({ ...acc, [op.id]: op }), {}),
+    [opportunities]
+  );
+
   const clientMap = useMemo(
     () => clients.reduce((acc, client) => ({ ...acc, [client.id]: client.name }), {}),
     [clients]
@@ -52,10 +59,18 @@ export default function Tasks() {
 
   const visible = useMemo(() => {
     const today = todayISO();
-    if (filter === 'hoy') return tasks.filter((t) => t.status === 'pendiente' && t.due_date && t.due_date <= today);
-    if (filter === 'todas') return tasks;
-    return tasks.filter((t) => t.status === filter);
-  }, [tasks, filter]);
+    const decorated = tasks.map((task) => ({
+      task,
+      priority: taskPriority(task, oppById[task.opportunity_id]),
+    }));
+    let list = decorated;
+    if (filter === 'hoy') {
+      list = decorated.filter(({ task }) => task.status === 'pendiente' && task.due_date && task.due_date <= today);
+    } else if (filter !== 'todas') {
+      list = decorated.filter(({ task }) => task.status === filter);
+    }
+    return sortByPriority(list);
+  }, [tasks, filter, oppById]);
 
   const toggle = async (task) => {
     const status = task.status === 'pendiente' ? 'completada' : 'pendiente';
@@ -128,20 +143,26 @@ export default function Tasks() {
         />
       ) : (
         <div className="space-y-2">
-          {visible.map((task) => {
+          {visible.map(({ task, priority }) => {
             const overdue = task.status === 'pendiente' && task.due_date && task.due_date < todayISO();
             return (
               <div
                 key={task.id}
-                className="group flex items-start gap-3 rounded-xl border border-border/70 bg-card p-3 transition-colors hover:border-primary/30"
+                className={cn(
+                  'group flex items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-primary/30',
+                  priority.level === 'urgente' ? 'border-rose-500/30' : 'border-border/70'
+                )}
               >
                 <button onClick={() => toggle(task)} className="mt-0.5 text-muted-foreground transition-colors hover:text-primary">
                   {task.status === 'pendiente' ? <Circle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5 text-emerald-400" />}
                 </button>
                 <div className="min-w-0 flex-1">
-                  <p className={cn('text-sm font-medium leading-snug', task.status === 'completada' && 'text-muted-foreground line-through')}>
-                    {task.title}
-                  </p>
+                  <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                    <PriorityBadge level={priority.level} />
+                    <p className={cn('text-sm font-medium leading-snug', task.status === 'completada' && 'text-muted-foreground line-through')}>
+                      {task.title}
+                    </p>
+                  </div>
                   <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground">
                     <span className={overdue ? 'text-rose-400' : ''}>
                       {overdue ? 'Vencida · ' : ''}
