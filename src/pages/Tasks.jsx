@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, Circle, ListChecks, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ListChecks, Loader2, Plus } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
 import EmptyState from '@/components/crm/EmptyState';
 import TaskDialog from '@/components/tasks/TaskDialog';
-import PriorityBadge from '@/components/tasks/PriorityBadge';
+import TaskRow from '@/components/tasks/TaskRow';
 import { Button } from '@/components/ui/button';
-import { formatDate, todayISO } from '@/lib/crm';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { todayISO } from '@/lib/crm';
 import { sortByPriority, taskPriority } from '@/lib/taskPriority';
+import { TASK_CATEGORIES } from '@/lib/taskCategory';
 import { cn } from '@/lib/utils';
 
 const FILTERS = [
@@ -23,6 +25,7 @@ export default function Tasks() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pendiente');
+  const [category, setCategory] = useState('todas');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
@@ -69,8 +72,23 @@ export default function Tasks() {
     } else if (filter !== 'todas') {
       list = decorated.filter(({ task }) => task.status === filter);
     }
+    if (category !== 'todas') {
+      list = list.filter(({ task }) => (task.category || 'seguimiento') === category);
+    }
     return sortByPriority(list);
-  }, [tasks, filter, oppById]);
+  }, [tasks, filter, category, oppById]);
+
+  const sections = useMemo(() => {
+    if (filter === 'completada' || filter === 'todas') {
+      return [{ id: 'todas', label: null, items: visible }];
+    }
+    const immediate = visible.filter(({ priority }) => priority.level === 'urgente' || priority.level === 'alta');
+    const routine = visible.filter(({ priority }) => priority.level !== 'urgente' && priority.level !== 'alta');
+    return [
+      { id: 'inmediata', label: 'Atención inmediata', tone: 'text-rose-500', items: immediate },
+      { id: 'rutinaria', label: 'Rutinarias', tone: 'text-muted-foreground', items: routine },
+    ].filter((section) => section.items.length > 0);
+  }, [visible, filter]);
 
   const toggle = async (task) => {
     const status = task.status === 'pendiente' ? 'completada' : 'pendiente';
@@ -120,6 +138,23 @@ export default function Tasks() {
         ))}
       </div>
 
+      <div className="mb-4 flex items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground">Categoría</span>
+        <Select value={category} onValueChange={setCategory}>
+          <SelectTrigger className="h-8 w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas las categorías</SelectItem>
+            {TASK_CATEGORIES.map((item) => (
+              <SelectItem key={item.id} value={item.id}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {loading ? (
         <div className="flex h-[40vh] items-center justify-center">
           <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
@@ -142,59 +177,36 @@ export default function Tasks() {
           }
         />
       ) : (
-        <div className="space-y-2">
-          {visible.map(({ task, priority }) => {
-            const overdue = task.status === 'pendiente' && task.due_date && task.due_date < todayISO();
-            return (
-              <div
-                key={task.id}
-                className={cn(
-                  'group flex items-start gap-3 rounded-xl border bg-card p-3 transition-colors hover:border-primary/30',
-                  priority.level === 'urgente' ? 'border-rose-500/30' : 'border-border/70'
-                )}
-              >
-                <button onClick={() => toggle(task)} className="mt-0.5 text-muted-foreground transition-colors hover:text-primary">
-                  {task.status === 'pendiente' ? <Circle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5 text-emerald-400" />}
-                </button>
-                <div className="min-w-0 flex-1">
-                  <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                    <PriorityBadge level={priority.level} />
-                    <p className={cn('text-sm font-medium leading-snug', task.status === 'completada' && 'text-muted-foreground line-through')}>
-                      {task.title}
-                    </p>
-                  </div>
-                  <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-muted-foreground">
-                    <span className={overdue ? 'text-rose-400' : ''}>
-                      {overdue ? 'Vencida · ' : ''}
-                      {formatDate(task.due_date)}
-                    </span>
-                    {task.opportunity_id && <span>· {oppMap[task.opportunity_id] || 'Oportunidad'}</span>}
-                    {task.client_id && <span>· {clientMap[task.client_id] || 'Cliente'}</span>}
-                    {task.assignee && <span>· {task.assignee}</span>}
-                    {task.auto_generated && (
-                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">Auto</span>
-                    )}
-                  </p>
+        <div className="space-y-5">
+          {sections.map((section) => (
+            <div key={section.id}>
+              {section.label && (
+                <div className="mb-2 flex items-center gap-2">
+                  <h3 className={cn('text-[11px] font-semibold uppercase tracking-[0.14em]', section.tone)}>{section.label}</h3>
+                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    {section.items.length}
+                  </span>
                 </div>
-                <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => {
+              )}
+              <div className="space-y-2">
+                {section.items.map(({ task, priority }) => (
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    priority={priority}
+                    opportunityName={oppMap[task.opportunity_id]}
+                    clientName={clientMap[task.client_id]}
+                    onToggle={() => toggle(task)}
+                    onEdit={() => {
                       setEditing(task);
                       setDialogOpen(true);
                     }}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(task)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
+                    onDelete={() => remove(task)}
+                  />
+                ))}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
 

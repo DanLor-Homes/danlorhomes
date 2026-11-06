@@ -24,6 +24,27 @@
       ],
       "default": "pendiente"
     },
+    "category": {
+      "type": "string",
+      "title": "Categor\u00eda",
+      "enum": [
+        "seguimiento",
+        "visita",
+        "negociacion",
+        "documentacion",
+        "administrativa",
+        "otro"
+      ],
+      "enumColors": [
+        "blue",
+        "purple",
+        "green",
+        "yellow",
+        "gray",
+        "gray"
+      ],
+      "default": "seguimiento"
+    },
     "opportunity_id": {
       "type": "string",
       "title": "Oportunidad asociada"

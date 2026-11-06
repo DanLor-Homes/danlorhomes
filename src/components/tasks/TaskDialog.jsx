@@ -7,10 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { todayISO } from '@/lib/crm';
+import { DEFAULT_CATEGORY, TASK_CATEGORIES } from '@/lib/taskCategory';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function TaskDialog({ open, onOpenChange, task, opportunities = [], onSaved }) {
-  const [form, setForm] = useState({ title: '', due_date: todayISO(), status: 'pendiente', opportunity_id: '', assignee: '' });
+  const [form, setForm] = useState({
+    title: '',
+    due_date: todayISO(),
+    status: 'pendiente',
+    category: DEFAULT_CATEGORY,
+    opportunity_id: '',
+    assignee: '',
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const { toast } = useToast();
@@ -24,10 +32,18 @@ export default function TaskDialog({ open, onOpenChange, task, opportunities = [
             title: task.title || '',
             due_date: task.due_date || todayISO(),
             status: task.status || 'pendiente',
+            category: task.category || DEFAULT_CATEGORY,
             opportunity_id: task.opportunity_id || '',
             assignee: task.assignee || '',
           }
-        : { title: '', due_date: todayISO(), status: 'pendiente', opportunity_id: '', assignee: '' }
+        : {
+            title: '',
+            due_date: todayISO(),
+            status: 'pendiente',
+            category: DEFAULT_CATEGORY,
+            opportunity_id: '',
+            assignee: '',
+          }
     );
   }, [open, task]);
 
@@ -45,6 +61,7 @@ export default function TaskDialog({ open, onOpenChange, task, opportunities = [
       title: form.title.trim(),
       due_date: form.due_date || todayISO(),
       status: form.status,
+      category: form.category || DEFAULT_CATEGORY,
       opportunity_id: form.opportunity_id || '',
       assignee: form.assignee?.trim() || '',
     };
@@ -89,6 +106,21 @@ export default function TaskDialog({ open, onOpenChange, task, opportunities = [
                 <SelectContent>
                   <SelectItem value="pendiente">Pendiente</SelectItem>
                   <SelectItem value="completada">Completada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Categoría</Label>
+              <Select value={form.category} onValueChange={(v) => set('category', v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TASK_CATEGORIES.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
