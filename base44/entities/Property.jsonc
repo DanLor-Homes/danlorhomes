@@ -55,6 +55,10 @@
       "type": "string",
       "title": "Zona"
     },
+    "reference_zone": {
+      "type": "string",
+      "title": "Zona de referencia (tasaci\u00f3n)"
+    },
     "address": {
       "type": "string",
       "title": "Direcci\u00f3n"
@@ -272,6 +276,19 @@
     "notes": {
       "type": "string",
       "title": "Notas internas"
+    },
+    "valuation_value": {
+      "type": "number",
+      "title": "Tasaci\u00f3n estimada"
+    },
+    "valuation_price_m2": {
+      "type": "number",
+      "title": "Tasaci\u00f3n \u20ac/m\u00b2"
+    },
+    "valuation_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de tasaci\u00f3n"
     }
   },
   "required": [

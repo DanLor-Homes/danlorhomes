@@ -119,6 +119,13 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
               >
                 <Printer className="mr-1.5 h-3.5 w-3.5" /> Ficha
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.assign(`/tasacion?inmueble=${property.id}`)}
+              >
+                <TrendingUp className="mr-1.5 h-3.5 w-3.5" /> Tasar
+              </Button>
               <Button variant="outline" size="sm" onClick={() => onEdit?.(property)}>
                 <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
               </Button>
