@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Building2, CalendarClock, Clock, Flame } from 'lucide-react';
+import { Bell, Building2, CalendarClock, Clock, Eraser, Flame } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -10,11 +10,21 @@ import { daysSince, formatCurrency, formatDate, stageLabel } from '@/lib/crm';
 import { scoreLead } from '@/lib/leadScoring';
 
 const HOT_STALE_DAYS = 30;
+const CLEARED_KEY = 'danlor_cleared_alerts';
+
+const readCleared = () => {
+  try {
+    return JSON.parse(localStorage.getItem(CLEARED_KEY) || '{}') || {};
+  } catch {
+    return {};
+  }
+};
 
 export default function NotificationsBell() {
   const [alerts, setAlerts] = useState({ stalled: [], closingSoon: [], total: 0 });
   const [listings, setListings] = useState([]);
   const [staleLeads, setStaleLeads] = useState([]);
+  const [cleared, setCleared] = useState(readCleared);
 
   useEffect(() => {
     let active = true;
@@ -74,7 +84,31 @@ export default function NotificationsBell() {
     };
   }, []);
 
-  const total = alerts.total + listings.length + staleLeads.length;
+  const visibleStaleLeads = staleLeads.filter(({ client }) => !cleared[`lead-${client.id}`]);
+  const visibleListings = listings.filter((listing) => !cleared[`listing-${listing.id}`]);
+  const visibleClosingSoon = alerts.closingSoon.filter(({ opportunity }) => !cleared[`close-${opportunity.id}`]);
+  const visibleStalled = alerts.stalled.filter(({ opportunity }) => !cleared[`stall-${opportunity.id}`]);
+
+  const total =
+    visibleStaleLeads.length + visibleListings.length + visibleClosingSoon.length + visibleStalled.length;
+
+  const clearAll = () => {
+    const next = { ...cleared };
+    staleLeads.forEach(({ client }) => {
+      next[`lead-${client.id}`] = true;
+    });
+    listings.forEach((listing) => {
+      next[`listing-${listing.id}`] = true;
+    });
+    alerts.closingSoon.forEach(({ opportunity }) => {
+      next[`close-${opportunity.id}`] = true;
+    });
+    alerts.stalled.forEach(({ opportunity }) => {
+      next[`stall-${opportunity.id}`] = true;
+    });
+    localStorage.setItem(CLEARED_KEY, JSON.stringify(next));
+    setCleared(next);
+  };
 
   return (
     <Popover>
@@ -90,7 +124,18 @@ export default function NotificationsBell() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-80 p-0">
         <div className="border-b border-border/70 px-3 py-2.5">
-          <p className="text-sm font-semibold">Avisos automáticos</p>
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-sm font-semibold">Avisos automáticos</p>
+            {total > 0 && (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+              >
+                <Eraser className="h-3.5 w-3.5" /> Limpiar
+              </button>
+            )}
+          </div>
           <p className="text-[11px] leading-snug text-muted-foreground">
             Inmuebles nuevos en portales, leads calientes sin contacto, etapas estancadas y cierres a menos de 3 días
           </p>
@@ -102,12 +147,12 @@ export default function NotificationsBell() {
             </p>
           ) : (
             <div className="space-y-1">
-              {staleLeads.length > 0 && (
+              {visibleStaleLeads.length > 0 && (
                 <p className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
-                  Leads calientes sin contacto · {staleLeads.length}
+                  Leads calientes sin contacto · {visibleStaleLeads.length}
                 </p>
               )}
-              {staleLeads.map(({ client, score, days }) => (
+              {visibleStaleLeads.map(({ client, score, days }) => (
                 <Link
                   key={`lead-${client.id}`}
                   to="/leads"
@@ -123,12 +168,12 @@ export default function NotificationsBell() {
                   </span>
                 </Link>
               ))}
-              {listings.length > 0 && (
+              {visibleListings.length > 0 && (
                 <p className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
-                  Inmuebles nuevos · {listings.length}
+                  Inmuebles nuevos · {visibleListings.length}
                 </p>
               )}
-              {listings.slice(0, 4).map((listing) => (
+              {visibleListings.slice(0, 4).map((listing) => (
                 <Link
                   key={`listing-${listing.id}`}
                   to="/portales"
@@ -145,7 +190,7 @@ export default function NotificationsBell() {
                   </span>
                 </Link>
               ))}
-              {alerts.closingSoon.map(({ opportunity, remaining }) => (
+              {visibleClosingSoon.map(({ opportunity, remaining }) => (
                 <Link
                   key={`close-${opportunity.id}`}
                   to="/pipeline"
@@ -160,7 +205,7 @@ export default function NotificationsBell() {
                   </span>
                 </Link>
               ))}
-              {alerts.stalled.map(({ opportunity, days }) => (
+              {visibleStalled.map(({ opportunity, days }) => (
                 <Link
                   key={`stall-${opportunity.id}`}
                   to="/pipeline"
