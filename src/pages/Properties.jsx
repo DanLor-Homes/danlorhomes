@@ -213,6 +213,10 @@ export default function Properties() {
           setDetailOpen(false);
           window.location.assign('/clientes');
         }}
+        onDelete={(property) => {
+          setDetailOpen(false);
+          setToDelete(property);
+        }}
         onChanged={load}
       />
 

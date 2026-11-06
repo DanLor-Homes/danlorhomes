@@ -1,11 +1,11 @@
 import React from 'react';
-import { Mail, MessageSquarePlus, Phone } from 'lucide-react';
+import { Mail, MessageSquarePlus, Phone, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatCurrency, daysSince } from '@/lib/crm';
 import { scoreBand } from '@/lib/leadScoring';
 import LeadScoreBadge from '@/components/clients/LeadScoreBadge';
 
-export default function LeadRow({ client, lead, onOpen, onLog }) {
+export default function LeadRow({ client, lead, onOpen, onLog, onDelete }) {
   const band = scoreBand(lead.score);
   const days = daysSince(lead.last);
   const recency = !lead.last ? 'Sin contacto' : days === 0 ? 'Contacto hoy' : `Hace ${days} d`;
@@ -68,6 +68,15 @@ export default function LeadRow({ client, lead, onOpen, onLog }) {
         )}
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onLog(client)} aria-label="Registrar interacción">
           <MessageSquarePlus className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          onClick={() => onDelete(client)}
+          aria-label={`Eliminar ${client.name}`}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
     </div>

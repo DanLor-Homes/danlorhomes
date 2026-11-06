@@ -10,6 +10,16 @@ import ClientFormDialog from '@/components/clients/ClientFormDialog';
 import InteractionDialog from '@/components/interactions/InteractionDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { formatCurrency, daysSince } from '@/lib/crm';
 import { scoreLead, SCORE_BANDS } from '@/lib/leadScoring';
@@ -36,6 +46,7 @@ export default function Leads() {
   const [formOpen, setFormOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
   const [logClientId, setLogClientId] = useState(null);
+  const [toDelete, setToDelete] = useState(null);
 
   const load = useCallback(async () => {
     const [clientRes, interactionAgg, opportunityAgg] = await Promise.all([
@@ -126,6 +137,17 @@ export default function Leads() {
     setLogOpen(true);
   };
 
+  const confirmDelete = async () => {
+    if (!toDelete) return;
+    await base44.entities.Client.delete(toDelete.id);
+    if (selected?.id === toDelete.id) {
+      setDetailOpen(false);
+      setSelected(null);
+    }
+    setToDelete(null);
+    load();
+  };
+
   return (
     <div>
       <PageHeader
@@ -213,7 +235,14 @@ export default function Leads() {
               <span />
             </div>
             {visible.map((lead) => (
-              <LeadRow key={lead.client.id} client={lead.client} lead={lead} onOpen={openDetail} onLog={openLog} />
+              <LeadRow
+                key={lead.client.id}
+                client={lead.client}
+                lead={lead}
+                onOpen={openDetail}
+                onLog={openLog}
+                onDelete={setToDelete}
+              />
             ))}
           </>
         )}
@@ -240,6 +269,26 @@ export default function Leads() {
         defaultClientId={logClientId}
         onSaved={load}
       />
+
+      <AlertDialog open={Boolean(toDelete)} onOpenChange={(next) => !next && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar {toDelete?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminará la ficha del lead. Las oportunidades e interacciones asociadas conservarán la referencia.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

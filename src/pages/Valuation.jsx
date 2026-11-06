@@ -69,6 +69,12 @@ export default function Valuation() {
 
   const rows = useMemo(() => comparablesList(own, reference), [own, reference]);
 
+  const selectSubject = (id) => {
+    setSubjectId(id);
+    const next = properties.find((item) => item.id === id);
+    setReferenceZone(next?.reference_zone || '');
+  };
+
   const save = async () => {
     if (!subject || !valuation.estimate) return;
     setSaving(true);
@@ -120,7 +126,7 @@ export default function Valuation() {
           <ValuationControls
             properties={properties}
             subjectId={subjectId}
-            onSubject={setSubjectId}
+            onSubject={selectSubject}
             zones={zones}
             referenceZone={referenceZone}
             onReferenceZone={setReferenceZone}

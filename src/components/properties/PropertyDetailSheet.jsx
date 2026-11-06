@@ -12,6 +12,7 @@ import {
   Maximize,
   Pencil,
   Printer,
+  Trash2,
   TrendingUp,
   Zap,
 } from 'lucide-react';
@@ -47,7 +48,7 @@ function FileRow({ label, file, onOpen }) {
   );
 }
 
-export default function PropertyDetailSheet({ property, open, onOpenChange, onEdit, onOpenClient, onChanged }) {
+export default function PropertyDetailSheet({ property, open, onOpenChange, onEdit, onOpenClient, onChanged, onDelete }) {
   const [clients, setClients] = useState([]);
   const [comparables, setComparables] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -358,6 +359,16 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
           <Button variant="ghost" size="sm" className="w-full" onClick={() => { onChanged?.(); load(); }}>
             Actualizar datos
           </Button>
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-muted-foreground hover:text-destructive"
+              onClick={() => onDelete(property)}
+            >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Eliminar inmueble
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>
