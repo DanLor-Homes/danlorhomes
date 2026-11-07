@@ -399,7 +399,7 @@ export default function Leads() {
       ) : (
         <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
           <div className="mt-3">
-            <ClientDropDock dragging={drag.dragging} showTrash={false} />
+            <ClientDropDock dragging={drag.dragging} />
           </div>
 
           <div className="mt-3">
