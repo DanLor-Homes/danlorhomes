@@ -37,7 +37,7 @@ const NAV = [
   { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
   { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
   { to: '/tasacion', label: 'Tasación', icon: Calculator },
-  { to: '/contratos', label: 'Contratos', icon: FileSignature },
+  { to: '/contratos', label: 'Documentos', icon: FileSignature },
   { to: '/propietarios', label: 'Propietarios', icon: KeyRound },
   { to: '/portales', label: 'Portales', icon: Globe },
   { to: '/particulares', label: 'Particulares', icon: UserRound },
