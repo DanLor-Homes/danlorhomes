@@ -40,6 +40,10 @@
       "type": "boolean",
       "title": "Activo",
       "default": true
+    },
+    "order": {
+      "type": "number",
+      "title": "Orden"
     }
   },
   "required": [

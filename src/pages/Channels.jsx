@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Loader2, Megaphone, Plus, Trash2 } from 'lucide-react';
+import { GripVertical, Loader2, Megaphone, Plus } from 'lucide-react';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { base44 } from '@/api/base44Client';
+import DraggableItem from '@/components/drag/DraggableItem';
+import ChannelCard from '@/components/channels/ChannelCard';
 import PageHeader from '@/components/crm/PageHeader';
 import EmptyState from '@/components/crm/EmptyState';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { CHANNELS, CHANNEL_LABELS, formatCurrency } from '@/lib/crm';
+import { CHANNELS } from '@/lib/crm';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function Channels() {
@@ -18,6 +20,7 @@ export default function Channels() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newName, setNewName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
@@ -25,7 +28,8 @@ export default function Channels() {
       base44.entities.Channel.list(),
       base44.entities.Opportunity.filter({ archived: false }, { sort: '-updated_date', limit: 500 }),
     ]);
-    setChannels(Array.isArray(channelRes) ? channelRes : channelRes?.items || []);
+    const channelList = Array.isArray(channelRes) ? channelRes : channelRes?.items || [];
+    setChannels([...channelList].sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0)));
     setOpportunities(oppRes.items || []);
     setLoading(false);
   }, []);
@@ -52,7 +56,7 @@ export default function Channels() {
     if (!newName) return;
     setSaving(true);
     try {
-      await base44.entities.Channel.create({ name: newName, active: true });
+      await base44.entities.Channel.create({ name: newName, active: true, order: channels.length });
       setDialogOpen(false);
       setNewName('');
       await load();
@@ -70,6 +74,20 @@ export default function Channels() {
   const remove = async (channel) => {
     setChannels((list) => list.filter((item) => item.id !== channel.id));
     await base44.entities.Channel.delete(channel.id);
+  };
+
+  const handleDragEnd = async (result) => {
+    setDragging(false);
+    const { source, destination } = result;
+    if (!destination || destination.index === source.index) return;
+
+    const next = Array.from(channels);
+    const [moved] = next.splice(source.index, 1);
+    next.splice(destination.index, 0, moved);
+    const reordered = next.map((item, index) => ({ ...item, order: index }));
+
+    setChannels(reordered);
+    await base44.entities.Channel.bulkUpdate(reordered.map(({ id, order }) => ({ id, order })));
   };
 
   return (
@@ -96,38 +114,35 @@ export default function Channels() {
           action={<Button size="sm" onClick={() => setDialogOpen(true)}>Añadir canal</Button>}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {channels.map((channel) => {
-            const data = stats[channel.id] || { count: 0, value: 0, won: 0 };
-            return (
-              <div key={channel.id} className="card-surface p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-heading text-sm font-bold">{CHANNEL_LABELS[channel.name] || channel.name}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {data.count} oportunidades · {formatCurrency(data.value)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Switch checked={Boolean(channel.active)} onCheckedChange={() => toggleActive(channel)} />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                      onClick={() => remove(channel)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
+        <>
+          <p className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+            <GripVertical className="h-3.5 w-3.5" />
+            {dragging ? 'Suelta la tarjeta en su nueva posición' : 'Arrastra una tarjeta para cambiar el orden de los canales'}
+          </p>
+          <DragDropContext onDragStart={() => setDragging(true)} onDragEnd={handleDragEnd}>
+            <Droppable droppableId="channels" direction="vertical">
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+                >
+                  {channels.map((channel, index) => (
+                    <DraggableItem key={channel.id} id={channel.id} index={index}>
+                      <ChannelCard
+                        channel={channel}
+                        stats={stats[channel.id] || { count: 0, value: 0, won: 0 }}
+                        onToggle={toggleActive}
+                        onRemove={remove}
+                      />
+                    </DraggableItem>
+                  ))}
+                  {provided.placeholder}
                 </div>
-                <div className="mt-3 border-t border-border/60 pt-2.5">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ganado</p>
-                  <p className="font-heading text-lg font-bold text-emerald-400">{formatCurrency(data.won)}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        </>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
