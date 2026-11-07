@@ -11,7 +11,10 @@ export default function EditorialHero({ pipelineValue }) {
       <div className="ed-hc">
         <div className="ed-hr">
           <div>
-            <p className="ed-sc ed-date">Resumen comercial</p>
+            <span className="ed-kicker">
+              <span className="ed-dot" />
+              Resumen comercial
+            </span>
             <h1>Panel de control</h1>
             <p className="ed-d">Estado del embudo, rendimiento del equipo y avisos automáticos de seguimiento.</p>
           </div>
@@ -19,8 +22,10 @@ export default function EditorialHero({ pipelineValue }) {
             Ver pipeline →
           </Link>
         </div>
-        <div className="ed-big">{pipelineValue}</div>
-        <p className="ed-sc ed-bl">Pipeline abierto</p>
+        <div className="ed-kpi">
+          <p className="ed-sc ed-bl">Pipeline abierto</p>
+          <div className="ed-big">{pipelineValue}</div>
+        </div>
       </div>
     </div>
   );
