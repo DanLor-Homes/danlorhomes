@@ -51,8 +51,10 @@ export default function Leads() {
   const load = useCallback(async () => {
     const [clientRes, interactionAgg, opportunityAgg] = await Promise.all([
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
-      base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }),
-      base44.entities.Opportunity.aggregate({ query: { status: 'open' }, groupBy: 'client_id', sum: ['amount'] }),
+      base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }).catch(() => ({ rows: [] })),
+      base44.entities.Opportunity.aggregate({ query: { status: 'open' }, groupBy: 'client_id', sum: ['amount'] }).catch(
+        () => ({ rows: [] })
+      ),
     ]);
 
     const activityMap = {};

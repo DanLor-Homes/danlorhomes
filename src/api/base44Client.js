@@ -23,6 +23,19 @@ const WRITE_METHODS = new Set([
   'deleteMany',
 ]);
 
+// Un fallo puntual de conexión no debe romper la pantalla: se reintenta una vez.
+const isNetworkError = (error) => /network error|failed to fetch|networkerror/i.test(error?.message || '');
+
+const withRetry = async (run) => {
+  try {
+    return await run();
+  } catch (error) {
+    if (!isNetworkError(error)) throw error;
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    return run();
+  }
+};
+
 const wrapEntity = (entityName, entity) =>
   new Proxy(entity, {
     get(target, prop) {
@@ -38,7 +51,7 @@ const wrapEntity = (entityName, entity) =>
           } catch {
             return value.apply(target, args);
           }
-          return cachedRead(key, () => value.apply(target, args));
+          return cachedRead(key, () => withRetry(() => value.apply(target, args)));
         };
       }
 
