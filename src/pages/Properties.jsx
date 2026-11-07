@@ -20,8 +20,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { DragDropContext } from '@hello-pangea/dnd';
+import DragStatusDock from '@/components/drag/DragStatusDock';
+import DragList from '@/components/drag/DragList';
+import DraggableItem from '@/components/drag/DraggableItem';
+import useStatusDragDrop from '@/hooks/useStatusDragDrop';
 import { formatCurrency } from '@/lib/crm';
-import { PROPERTY_STATUS, findMatches } from '@/lib/properties';
+import { PROPERTY_STATUS, findMatches, propertyStatusLabel } from '@/lib/properties';
 import { cn } from '@/lib/utils';
 
 export default function Properties() {
@@ -36,6 +41,20 @@ export default function Properties() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [toDelete, setToDelete] = useState(null);
   const { toast } = useToast();
+
+  const drag = useStatusDragDrop({
+    onMove: async (id, status) => {
+      const property = properties.find((item) => item.id === id);
+      if (!property || property.status === status) return;
+      setProperties((list) => list.map((item) => (item.id === id ? { ...item, status } : item)));
+      await base44.entities.Property.update(id, { status });
+      toast({ title: 'Inmueble actualizado', description: `${property.title} → ${propertyStatusLabel(status)}` });
+    },
+    onTrash: (id) => {
+      const property = properties.find((item) => item.id === id);
+      if (property) setToDelete(property);
+    },
+  });
 
   const load = useCallback(async () => {
     const [propertyRes, clientRes] = await Promise.all([
@@ -168,28 +187,37 @@ export default function Properties() {
           }
         />
       ) : (
-        <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
-          {visible.map((property) => (
-            <div key={property.id} className="group relative">
-              <PropertyCard
-                property={property}
-                matches={matchesByProperty.get(property.id) || 0}
-                onClick={() => openDetail(property)}
-              />
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setToDelete(property);
-                }}
-                aria-label={`Eliminar ${property.title}`}
-                className="absolute right-2 top-2 rounded-md bg-background/85 p-1.5 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
+        <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
+          <DragStatusDock
+            statuses={PROPERTY_STATUS}
+            dragging={drag.dragging}
+            hint="Arrastra un inmueble para cambiar su estado o eliminarlo"
+          />
+          <DragList className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
+            {visible.map((property, index) => (
+              <DraggableItem key={property.id} id={property.id} index={index}>
+                <div className="group relative">
+                  <PropertyCard
+                    property={property}
+                    matches={matchesByProperty.get(property.id) || 0}
+                    onClick={() => openDetail(property)}
+                  />
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setToDelete(property);
+                    }}
+                    aria-label={`Eliminar ${property.title}`}
+                    className="absolute right-2 top-2 rounded-md bg-background/85 p-1.5 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </DraggableItem>
+            ))}
+          </DragList>
+        </DragDropContext>
       )}
 
       <PropertyFormDialog

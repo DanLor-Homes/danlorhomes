@@ -7,6 +7,11 @@ import TaskDialog from '@/components/tasks/TaskDialog';
 import TaskRow from '@/components/tasks/TaskRow';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DragDropContext } from '@hello-pangea/dnd';
+import DragStatusDock from '@/components/drag/DragStatusDock';
+import DragList from '@/components/drag/DragList';
+import DraggableItem from '@/components/drag/DraggableItem';
+import useStatusDragDrop from '@/hooks/useStatusDragDrop';
 import { todayISO } from '@/lib/crm';
 import { sortByPriority, taskPriority } from '@/lib/taskPriority';
 import { TASK_CATEGORIES } from '@/lib/taskCategory';
@@ -17,6 +22,11 @@ const FILTERS = [
   { id: 'hoy', label: 'Hoy' },
   { id: 'completada', label: 'Completadas' },
   { id: 'todas', label: 'Todas' },
+];
+
+const TASK_STATUSES = [
+  { id: 'pendiente', label: 'Pendiente' },
+  { id: 'completada', label: 'Completada' },
 ];
 
 export default function Tasks() {
@@ -101,6 +111,21 @@ export default function Tasks() {
     await base44.entities.CommercialTask.delete(task.id);
   };
 
+  const drag = useStatusDragDrop({
+    onMove: async (id, status) => {
+      const task = tasks.find((item) => item.id === id);
+      if (!task || task.status === status) return;
+      setTasks((list) => list.map((item) => (item.id === id ? { ...item, status } : item)));
+      await base44.entities.CommercialTask.update(id, { status });
+    },
+    onTrash: (id) => {
+      const task = tasks.find((item) => item.id === id);
+      if (task) remove(task);
+    },
+  });
+
+  const taskIndex = useMemo(() => new Map(visible.map((item, i) => [item.task.id, i])), [visible]);
+
   const counts = {
     pendiente: tasks.filter((t) => t.status === 'pendiente').length,
     completada: tasks.filter((t) => t.status === 'completada').length,
@@ -177,7 +202,13 @@ export default function Tasks() {
           }
         />
       ) : (
-        <div className="space-y-5">
+        <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
+          <DragStatusDock
+            statuses={TASK_STATUSES}
+            dragging={drag.dragging}
+            hint="Arrastra una tarea para completarla o eliminarla"
+          />
+          <DragList className="space-y-5">
           {sections.map((section) => (
             <div key={section.id}>
               {section.label && (
@@ -190,24 +221,26 @@ export default function Tasks() {
               )}
               <div className="space-y-2">
                 {section.items.map(({ task, priority }) => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    priority={priority}
-                    opportunityName={oppMap[task.opportunity_id]}
-                    clientName={clientMap[task.client_id]}
-                    onToggle={() => toggle(task)}
-                    onEdit={() => {
-                      setEditing(task);
-                      setDialogOpen(true);
-                    }}
-                    onDelete={() => remove(task)}
-                  />
+                  <DraggableItem key={task.id} id={task.id} index={taskIndex.get(task.id) ?? 0}>
+                    <TaskRow
+                      task={task}
+                      priority={priority}
+                      opportunityName={oppMap[task.opportunity_id]}
+                      clientName={clientMap[task.client_id]}
+                      onToggle={() => toggle(task)}
+                      onEdit={() => {
+                        setEditing(task);
+                        setDialogOpen(true);
+                      }}
+                      onDelete={() => remove(task)}
+                    />
+                  </DraggableItem>
                 ))}
               </div>
             </div>
           ))}
-        </div>
+          </DragList>
+        </DragDropContext>
       )}
 
       <TaskDialog open={dialogOpen} onOpenChange={setDialogOpen} task={editing} opportunities={opportunities} onSaved={load} />

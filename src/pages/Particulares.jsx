@@ -12,7 +12,12 @@ import ContactDialog from '@/components/portals/ContactDialog';
 import PendingClassificationRow from '@/components/particulares/PendingClassificationRow';
 import PortalCoverage from '@/components/particulares/PortalCoverage';
 import ClientFormDialog from '@/components/clients/ClientFormDialog';
-import { asArray, PORTALS } from '@/lib/portals';
+import { DragDropContext } from '@hello-pangea/dnd';
+import DragStatusDock from '@/components/drag/DragStatusDock';
+import DragList from '@/components/drag/DragList';
+import DraggableItem from '@/components/drag/DraggableItem';
+import useStatusDragDrop from '@/hooks/useStatusDragDrop';
+import { asArray, PORTALS, LISTING_STATUS } from '@/lib/portals';
 import { classificationHint, classifyPublisher } from '@/lib/publisherClassifier';
 import { classifyPendingListings } from '@/lib/portalClassification';
 import { buildClientDraft, discardListing, markListingContacted, markListingConverted } from '@/lib/listingActions';
@@ -25,6 +30,11 @@ const OPERATION_TABS = [
 ];
 
 const PENDING_LIMIT = 8;
+
+const LISTING_DROP_STATUSES = ['nuevo', 'revisado', 'contactado', 'convertido', 'descartado'].map((id) => ({
+  id,
+  label: LISTING_STATUS[id].label,
+}));
 
 export default function Particulares() {
   const { toast } = useToast();
@@ -167,6 +177,23 @@ export default function Particulares() {
     await load();
   };
 
+  const drag = useStatusDragDrop({
+    onMove: async (id, status) => {
+      const listing = listings.find((item) => item.id === id);
+      if (!listing || listing.status === status) return;
+      setListings((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
+      await base44.entities.PortalListing.update(id, { status });
+      toast({
+        title: 'Anuncio movido',
+        description: `${listing.title} → ${LISTING_STATUS[status]?.label || status}`,
+      });
+    },
+    onTrash: (id) => {
+      const listing = listings.find((item) => item.id === id);
+      if (listing) handleDiscard(listing);
+    },
+  });
+
   return (
     <div>
       <PageHeader
@@ -235,18 +262,26 @@ export default function Particulares() {
             }
           />
         ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {particular.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                publisherHint={classificationHint(listing)}
-                onContact={setContactListing}
-                onConvert={handleConvert}
-                onDiscard={handleDiscard}
-              />
-            ))}
-          </div>
+          <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
+            <DragStatusDock
+              statuses={LISTING_DROP_STATUSES}
+              dragging={drag.dragging}
+              hint="Arrastra un anuncio para cambiar su estado o descartarlo"
+            />
+            <DragList className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {particular.map((listing, index) => (
+                <DraggableItem key={listing.id} id={listing.id} index={index}>
+                  <ListingCard
+                    listing={listing}
+                    publisherHint={classificationHint(listing)}
+                    onContact={setContactListing}
+                    onConvert={handleConvert}
+                    onDiscard={handleDiscard}
+                  />
+                </DraggableItem>
+              ))}
+            </DragList>
+          </DragDropContext>
         )}
       </div>
 
