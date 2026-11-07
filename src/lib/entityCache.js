@@ -1,4 +1,4 @@
-const TTL_MS = 12000;
+const TTL_MS = 30000;
 
 // key -> { time, promise }
 const store = new Map();

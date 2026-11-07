@@ -29,10 +29,7 @@ export default function NotificationsBell() {
   useEffect(() => {
     let active = true;
     Promise.all([
-      base44.entities.Opportunity.filter(
-        { archived: false, status: 'open' },
-        { sort: 'expected_closing_date', limit: 200 }
-      ),
+      base44.entities.Opportunity.filter({ archived: false }, { sort: '-updated_date', limit: 500 }),
       base44.entities.PortalListing.filter({ status: 'nuevo' }, { sort: '-first_seen', limit: 30 }),
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
       base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }),
@@ -48,6 +45,7 @@ export default function NotificationsBell() {
 
         const openByClient = {};
         opportunities.forEach((o) => {
+          if (o.status !== 'open') return;
           const entry = openByClient[o.client_id] || { count: 0, value: 0 };
           entry.count += 1;
           entry.value += Number(o.amount) || 0;

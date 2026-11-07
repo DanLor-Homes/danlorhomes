@@ -26,10 +26,23 @@ const WRITE_METHODS = new Set([
 // Un fallo puntual de conexión no debe romper la pantalla: se reintenta una vez.
 const isNetworkError = (error) => /network error|failed to fetch|networkerror/i.test(error?.message || '');
 
+// Al tocar el límite de peticiones se espera lo que indica el servidor antes de reintentar.
+const isRateLimited = (error) =>
+  error?.status === 429 || /rate limit|too many requests|l[ií]mite/i.test(error?.message || '');
+
+const rateLimitWait = (error) => {
+  const match = /retry after (\d+)\s*s/i.exec(error?.message || '');
+  return Math.min((match ? Number(match[1]) : 3) + 1, 15) * 1000;
+};
+
 const withRetry = async (run) => {
   try {
     return await run();
   } catch (error) {
+    if (isRateLimited(error)) {
+      await new Promise((resolve) => setTimeout(resolve, rateLimitWait(error)));
+      return run();
+    }
     if (!isNetworkError(error)) throw error;
     await new Promise((resolve) => setTimeout(resolve, 700));
     return run();
