@@ -1,0 +1,141 @@
+{
+  "name": "ValuationComparable",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Inmueble testigo"
+    },
+    "municipality": {
+      "type": "string",
+      "title": "Municipio"
+    },
+    "province": {
+      "type": "string",
+      "title": "Provincia"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "property_type": {
+      "type": "string",
+      "title": "Tipo de inmueble",
+      "enum": [
+        "piso",
+        "atico",
+        "adosado",
+        "chalet",
+        "local",
+        "oficina",
+        "garaje",
+        "nave",
+        "terreno"
+      ],
+      "default": "piso"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler"
+      ],
+      "default": "venta"
+    },
+    "price": {
+      "type": "number",
+      "title": "Precio"
+    },
+    "surface": {
+      "type": "number",
+      "title": "Superficie (m\u00b2)"
+    },
+    "condition": {
+      "type": "string",
+      "title": "Estado de conservaci\u00f3n",
+      "enum": [
+        "nuevo",
+        "reformado",
+        "buen_estado",
+        "a_reformar"
+      ],
+      "default": "buen_estado"
+    },
+    "year_built": {
+      "type": "number",
+      "title": "A\u00f1o de construcci\u00f3n"
+    },
+    "source_url": {
+      "type": "string",
+      "title": "Enlace del anuncio"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    }
+  },
+  "required": [
+    "title",
+    "price",
+    "surface"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
