@@ -86,8 +86,8 @@ function detectRateType(text, fallback) {
 
 async function download(url, attempt = 1) {
   const response = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(15000) });
-  if (response.status === 429 && attempt < 2) {
-    await new Promise((resolve) => setTimeout(resolve, 1800));
+  if (response.status === 429 && attempt < 3) {
+    await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
     return download(url, attempt + 1);
   }
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -139,11 +139,17 @@ export default async function (req) {
     const user = await base44.auth.me().catch((e) => (e.status === 401 ? null : Promise.reject(e)));
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
+    const body = await req.json().catch(() => ({}));
+    const requested = Array.isArray(body?.banks) ? body.banks : [];
+    const targets = requested.length
+      ? BANKS.filter((config) => requested.includes(config.bank))
+      : BANKS;
+
     const updated = [];
     const failed = [];
 
-    for (let index = 0; index < BANKS.length; index += 6) {
-      const chunk = BANKS.slice(index, index + 6);
+    for (let index = 0; index < targets.length; index += 6) {
+      const chunk = targets.slice(index, index + 6);
       const settled = await Promise.allSettled(
         chunk.map(async (config, slot) => {
           await new Promise((resolve) => setTimeout(resolve, slot * 600));
