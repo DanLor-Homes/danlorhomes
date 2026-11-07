@@ -1,78 +1,47 @@
 import React from 'react';
-import { Image } from '@/components/ui/image';
-import { formatDate } from '@/lib/crm';
-import MandateAlertRow from '@/components/owners/MandateAlertRow';
-import { ROW_IMAGE } from './assets';
+import { CheckCheck } from 'lucide-react';
 
-export default function AlertsBriefing({ alerts, limit }) {
-  const total =
-    alerts.staleQuotes.length +
-    alerts.risky.length +
-    alerts.overdue.length +
-    alerts.mandatesExpired.length +
-    alerts.mandatesThisWeek.length;
-
+export default function AlertsBriefing({ alerts, onDismiss }) {
   return (
-    <section className="ed-sec ed-d3">
+    <section className="ed-sec ed-d3 ed-alerts">
       <div className="ed-sh">
-        <h3>Avisos automáticos</h3>
+        <div>
+          <h3>Avisos automáticos</h3>
+          <p className="ed-sub">
+            Cierres inminentes, leads calientes, etapas estancadas, presupuestos sin respuesta, inmuebles nuevos y
+            mandatos.
+          </p>
+        </div>
+        <span className="ed-count">{alerts.length}</span>
       </div>
 
-      {total === 0 ? (
+      {alerts.length === 0 ? (
         <p className="ed-ok">
-          Todo al día: sin mandatos caducados ni por vencer, presupuestos sin respuesta, cierres inminentes ni tareas
-          vencidas.
+          Todo al día: sin cierres inminentes, leads calientes sin contacto, etapas estancadas, presupuestos sin
+          respuesta, inmuebles nuevos en portales, mandatos por vencer ni tareas vencidas.
         </p>
       ) : (
-        <div>
-          {alerts.mandatesExpired.slice(0, limit).map((property) => (
-            <MandateAlertRow key={`expired-${property.id}`} property={property} />
-          ))}
-          {alerts.mandatesExpired.length > limit && (
-            <p className="ed-note">y {alerts.mandatesExpired.length - limit} mandatos caducados más</p>
-          )}
-          {alerts.mandatesThisWeek.slice(0, limit).map((property) => (
-            <MandateAlertRow key={`week-${property.id}`} property={property} />
-          ))}
-          {alerts.mandatesThisWeek.length > limit && (
-            <p className="ed-note">y {alerts.mandatesThisWeek.length - limit} mandatos más que vencen esta semana</p>
-          )}
-
-          {alerts.staleQuotes.map((op) => (
-            <div key={`quote-${op.id}`} className="ed-al">
-              <span className="ed-tag">Presupuesto</span>
-              <div className="ed-f1">
-                <p className="ed-n">{op.name}</p>
-                <p className="ed-s">Presupuesto enviado sin respuesta hace {op.days} días</p>
-              </div>
-              <Image src={ROW_IMAGE} alt="" className="ed-ph" fittingType="fill" />
-            </div>
-          ))}
-
-          {alerts.risky.map((op) => (
-            <div key={`risk-${op.id}`} className="ed-al">
-              <span className="ed-tag">Cierre</span>
-              <div className="ed-f1">
-                <p className="ed-n">{op.name}</p>
-                <p className="ed-s">
-                  Cierre previsto {formatDate(op.expected_closing_date)} · quedan {op.remaining} días
-                </p>
-              </div>
-              <Image src={ROW_IMAGE} alt="" className="ed-ph" fittingType="fill" />
-            </div>
-          ))}
-
-          {alerts.overdue.map((task) => (
-            <div key={`task-${task.id}`} className="ed-al">
-              <span className="ed-tag">Tarea</span>
-              <div className="ed-f1">
-                <p className="ed-n">{task.title}</p>
-                <p className="ed-s">Vencida el {formatDate(task.due_date)}</p>
-              </div>
-              <Image src={ROW_IMAGE} alt="" className="ed-ph" fittingType="fill" />
-            </div>
-          ))}
-        </div>
+        <>
+          <p className="ed-note">Toca un aviso para revisarlo: se marca como visto y desaparece de la lista.</p>
+          <div className="ed-alerts-grid">
+            {alerts.map((alert) => (
+              <button
+                key={alert.key}
+                type="button"
+                className="ed-al"
+                onClick={() => onDismiss(alert)}
+                title="Marcar como revisado"
+              >
+                <span className="ed-tag">{alert.tag}</span>
+                <span className="ed-f1">
+                  <span className="ed-n ed-al-title">{alert.title}</span>
+                  <span className="ed-s">{alert.detail}</span>
+                </span>
+                <CheckCheck className="ed-al-check" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

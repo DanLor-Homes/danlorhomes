@@ -1,0 +1,84 @@
+{
+  "name": "AlertDismissal",
+  "type": "object",
+  "properties": {
+    "alert_key": {
+      "type": "string",
+      "title": "Aviso"
+    },
+    "alert_type": {
+      "type": "string",
+      "title": "Tipo de aviso"
+    },
+    "title": {
+      "type": "string",
+      "title": "T\u00edtulo del aviso"
+    },
+    "dismissed_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Revisado el"
+    }
+  },
+  "required": [
+    "alert_key"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

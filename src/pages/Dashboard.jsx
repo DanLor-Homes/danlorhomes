@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { OPEN_STAGES, daysSince, daysUntil, formatCurrency, todayISO } from '@/lib/crm';
-import { mandateStatus, mandateTypeOf } from '@/lib/mandates';
+import { OPEN_STAGES, daysSince, formatCurrency, todayISO } from '@/lib/crm';
+import { mandateStatus } from '@/lib/mandates';
+import { buildDashboardAlerts } from '@/lib/alerts';
 import MandatesSummary from '@/components/owners/MandatesSummary';
 import HotStaleLeads from '@/components/leads/HotStaleLeads';
 import QuickRepliesCard from '@/components/dashboard/QuickRepliesCard';
@@ -15,7 +16,6 @@ import AlertsBriefing from '@/components/dashboard/editorial/AlertsBriefing';
 import UpcomingTasks from '@/components/dashboard/editorial/UpcomingTasks';
 import AiPriorities from '@/components/dashboard/AiPriorities';
 
-const MANDATE_ALERT_LIMIT = 4;
 const AUTOMATION_RUN_KEY = 'danlor_last_automation_run';
 const AUTOMATION_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -25,16 +25,20 @@ export default function Dashboard() {
   const [properties, setProperties] = useState([]);
   const [clients, setClients] = useState([]);
   const [activity, setActivity] = useState({});
+  const [listings, setListings] = useState([]);
+  const [dismissed, setDismissed] = useState(() => new Set());
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const load = useCallback(async () => {
-    const [oppRes, taskRes, propertyRes, clientRes, interactionAgg] = await Promise.all([
+    const [oppRes, taskRes, propertyRes, clientRes, interactionAgg, listingRes, dismissalRes] = await Promise.all([
       base44.entities.Opportunity.filter({ archived: false }, { sort: '-updated_date', limit: 500 }),
       base44.entities.CommercialTask.filter({}, { sort: 'due_date', limit: 500 }),
       base44.entities.Property.filter({}, { sort: 'mandate_end', limit: 500 }),
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
       base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }).catch(() => ({ rows: [] })),
+      base44.entities.PortalListing.filter({ status: 'nuevo' }, { sort: '-first_seen', limit: 300 }),
+      base44.entities.AlertDismissal.list({ limit: 500 }),
     ]);
 
     const activityMap = {};
@@ -47,6 +51,8 @@ export default function Dashboard() {
     setProperties(propertyRes.items || []);
     setClients(clientRes.items || []);
     setActivity(activityMap);
+    setListings(listingRes.items || []);
+    setDismissed(new Set((dismissalRes.items || []).map((item) => item.alert_key)));
     setLoading(false);
   }, []);
 
@@ -90,38 +96,12 @@ export default function Dashboard() {
     return { open, won, lost, pipelineValue, wonValue, ticket, closeRate, pendingToday, byStage };
   }, [opportunities, tasks]);
 
-  const alerts = useMemo(() => {
-    const staleQuotes = opportunities
-      .filter((o) => o.status === 'open' && o.stage === 'presupuesto_enviado')
-      .map((o) => ({ ...o, days: daysSince(o.stage_changed_date) ?? 0 }))
-      .filter((o) => o.days >= 5);
-
-    const risky = opportunities
-      .filter((o) => o.status === 'open' && o.expected_closing_date)
-      .map((o) => ({ ...o, remaining: daysUntil(o.expected_closing_date) }))
-      .filter((o) => o.remaining !== null && o.remaining >= 0 && o.remaining < 3);
-
-    const overdue = tasks.filter((t) => t.status === 'pendiente' && t.due_date && t.due_date < todayISO());
-
-    const mandateRows = properties
-      .filter((p) => p.mandate_end && mandateTypeOf(p) !== 'sin_mandato')
-      .map((p) => ({ ...p, days: daysUntil(p.mandate_end), mandato: mandateTypeOf(p) }))
-      .filter((p) => p.days !== null);
-
-    const mandatesExpired = mandateRows.filter((p) => p.days < 0).sort((a, b) => a.days - b.days);
-    const mandatesThisWeek = mandateRows
-      .filter((p) => p.days >= 0 && p.days <= 7)
-      .sort((a, b) => a.days - b.days);
-
-    return { staleQuotes, risky, overdue, mandatesExpired, mandatesThisWeek };
-  }, [opportunities, tasks, properties]);
-
   const mandateRows = useMemo(
     () => properties.map((property) => ({ property, status: mandateStatus(property) })),
     [properties]
   );
 
-  const hotLeads = useMemo(() => {
+  const scoredLeads = useMemo(() => {
     const openByClient = {};
     opportunities
       .filter((o) => o.status === 'open')
@@ -132,23 +112,45 @@ export default function Dashboard() {
         openByClient[o.client_id] = entry;
       });
 
-    return clients
-      .map((client) => {
-        const act = activity[client.id] || {};
-        const opp = openByClient[client.id] || {};
-        const lead = scoreLead({
-          client,
-          interactionCount: act.count || 0,
-          lastInteraction: act.last || null,
-          openValue: opp.value || 0,
-          openCount: opp.count || 0,
-        });
-        return { client, ...lead, days: daysSince(act.last) };
-      })
-      .filter((lead) => lead.band.id === 'hot' && (lead.days === null || lead.days > 30))
-      .sort((a, b) => (b.days ?? 9999) - (a.days ?? 9999))
-      .slice(0, 4);
+    return clients.map((client) => {
+      const act = activity[client.id] || {};
+      const opp = openByClient[client.id] || {};
+      const lead = scoreLead({
+        client,
+        interactionCount: act.count || 0,
+        lastInteraction: act.last || null,
+        openValue: opp.value || 0,
+        openCount: opp.count || 0,
+      });
+      return { client, ...lead, days: daysSince(act.last) };
+    });
   }, [clients, activity, opportunities]);
+
+  const hotLeads = useMemo(
+    () =>
+      scoredLeads
+        .filter((lead) => lead.band.id === 'hot' && (lead.days === null || lead.days > 30))
+        .sort((a, b) => (b.days ?? 9999) - (a.days ?? 9999))
+        .slice(0, 4),
+    [scoredLeads]
+  );
+
+  const alertItems = useMemo(
+    () =>
+      buildDashboardAlerts({
+        opportunities,
+        tasks,
+        properties,
+        hotLeads: scoredLeads,
+        listings,
+      }).filter((alert) => !dismissed.has(alert.key)),
+    [opportunities, tasks, properties, scoredLeads, listings, dismissed]
+  );
+
+  const overdueCount = useMemo(
+    () => tasks.filter((t) => t.status === 'pendiente' && t.due_date && t.due_date < todayISO()).length,
+    [tasks]
+  );
 
   const openMandateGroup = (selection) => {
     const params = new URLSearchParams({
@@ -157,6 +159,21 @@ export default function Dashboard() {
       etiqueta: selection.label,
     });
     navigate(`/propietarios?${params.toString()}`);
+  };
+
+  const dismissAlert = async (alert) => {
+    setDismissed((prev) => new Set(prev).add(alert.key));
+    if (alert.to) navigate(alert.to);
+    try {
+      await base44.entities.AlertDismissal.create({
+        alert_key: alert.key,
+        alert_type: alert.type,
+        title: alert.title,
+        dismissed_at: new Date().toISOString(),
+      });
+    } catch (error) {
+      // El aviso queda revisado en esta sesión aunque no se guarde el registro
+    }
   };
 
   const maxStageValue = Math.max(...metrics.byStage.map((s) => s.value), 1);
@@ -189,7 +206,7 @@ export default function Dashboard() {
     {
       label: 'Tareas para hoy',
       value: metrics.pendingToday.length,
-      hint: alerts.overdue.length ? `${alerts.overdue.length} vencidas` : 'Sin tareas vencidas',
+      hint: overdueCount ? `${overdueCount} vencidas` : 'Sin tareas vencidas',
     },
   ];
 
@@ -209,7 +226,7 @@ export default function Dashboard() {
 
       <div className="ed-body">
         <StageList stages={metrics.byStage} maxStageValue={maxStageValue} />
-        <AlertsBriefing alerts={alerts} limit={MANDATE_ALERT_LIMIT} />
+        <AlertsBriefing alerts={alertItems} onDismiss={dismissAlert} />
       </div>
 
       <div className="ed-band">
