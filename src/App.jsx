@@ -17,7 +17,6 @@ import Dashboard from '@/pages/Dashboard';
 import Pipeline from '@/pages/Pipeline';
 import Properties from '@/pages/Properties';
 import Tasks from '@/pages/Tasks';
-import Clients from '@/pages/Clients';
 import Leads from '@/pages/Leads';
 import CalendarPage from '@/pages/Calendar';
 import Reports from '@/pages/Reports';
@@ -77,7 +76,6 @@ const AuthenticatedApp = () => {
           <Route path="/portales" element={<Portales />} />
           <Route path="/particulares" element={<Particulares />} />
           <Route path="/tareas" element={<Tasks />} />
-          <Route path="/clientes" element={<Clients />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/calendario" element={<CalendarPage />} />
           <Route path="/informes" element={<Reports />} />

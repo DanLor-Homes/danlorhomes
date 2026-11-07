@@ -239,7 +239,7 @@ export default function Properties() {
         }}
         onOpenClient={() => {
           setDetailOpen(false);
-          window.location.assign('/clientes');
+          window.location.assign('/leads');
         }}
         onDelete={(property) => {
           setDetailOpen(false);
