@@ -131,8 +131,29 @@ export default function Portales() {
   };
 
   const handleDiscard = async (listing) => {
-    await discardListing(listing);
-    await load();
+    const removing = listing.status === 'descartado';
+    try {
+      if (removing) {
+        await base44.entities.PortalListing.delete(listing.id);
+      } else {
+        await discardListing(listing);
+      }
+      setListings((prev) =>
+        removing
+          ? prev.filter((item) => item.id !== listing.id)
+          : prev.map((item) => (item.id === listing.id ? { ...item, status: 'descartado' } : item))
+      );
+      toast({
+        title: removing ? 'Inmueble eliminado' : 'Anuncio descartado',
+        description: listing.title,
+      });
+    } catch (error) {
+      toast({
+        title: 'No se pudo quitar el inmueble',
+        description: error?.message || 'Vuelve a intentarlo.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleContacted = async (listing) => {
