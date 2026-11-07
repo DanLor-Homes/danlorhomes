@@ -31,6 +31,8 @@ import Contracts from '@/pages/Contracts';
 import PropertySheet from '@/pages/PropertySheet';
 import PropertyPanel from '@/pages/Panel';
 import Valuation from '@/pages/Valuation';
+import Mail from '@/pages/Mail';
+import Mortgages from '@/pages/Mortgages';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,6 +73,8 @@ const AuthenticatedApp = () => {
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/inmuebles" element={<Properties />} />
           <Route path="/tasacion" element={<Valuation />} />
+          <Route path="/hipotecas" element={<Mortgages />} />
+          <Route path="/correo" element={<Mail />} />
           <Route path="/contratos" element={<Contracts />} />
           <Route path="/propietarios" element={<Owners />} />
           <Route path="/portales" element={<Portales />} />

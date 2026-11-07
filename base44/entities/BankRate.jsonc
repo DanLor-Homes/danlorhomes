@@ -1,0 +1,142 @@
+{
+  "name": "BankRate",
+  "type": "object",
+  "properties": {
+    "bank": {
+      "type": "string",
+      "title": "Entidad"
+    },
+    "product": {
+      "type": "string",
+      "title": "Producto"
+    },
+    "rate_type": {
+      "type": "string",
+      "title": "Tipo de inter\u00e9s",
+      "enum": [
+        "fija",
+        "variable",
+        "mixta"
+      ],
+      "enumColors": [
+        "blue",
+        "purple",
+        "yellow"
+      ],
+      "default": "fija"
+    },
+    "tin": {
+      "type": "number",
+      "title": "TIN (%)"
+    },
+    "tae": {
+      "type": "number",
+      "title": "TAE (%)"
+    },
+    "term_years": {
+      "type": "number",
+      "title": "Plazo m\u00e1ximo (a\u00f1os)"
+    },
+    "max_financing": {
+      "type": "number",
+      "title": "Financiaci\u00f3n m\u00e1xima (%)"
+    },
+    "opening_fee": {
+      "type": "number",
+      "title": "Comisi\u00f3n de apertura (%)"
+    },
+    "link": {
+      "type": "string",
+      "title": "Enlace oficial"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    },
+    "source": {
+      "type": "string",
+      "title": "Origen del dato",
+      "enum": [
+        "web",
+        "manual"
+      ],
+      "enumColors": [
+        "blue",
+        "gray"
+      ],
+      "default": "manual"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Le\u00eddo el"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "Activa",
+      "default": true
+    }
+  },
+  "required": [
+    "bank",
+    "product"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
