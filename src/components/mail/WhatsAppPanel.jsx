@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import WhatsAppHistory from '@/components/mail/WhatsAppHistory';
+import QuickReplies from '@/components/mail/QuickReplies';
 import { applyTemplate } from '@/lib/mail';
 import { whatsappLink } from '@/lib/portals';
 
@@ -120,6 +121,13 @@ export default function WhatsAppPanel({ clients, templates, messages, loading, o
               </SelectContent>
             </Select>
           </div>
+
+          <QuickReplies
+            onUse={(reply) => {
+              const filled = applyTemplate(reply, client);
+              setText((prev) => (prev.trim() ? `${prev.trim()}\n${filled}` : filled));
+            }}
+          />
 
           <div>
             <Label htmlFor="wa-text">Mensaje</Label>
