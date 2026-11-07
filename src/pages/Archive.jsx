@@ -1,10 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Archive as ArchiveIcon, Loader2, RotateCcw, Sparkles } from 'lucide-react';
+import { Archive as ArchiveIcon, Loader2, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
 import EmptyState from '@/components/crm/EmptyState';
 import StageBadge from '@/components/crm/StageBadge';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { formatCurrency, formatDate } from '@/lib/crm';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -12,6 +22,8 @@ export default function Archive() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
@@ -28,6 +40,19 @@ export default function Archive() {
     await base44.entities.Opportunity.update(opportunity.id, { archived: false, archived_date: '' });
     setItems((list) => list.filter((item) => item.id !== opportunity.id));
     toast({ title: 'Oportunidad restaurada' });
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      await base44.entities.Opportunity.delete(pendingDelete.id);
+      setItems((list) => list.filter((item) => item.id !== pendingDelete.id));
+      toast({ title: 'Registro eliminado del archivo' });
+      setPendingDelete(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const runArchive = async () => {
@@ -93,10 +118,43 @@ export default function Archive() {
               <Button variant="ghost" size="sm" className="text-xs" onClick={() => restore(item)}>
                 <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Restaurar
               </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setPendingDelete(item)}
+              >
+                <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Eliminar
+              </Button>
             </div>
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar definitivamente?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se borrará «{pendingDelete?.name}» del archivo. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                confirmDelete();
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : null}
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
