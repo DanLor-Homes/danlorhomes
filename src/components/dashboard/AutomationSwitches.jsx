@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Workflow } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { Switch } from '@/components/ui/switch';
 
 const RULES = [
   {
@@ -79,38 +77,37 @@ export default function AutomationSwitches() {
   };
 
   return (
-    <section className="card-surface p-5">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h3 className="flex items-center gap-2 font-heading text-sm font-bold">
-            <Workflow className="h-4 w-4 text-primary" />
-            Automatizaciones
-          </h3>
-          <p className="mt-0.5 text-xs text-muted-foreground">Activa o pausa cada flujo automático sin tocar nada técnico.</p>
-        </div>
+    <section className="ed-sec ed-d4">
+      <div className="ed-sh">
+        <h3>Automatizaciones</h3>
       </div>
+      <p className="ed-sub" style={{ margin: '-6px 0 6px' }}>
+        Activa o pausa cada flujo automático sin tocar nada técnico.
+      </p>
 
       {loading ? (
         <div className="flex justify-center py-6">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-primary" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#e4ddd0] border-t-[#2D6A4F]" />
         </div>
       ) : (
-        <ul className="space-y-3">
-          {RULES.map((rule) => (
-            <li key={rule.key} className="flex items-start justify-between gap-3 border-b border-border/50 pb-3 last:border-0 last:pb-0">
-              <div className="min-w-0">
-                <p className="text-sm font-medium leading-snug">{rule.label}</p>
-                <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{rule.hint}</p>
-              </div>
-              <Switch
+        RULES.map((rule) => (
+          <div key={rule.key} className="ed-au">
+            <div className="ed-f1">
+              <b>{rule.label}</b>
+              <p>{rule.hint}</p>
+            </div>
+            <label className="ed-sw">
+              <input
+                type="checkbox"
                 checked={enabled[rule.key] !== false}
                 disabled={saving === rule.key}
-                onCheckedChange={(value) => toggle(rule.key, value)}
+                onChange={(event) => toggle(rule.key, event.target.checked)}
                 aria-label={rule.label}
               />
-            </li>
-          ))}
-        </ul>
+              <span />
+            </label>
+          </div>
+        ))
       )}
     </section>
   );
