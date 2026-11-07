@@ -26,6 +26,11 @@ export default function ListingCard({ listing, publisherHint, onContact, onConve
           <span className={`rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${status.tone}`}>
             {status.label}
           </span>
+          {listing.publisher_type && listing.publisher_type !== 'desconocido' && (
+            <span className="rounded-md border border-border/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              {listing.publisher_type === 'inmobiliaria' ? 'Inmobiliaria' : 'Particular'}
+            </span>
+          )}
         </div>
         <p className="shrink-0 font-heading text-sm font-bold">
           {listing.price ? formatCurrency(listing.price) : '—'}

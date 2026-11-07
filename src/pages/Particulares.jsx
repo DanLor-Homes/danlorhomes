@@ -11,9 +11,11 @@ import ListingCard from '@/components/portals/ListingCard';
 import ContactDialog from '@/components/portals/ContactDialog';
 import PendingClassificationRow from '@/components/particulares/PendingClassificationRow';
 import PortalCoverage from '@/components/particulares/PortalCoverage';
+import ClientFormDialog from '@/components/clients/ClientFormDialog';
 import { asArray, PORTALS } from '@/lib/portals';
 import { classificationHint, classifyPublisher } from '@/lib/publisherClassifier';
-import { convertListingToClient, discardListing, markListingContacted } from '@/lib/listingActions';
+import { classifyPendingListings } from '@/lib/portalClassification';
+import { buildClientDraft, discardListing, markListingContacted, markListingConverted } from '@/lib/listingActions';
 import { cn } from '@/lib/utils';
 
 const OPERATION_TABS = [
@@ -35,6 +37,7 @@ export default function Particulares() {
   const [operation, setOperation] = useState('todas');
   const [term, setTerm] = useState('');
   const [contactListing, setContactListing] = useState(null);
+  const [formDialog, setFormDialog] = useState({ open: false, client: null, listing: null });
 
   const load = async () => {
     const [sourceRes, listingRes] = await Promise.all([
@@ -42,22 +45,10 @@ export default function Particulares() {
       base44.entities.PortalListing.list({ sort: '-first_seen', limit: 300 }),
     ]);
 
-    const items = asArray(listingRes);
-    const pending = items.filter((item) => !item.publisher_type || item.publisher_type === 'desconocido');
-    const autoResults = pending
-      .map((item) => ({ id: item.id, ...classifyPublisher(item) }))
-      .filter((item) => item.publisher_type !== 'desconocido');
-
-    if (autoResults.length) {
-      await base44.entities.PortalListing.bulkUpdate(
-        autoResults.map(({ id, publisher_type }) => ({ id, publisher_type }))
-      );
-    }
-
-    const assigned = new Map(autoResults.map((item) => [item.id, item.publisher_type]));
-    setListings(items.map((item) => (assigned.has(item.id) ? { ...item, publisher_type: assigned.get(item.id) } : item)));
+    const { listings: classified, count } = await classifyPendingListings(asArray(listingRes));
+    setListings(classified);
     setSources(asArray(sourceRes));
-    setAutoCount(autoResults.length);
+    setAutoCount(count);
     setLoading(false);
   };
 
@@ -130,9 +121,16 @@ export default function Particulares() {
     });
   };
 
-  const handleConvert = async (listing) => {
-    await convertListingToClient(listing);
-    toast({ title: 'Cliente creado', description: 'Ya está disponible en la ficha de clientes.' });
+  const handleConvert = (listing) => {
+    setFormDialog({ open: true, client: buildClientDraft(listing), listing });
+  };
+
+  const handleClientSaved = async (client) => {
+    if (formDialog.listing && client?.id) {
+      await markListingConverted(formDialog.listing, client.id);
+    }
+    setFormDialog({ open: false, client: null, listing: null });
+    toast({ title: 'Cliente creado', description: 'Ficha autorrellenada con los datos del anuncio.' });
     await load();
   };
 
@@ -262,6 +260,13 @@ export default function Particulares() {
         open={Boolean(contactListing)}
         onOpenChange={(open) => !open && setContactListing(null)}
         onContacted={handleContacted}
+      />
+
+      <ClientFormDialog
+        open={formDialog.open}
+        onOpenChange={(open) => setFormDialog((prev) => ({ ...prev, open }))}
+        client={formDialog.client}
+        onSaved={handleClientSaved}
       />
     </div>
   );

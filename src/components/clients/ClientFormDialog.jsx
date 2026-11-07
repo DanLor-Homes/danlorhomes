@@ -130,14 +130,12 @@ export default function ClientFormDialog({ open, onOpenChange, client, onSaved }
     }
 
     try {
-      if (client?.id) {
-        await base44.entities.Client.update(client.id, payload);
-      } else {
-        await base44.entities.Client.create(payload);
-      }
+      const saved = client?.id
+        ? await base44.entities.Client.update(client.id, payload)
+        : await base44.entities.Client.create(payload);
       toast({ title: client?.id ? 'Cliente actualizado' : 'Cliente creado' });
       onOpenChange(false);
-      onSaved?.();
+      onSaved?.(saved);
     } catch (err) {
       setError(err?.message || 'No se pudo guardar el cliente.');
     } finally {

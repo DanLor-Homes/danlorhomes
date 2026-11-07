@@ -10,9 +10,16 @@ import SourceCard from '@/components/portals/SourceCard';
 import SourceDialog from '@/components/portals/SourceDialog';
 import ListingCard from '@/components/portals/ListingCard';
 import ContactDialog from '@/components/portals/ContactDialog';
+import ClientFormDialog from '@/components/clients/ClientFormDialog';
 import { asArray } from '@/lib/portals';
-import { convertListingToClient, discardListing, markListingContacted } from '@/lib/listingActions';
+import { buildClientDraft, discardListing, markListingContacted, markListingConverted } from '@/lib/listingActions';
+import { classifyPendingListings } from '@/lib/portalClassification';
 import { cn } from '@/lib/utils';
+
+const PUBLISHER_TABS = [
+  { id: 'particular', label: 'Particulares' },
+  { id: 'inmobiliaria', label: 'Inmobiliarias' },
+];
 
 const FILTERS = [
   { id: 'nuevo', label: 'Nuevos' },
@@ -30,16 +37,19 @@ export default function Portales() {
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [filter, setFilter] = useState('nuevo');
+  const [publisher, setPublisher] = useState('particular');
   const [sourceDialog, setSourceDialog] = useState({ open: false, source: null });
   const [contactListing, setContactListing] = useState(null);
+  const [formDialog, setFormDialog] = useState({ open: false, client: null, listing: null });
 
   const load = async () => {
     const [sourceRes, listingRes] = await Promise.all([
       base44.entities.PortalSource.list({ sort: '-created_date', limit: 50 }),
       base44.entities.PortalListing.list({ sort: '-first_seen', limit: 200 }),
     ]);
+    const { listings: classified } = await classifyPendingListings(asArray(listingRes));
     setSources(asArray(sourceRes));
-    setListings(asArray(listingRes));
+    setListings(classified);
     setLoading(false);
   };
 
@@ -58,10 +68,23 @@ export default function Portales() {
     [listings, sources]
   );
 
-  const visible = useMemo(
-    () => (filter === 'todos' ? listings : listings.filter((item) => item.status === filter)),
-    [listings, filter]
+  const publisherCounts = useMemo(
+    () => ({
+      particular: listings.filter((item) => item.publisher_type === 'particular').length,
+      inmobiliaria: listings.filter((item) => item.publisher_type === 'inmobiliaria').length,
+      desconocido: listings.filter((item) => !item.publisher_type || item.publisher_type === 'desconocido').length,
+    }),
+    [listings]
   );
+
+  const visible = useMemo(() => {
+    const byPublisher = listings.filter((item) =>
+      publisher === 'desconocido'
+        ? !item.publisher_type || item.publisher_type === 'desconocido'
+        : item.publisher_type === publisher
+    );
+    return filter === 'todos' ? byPublisher : byPublisher.filter((item) => item.status === filter);
+  }, [listings, filter, publisher]);
 
   const handleScan = async (source) => {
     setScanning(true);
@@ -90,13 +113,20 @@ export default function Portales() {
     }
   };
 
-  const handleConvert = async (listing) => {
+  const handleConvert = (listing) => {
+    setFormDialog({ open: true, client: buildClientDraft(listing), listing });
+  };
+
+  const handleClientSaved = async (client) => {
     try {
-      await convertListingToClient(listing);
-      toast({ title: 'Cliente creado', description: 'Ya está disponible en la ficha de clientes.' });
+      if (formDialog.listing && client?.id) {
+        await markListingConverted(formDialog.listing, client.id);
+      }
+      setFormDialog({ open: false, client: null, listing: null });
+      toast({ title: 'Cliente creado', description: 'Ficha autorrellenada con los datos del anuncio.' });
       await load();
     } catch (error) {
-      toast({ title: 'No se pudo crear el cliente', description: error.message, variant: 'destructive' });
+      toast({ title: 'No se pudo cerrar la captación', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -150,7 +180,40 @@ export default function Portales() {
         <StatCard label="Búsquedas activas" value={counts.activas} hint={`${sources.length} configuradas`} icon={RefreshCw} tone="amber" />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-1.5">
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <div className="inline-flex gap-1 rounded-full border border-border/70 bg-muted/40 p-1">
+          {PUBLISHER_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setPublisher(tab.id)}
+              className={cn(
+                'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                publisher === tab.id
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {tab.label}
+              <span className="ml-1.5 text-[10px] font-medium text-muted-foreground">{publisherCounts[tab.id]}</span>
+            </button>
+          ))}
+        </div>
+        {publisherCounts.desconocido > 0 && (
+          <button
+            onClick={() => setPublisher('desconocido')}
+            className={cn(
+              'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
+              publisher === 'desconocido'
+                ? 'border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-300'
+                : 'border-dashed border-border/70 text-muted-foreground hover:text-foreground'
+            )}
+          >
+            Sin clasificar · {publisherCounts.desconocido}
+          </button>
+        )}
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {FILTERS.map((item) => (
           <button
             key={item.id}
@@ -243,6 +306,13 @@ export default function Portales() {
         open={Boolean(contactListing)}
         onOpenChange={(open) => !open && setContactListing(null)}
         onContacted={handleContacted}
+      />
+
+      <ClientFormDialog
+        open={formDialog.open}
+        onOpenChange={(open) => setFormDialog((prev) => ({ ...prev, open }))}
+        client={formDialog.client}
+        onSaved={handleClientSaved}
       />
     </div>
   );
