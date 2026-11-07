@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
+  Brain,
   Building2,
   Globe,
   Mail,
@@ -23,6 +24,7 @@ import StageBadge from '@/components/crm/StageBadge';
 import LeadScoreBadge from '@/components/clients/LeadScoreBadge';
 import InteractionDialog from '@/components/interactions/InteractionDialog';
 import MessageDraftDialog from '@/components/clients/MessageDraftDialog';
+import ClientAiBrief from '@/components/clients/ClientAiBrief';
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/crm';
 import { scoreLead } from '@/lib/leadScoring';
 import { VISIT_RESULT_CLASSES, visitResultLabel } from '@/lib/visits';
@@ -43,6 +45,7 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
   const [loading, setLoading] = useState(true);
   const [interactionOpen, setInteractionOpen] = useState(false);
   const [draftOpen, setDraftOpen] = useState(false);
+  const [briefOpen, setBriefOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!client?.id) return;
@@ -92,6 +95,9 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
                 <SheetDescription>{client.geographic_zone || 'Sin zona asignada'}</SheetDescription>
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
+                <Button variant="outline" size="sm" onClick={() => setBriefOpen(true)}>
+                  <Brain className="mr-1.5 h-3.5 w-3.5" /> Análisis IA
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => setDraftOpen(true)}>
                   <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Borrador IA
                 </Button>
@@ -294,6 +300,8 @@ export default function ClientDetailSheet({ client, open, onOpenChange, onEdit, 
       />
 
       <MessageDraftDialog client={client} open={draftOpen} onOpenChange={setDraftOpen} />
+
+      <ClientAiBrief client={client} open={briefOpen} onOpenChange={setBriefOpen} />
     </>
   );
 }

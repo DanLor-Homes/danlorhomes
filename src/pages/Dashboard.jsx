@@ -13,6 +13,7 @@ import MetricsStrip from '@/components/dashboard/editorial/MetricsStrip';
 import StageList from '@/components/dashboard/editorial/StageList';
 import AlertsBriefing from '@/components/dashboard/editorial/AlertsBriefing';
 import UpcomingTasks from '@/components/dashboard/editorial/UpcomingTasks';
+import AiPriorities from '@/components/dashboard/AiPriorities';
 
 const MANDATE_ALERT_LIMIT = 4;
 const AUTOMATION_RUN_KEY = 'danlor_last_automation_run';
@@ -214,6 +215,10 @@ export default function Dashboard() {
       <div className="ed-band">
         <HotStaleLeads leads={hotLeads} />
         <QuickRepliesCard leads={hotLeads} />
+      </div>
+
+      <div className="mt-5">
+        <AiPriorities />
       </div>
 
       <div className="ed-low">
