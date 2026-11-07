@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Building2, Globe, Plus, RefreshCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -51,6 +51,7 @@ export default function Portales() {
   const [sourceDialog, setSourceDialog] = useState({ open: false, source: null });
   const [contactListing, setContactListing] = useState(null);
   const [formDialog, setFormDialog] = useState({ open: false, client: null, listing: null });
+  const photosLoaded = useRef(false);
 
   const load = async () => {
     const [sourceRes, listingRes] = await Promise.all([
@@ -64,7 +65,27 @@ export default function Portales() {
   };
 
   useEffect(() => {
-    load();
+    const fillPhotos = async () => {
+      try {
+        const response = await base44.functions.invoke('listingPhotos', {});
+        const photos = response.data?.photos || [];
+        if (!photos.length) return;
+        setListings((prev) =>
+          prev.map((item) => {
+            const hit = photos.find((photo) => photo.id === item.id);
+            return hit ? { ...item, image_url: hit.image_url, photo_checked: true } : item;
+          })
+        );
+      } catch {
+        // Si el portal no devuelve la foto, la ficha mantiene el marcador de "sin foto".
+      }
+    };
+
+    load().then(() => {
+      if (photosLoaded.current) return;
+      photosLoaded.current = true;
+      fillPhotos();
+    });
     base44.auth.me().then(setUser).catch(() => setUser(null));
   }, []);
 

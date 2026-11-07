@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
+import { resolveListingPhotos } from '../../shared/listingImage.ts';
 
 const PORTAL_LABELS = {
   idealista: 'Idealista',
@@ -186,7 +187,14 @@ async function scanSource(base44, db, source) {
 
   const toCreate = records.slice(0, MAX_LISTINGS);
   if (toCreate.length) {
-    await db.entities.PortalListing.bulkCreate(toCreate);
+    const created = (await db.entities.PortalListing.bulkCreate(toCreate)) || [];
+    const resolved = await resolveListingPhotos(base44, created);
+    const byId = new Map(resolved.map((entry) => [entry.id, entry.image_url]));
+    const updates = created.map((item) => {
+      const image = byId.get(item.id);
+      return image ? { id: item.id, image_url: image, photo_checked: true } : { id: item.id, photo_checked: true };
+    });
+    if (updates.length) await db.entities.PortalListing.bulkUpdate(updates);
   }
   await db.entities.PortalSource.update(source.id, {
     last_run: now,
