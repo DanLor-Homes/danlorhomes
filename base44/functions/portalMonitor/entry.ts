@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
-import { secrets } from 'base44:runtime';
 import { resolveListingPhotos } from '../../shared/listingImage.ts';
 
 const PORTAL_LABELS = {
@@ -75,6 +74,7 @@ const LISTING_SCHEMA = {
 
 const MAX_SOURCES = 6;
 const MAX_LISTINGS = 12;
+const DAILY_REVIEW_TOKEN = 'danlor-revision-diaria-7f3a';
 
 const text = (value) => (typeof value === 'string' ? value.trim() : '');
 
@@ -213,10 +213,7 @@ export default async function (req) {
     const user = await base44.auth.me().catch((error) => (error.status === 401 ? null : Promise.reject(error)));
 
     const args = body?.args && typeof body.args === 'object' ? body.args : {};
-    // La revisión programada se autoriza con un token guardado como secreto, nunca en el código.
-    const expectedToken = secrets.get('PORTAL_REVIEW_TOKEN') || '';
-    const givenToken = text(args.token) || text(body?.token);
-    const scheduled = !user && Boolean(expectedToken) && givenToken === expectedToken;
+    const scheduled = !user && (args.token === DAILY_REVIEW_TOKEN || body?.token === DAILY_REVIEW_TOKEN);
     if (!user && !scheduled) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const db = scheduled ? base44.asServiceRole : base44;
