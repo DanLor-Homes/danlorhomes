@@ -17,7 +17,8 @@
         "facebook",
         "google_ads",
         "llamada_fria",
-        "cartel"
+        "cartel",
+        "broker"
       ],
       "enumColors": [
         "blue",
@@ -31,7 +32,8 @@
         "blue",
         "yellow",
         "gray",
-        "gray"
+        "gray",
+        "purple"
       ]
     },
     "active": {

@@ -45,6 +45,7 @@ export const CHANNELS = [
   { id: 'google_ads', label: 'Google Ads' },
   { id: 'llamada_fria', label: 'Llamada fría' },
   { id: 'cartel', label: 'Cartel / escaparate' },
+  { id: 'broker', label: 'Bróker inmobiliario' },
 ];
 
 export const CHANNEL_LABELS = CHANNELS.reduce((acc, c) => {
