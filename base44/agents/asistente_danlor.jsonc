@@ -52,12 +52,31 @@
     },
     {
       "function_name": "clientBrief",
-      "description": "Diagn\u00f3stico de un cliente: resumen, temperatura, prioridad, siguiente acci\u00f3n, se\u00f1ales, riesgos e inmuebles de la cartera que encajan."
+      "description": "Diagn\u00f3stico de un cliente con siguiente acci\u00f3n, se\u00f1ales y riesgos."
     },
     {
       "function_name": "draftMessage",
-      "description": "Redacta un email o WhatsApp para un cliente con el canal, el tono y el objetivo indicados."
+      "description": "Redacta un email o WhatsApp para un cliente con tono y objetivo."
     }
   ],
+  "context_files": [],
+  "app_user_connector_configs": [],
+  "selected_skill_names": [],
+  "selected_workspace_skill_ids": [],
+  "model": "automatic",
+  "whatsapp_greeting": null,
+  "telegram_greeting": null,
+  "line_greeting": null,
+  "memory_config": {
+    "enabled": true,
+    "scope": "both",
+    "include_other_conversation_context": false,
+    "instructions": null
+  },
+  "voice_config": {
+    "voice_id": null
+  },
+  "emails_settings": null,
+  "allow_anonymous_access": false,
   "name": "asistente_danlor"
 }
