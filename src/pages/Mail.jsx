@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import MailInbox from '@/components/mail/MailInbox';
 import MailComposer from '@/components/mail/MailComposer';
 import TemplatesPanel from '@/components/mail/TemplatesPanel';
+import WhatsAppPanel from '@/components/mail/WhatsAppPanel';
 import { parseEmail } from '@/lib/mail';
 
 export default function Mail() {
   const [emails, setEmails] = useState([]);
+  const [whatsapps, setWhatsapps] = useState([]);
   const [clients, setClients] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,8 +20,9 @@ export default function Mail() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [interactions, clientRes, templateRes] = await Promise.all([
+    const [interactions, whatsappRes, clientRes, templateRes] = await Promise.all([
       base44.entities.Interaction.filter({ type: 'email' }, { sort: '-date', limit: 100 }),
+      base44.entities.Interaction.filter({ type: 'whatsapp' }, { sort: '-date', limit: 100 }),
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
       base44.entities.EmailTemplate.filter({}, { sort: '-created_date', limit: 200 }),
     ]);
@@ -37,6 +40,15 @@ export default function Mail() {
         clientId: interaction.client_id,
         clientName: namesById[interaction.client_id] || '',
         parsed: parseEmail(interaction.content),
+      }))
+    );
+    setWhatsapps(
+      (whatsappRes.items || []).map((interaction) => ({
+        id: interaction.id,
+        date: interaction.date || interaction.created_date,
+        clientId: interaction.client_id,
+        clientName: namesById[interaction.client_id] || '',
+        content: interaction.content || '',
       }))
     );
     setClients(clientItems);
@@ -59,6 +71,7 @@ export default function Mail() {
 
   const tabs = [
     { id: 'bandeja', label: `Bandeja (${emails.length})` },
+    { id: 'whatsapp', label: `WhatsApp (${whatsapps.length})` },
     { id: 'plantillas', label: `Plantillas (${templates.length})` },
   ];
 
@@ -91,6 +104,14 @@ export default function Mail() {
 
       {tab === 'bandeja' ? (
         <MailInbox emails={emails} loading={loading} onReply={reply} />
+      ) : tab === 'whatsapp' ? (
+        <WhatsAppPanel
+          clients={clients}
+          templates={templates}
+          messages={whatsapps}
+          loading={loading}
+          onChanged={load}
+        />
       ) : (
         <TemplatesPanel templates={templates} loading={loading} onChanged={load} />
       )}
