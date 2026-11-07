@@ -189,10 +189,12 @@ async function scanSource(base44, db, source) {
   if (toCreate.length) {
     const created = (await db.entities.PortalListing.bulkCreate(toCreate)) || [];
     const resolved = await resolveListingPhotos(base44, created);
-    const byId = new Map(resolved.map((entry) => [entry.id, entry.image_url]));
+    const byId = new Map(resolved.map((entry) => [entry.id, entry]));
     const updates = created.map((item) => {
-      const image = byId.get(item.id);
-      return image ? { id: item.id, image_url: image, photo_checked: true } : { id: item.id, photo_checked: true };
+      const hit = byId.get(item.id);
+      return hit?.image_url
+        ? { id: item.id, image_url: hit.image_url, photo_generated: Boolean(hit.generated), photo_checked: true }
+        : { id: item.id, photo_checked: true };
     });
     if (updates.length) await db.entities.PortalListing.bulkUpdate(updates);
   }

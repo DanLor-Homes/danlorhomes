@@ -27,6 +27,11 @@
       "title": "Foto revisada",
       "default": false
     },
+    "photo_generated": {
+      "type": "boolean",
+      "title": "Imagen orientativa",
+      "default": false
+    },
     "price": {
       "type": "number",
       "title": "Precio"

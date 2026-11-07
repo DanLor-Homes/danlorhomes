@@ -9,11 +9,16 @@ const PHOTO_PATTERNS = [
   /<img[^>]+src=["'](https?:\/\/[^"']+\.(?:jpe?g|png|webp)[^"']*)["']/i,
 ];
 
-const MAX_LISTINGS = 12;
+const MAX_LISTINGS = 8;
 const BATCH = 6;
+
+// Portales que bloquean cualquier descarga desde el servidor: se va directo a la imagen orientativa.
+const BLOCKED_PORTALS = new Set(['idealista', 'milanuncios', 'fotocasa']);
 
 const isPhotoUrl = (value) =>
   /^https?:\/\//i.test(value) && /\.(jpe?g|png|webp)(\?|$)/i.test(value) && !/logo|icon|sprite|favicon|avatar/i.test(value);
+
+const isBlocked = (listing) => BLOCKED_PORTALS.has(String(listing?.portal || '').toLowerCase());
 
 export function photoFromHtml(html) {
   if (!html) return '';
@@ -105,31 +110,101 @@ Reglas:
       if (url && isPhotoUrl(image)) found.set(url, image.slice(0, 500));
     });
   } catch {
-    // Sin foto por esta vía: la ficha se queda con el marcador de "sin foto".
+    // Sin foto por esta vía: se intentará generar una imagen orientativa.
   }
   return found;
 }
 
+const TYPE_SCENES = {
+  piso: 'salón luminoso de un piso urbano reformado con ventanales grandes',
+  atico: 'ático con terraza privada y vistas abiertas a la ciudad',
+  'ático': 'ático con terraza privada y vistas abiertas a la ciudad',
+  duplex: 'dúplex moderno con escalera interior y doble altura',
+  'dúplex': 'dúplex moderno con escalera interior y doble altura',
+  estudio: 'estudio diáfano reformado con cocina integrada',
+  chalet: 'exterior de un chalet mediterráneo con jardín y piscina',
+  adosado: 'fachada de una vivienda adosada con pequeño jardín',
+  casa: 'fachada de una casa unifamiliar reformada',
+  local: 'interior diáfano de un local comercial a pie de calle',
+  oficina: 'oficina diáfana moderna con puestos de trabajo',
+  garaje: 'interior de un garaje con plaza de aparcamiento',
+  nave: 'interior diáfano de una nave industrial',
+  terreno: 'parcela urbana con vistas despejadas',
+};
+
+function buildPhotoPrompt(listing) {
+  const rawType = String(listing.property_type || 'piso').toLowerCase();
+  const scene = TYPE_SCENES[rawType] || `interior reformado de un ${rawType}`;
+  const zone = listing.zone ? ` en ${listing.zone}` : '';
+  const mode = listing.operation === 'alquiler' ? 'en alquiler' : 'en venta';
+  const specs = [
+    listing.rooms ? `${listing.rooms} habitaciones` : '',
+    listing.bathrooms ? `${listing.bathrooms} baños` : '',
+    listing.surface ? `${listing.surface} m²` : '',
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  return `Fotografía inmobiliaria profesional hiperrealista de un inmueble español ${mode}${zone}: ${scene}${
+    specs ? ` (${specs})` : ''
+  }. Estilo de reportaje de portal inmobiliario, gran angular, luz natural cálida de día, decoración neutra actual, materiales reales, composición cuidada en horizontal. Sin texto, sin marcas de agua, sin logotipos, sin personas.`;
+}
+
+async function generateListingPhoto(base44, listing) {
+  try {
+    const result = await base44.asServiceRole.integrations.Core.GenerateImage({
+      prompt: buildPhotoPrompt(listing),
+    });
+    const url = typeof result === 'string' ? result : result?.url || '';
+    return /^https?:\/\//i.test(url) ? url : '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Devuelve [{ id, image_url, generated }] para cada anuncio sin foto.
+ * Orden: descarga directa de la ficha, búsqueda asistida y, si el portal bloquea
+ * el acceso, una imagen orientativa generada a partir de los datos del anuncio.
+ */
 export async function resolveListingPhotos(base44, listings) {
   const targets = (Array.isArray(listings) ? listings : [])
     .filter((item) => item?.id && item?.url && !item?.image_url)
     .slice(0, MAX_LISTINGS);
   if (!targets.length) return [];
 
-  const direct = await fetchInBatches(targets.map((item) => item.url));
   const resolved = new Map();
-  targets.forEach((item, index) => {
+  const generated = new Set();
+
+  const fetchable = targets.filter((item) => !isBlocked(item));
+  const direct = await fetchInBatches(fetchable.map((item) => item.url));
+  fetchable.forEach((item, index) => {
     if (direct[index]) resolved.set(item.id, direct[index]);
   });
 
-  const missing = targets.filter((item) => !resolved.has(item.id));
-  if (missing.length) {
-    const searched = await photosFromSearch(base44, missing);
-    missing.forEach((item) => {
+  const searchable = targets.filter((item) => !resolved.has(item.id) && !isBlocked(item));
+  if (searchable.length) {
+    const searched = await photosFromSearch(base44, searchable);
+    searchable.forEach((item) => {
       const photo = searched.get(item.url);
       if (photo) resolved.set(item.id, photo);
     });
   }
 
-  return targets.map((item) => ({ id: item.id, image_url: resolved.get(item.id) || '' }));
+  const pending = targets.filter((item) => !resolved.has(item.id)).slice(0, MAX_LISTINGS);
+  if (pending.length) {
+    const photos = await Promise.all(pending.map((item) => generateListingPhoto(base44, item)));
+    pending.forEach((item, index) => {
+      if (photos[index]) {
+        resolved.set(item.id, photos[index]);
+        generated.add(item.id);
+      }
+    });
+  }
+
+  return targets.map((item) => ({
+    id: item.id,
+    image_url: resolved.get(item.id) || '',
+    generated: generated.has(item.id),
+  }));
 }

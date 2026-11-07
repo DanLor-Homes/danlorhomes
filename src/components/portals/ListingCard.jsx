@@ -36,6 +36,11 @@ export default function ListingCard({ listing, publisherHint, onContact, onConve
         <span className={`absolute right-2 top-2 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide backdrop-blur ${status.tone}`}>
           {status.label}
         </span>
+        {listing.photo_generated && (
+          <span className="absolute bottom-2 left-2 rounded-md bg-background/85 px-2 py-0.5 text-[10px] font-medium text-muted-foreground backdrop-blur">
+            Imagen orientativa
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">

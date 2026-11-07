@@ -66,18 +66,26 @@ export default function Portales() {
 
   useEffect(() => {
     const fillPhotos = async () => {
-      try {
-        const response = await base44.functions.invoke('listingPhotos', {});
-        const photos = response.data?.photos || [];
-        if (!photos.length) return;
-        setListings((prev) =>
-          prev.map((item) => {
-            const hit = photos.find((photo) => photo.id === item.id);
-            return hit ? { ...item, image_url: hit.image_url, photo_checked: true } : item;
-          })
-        );
-      } catch {
-        // Si el portal no devuelve la foto, la ficha mantiene el marcador de "sin foto".
+      for (let round = 0; round < 12; round += 1) {
+        let data = null;
+        try {
+          const response = await base44.functions.invoke('listingPhotos', {});
+          data = response.data || {};
+        } catch {
+          return;
+        }
+        const photos = data.photos || [];
+        if (photos.length) {
+          setListings((prev) =>
+            prev.map((item) => {
+              const hit = photos.find((photo) => photo.id === item.id);
+              return hit
+                ? { ...item, image_url: hit.image_url, photo_generated: hit.generated, photo_checked: true }
+                : item;
+            })
+          );
+        }
+        if (!data.remaining) return;
       }
     };
 
