@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Building2, Loader2, MonitorPlay, Plus, Search, Trash2 } from 'lucide-react';
+import { Building2, Loader2, MonitorPlay, Plus, Search } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
 import EmptyState from '@/components/crm/EmptyState';
@@ -196,24 +196,11 @@ export default function Properties() {
           <DragList className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
             {visible.map((property, index) => (
               <DraggableItem key={property.id} id={property.id} index={index}>
-                <div className="group relative">
-                  <PropertyCard
-                    property={property}
-                    matches={matchesByProperty.get(property.id) || 0}
-                    onClick={() => openDetail(property)}
-                  />
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setToDelete(property);
-                    }}
-                    aria-label={`Eliminar ${property.title}`}
-                    className="absolute right-2 top-2 rounded-md bg-background/85 p-1.5 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+                <PropertyCard
+                  property={property}
+                  matches={matchesByProperty.get(property.id) || 0}
+                  onClick={() => openDetail(property)}
+                />
               </DraggableItem>
             ))}
           </DragList>
