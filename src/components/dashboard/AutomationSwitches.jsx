@@ -81,9 +81,7 @@ export default function AutomationSwitches() {
       <div className="ed-sh">
         <h3>Automatizaciones</h3>
       </div>
-      <p className="ed-sub" style={{ margin: '-6px 0 6px' }}>
-        Activa o pausa cada flujo automático sin tocar nada técnico.
-      </p>
+      <p className="ed-sub">Activa o pausa cada flujo automático sin tocar nada técnico.</p>
 
       {loading ? (
         <div className="flex justify-center py-6">

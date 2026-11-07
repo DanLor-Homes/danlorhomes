@@ -17,9 +17,7 @@ export default function QuickRepliesCard({ leads }) {
         Respuesta inmediata
       </p>
       <h3 style={{ marginTop: 8 }}>Contesta antes de que se enfríe</h3>
-      <p className="ed-sub" style={{ fontSize: 12, color: '#6b655a', marginTop: 6, lineHeight: 1.5 }}>
-        La IA redacta el mensaje con el historial y el pipeline del lead.
-      </p>
+      <p className="ed-sub">La IA redacta el mensaje con el historial y el pipeline del lead.</p>
 
       {leads.length === 0 ? (
         <p className="ed-em">Ningún lead espera respuesta ahora mismo.</p>
