@@ -16,6 +16,7 @@ import StatCard from '@/components/crm/StatCard';
 import { Loader2, Percent, Target, Trophy } from 'lucide-react';
 import { CHANNELS, CHANNEL_LABELS, STAGES, formatCurrency } from '@/lib/crm';
 import MonthlyOutcomeChart from '@/components/reports/MonthlyOutcomeChart';
+import ChannelPdfButton from '@/components/reports/ChannelPdfButton';
 
 const tooltipStyle = {
   background: 'hsl(var(--popover))',
@@ -77,6 +78,8 @@ export default function Reports() {
       }).filter((row) => row.count > 0),
     [opportunities, channelSlugById]
   );
+
+  const channelOpportunities = (slug) => opportunities.filter((op) => channelSlugById[op.channel_id] === slug);
 
   const totals = useMemo(() => {
     const won = opportunities.filter((op) => op.status === 'won');
@@ -198,12 +201,13 @@ export default function Reports() {
         <div className="border-b border-border/70 px-5 py-3">
           <h3 className="font-heading text-sm font-bold">Conversión por canal</h3>
         </div>
-        <div className="hidden grid-cols-[1.4fr_repeat(4,1fr)] gap-4 border-b border-border/70 px-5 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
+        <div className="hidden grid-cols-[1.4fr_repeat(4,1fr)_auto] gap-4 border-b border-border/70 px-5 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
           <span>Canal</span>
           <span>Oportunidades</span>
           <span>Pipeline</span>
           <span>Ganado</span>
           <span>Tasa</span>
+          <span className="text-right">Informe</span>
         </div>
         {channelData.length === 0 ? (
           <p className="px-5 py-6 text-xs text-muted-foreground">Sin datos de canal todavía.</p>
@@ -211,13 +215,14 @@ export default function Reports() {
           channelData.map((row) => (
             <div
               key={row.id}
-              className="grid grid-cols-2 gap-2 border-b border-border/50 px-5 py-2.5 text-xs last:border-0 sm:grid-cols-[1.4fr_repeat(4,1fr)] sm:gap-4 sm:items-center"
+              className="grid grid-cols-2 gap-2 border-b border-border/50 px-5 py-2.5 text-xs last:border-0 sm:grid-cols-[1.4fr_repeat(4,1fr)_auto] sm:gap-4 sm:items-center"
             >
               <span className="font-medium">{CHANNEL_LABELS[row.id] || row.label}</span>
               <span className="text-muted-foreground">{row.count}</span>
               <span className="text-muted-foreground">{formatCurrency(row.pipeline)}</span>
               <span className="text-muted-foreground">{formatCurrency(row.ganado)}</span>
               <span className="font-semibold text-primary">{row.rate}%</span>
+              <ChannelPdfButton channel={row} stats={row} opportunities={channelOpportunities(row.id)} />
             </div>
           ))
         )}
