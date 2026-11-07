@@ -84,6 +84,36 @@ export function buildValuation({ surface, own, reference }) {
   };
 }
 
+/**
+ * Comparables por ubicación (municipio → provincia) para tasar una dirección
+ * que aún no está en la cartera.
+ */
+export function sampleByPlace(properties, { municipality, province, operation = 'venta', propertyType, excludeId }) {
+  const pool = (properties || [])
+    .filter((property) => property.id !== excludeId)
+    .filter((property) => (property.operation || 'venta') === operation)
+    .filter((property) => property.status !== 'retirado')
+    .map((property) => ({ ...property, price_m2: pricePerM2(property.price, property.surface) }))
+    .filter((property) => property.price_m2);
+
+  const haystack = (property) => norm([property.municipality, property.zone, property.address, property.title].join(' '));
+  const town = norm(municipality);
+  const area = norm(province);
+
+  const inTown = town.length > 2 ? pool.filter((property) => haystack(property).includes(town)) : [];
+  const inProvince =
+    area.length > 2
+      ? pool.filter((property) => norm(property.province) === area || haystack(property).includes(area))
+      : [];
+
+  const scope = inTown.length ? 'municipio' : inProvince.length ? 'provincia' : null;
+  const matched = scope === 'municipio' ? inTown : scope === 'provincia' ? inProvince : [];
+  const typed = matched.filter((property) => property.property_type === propertyType);
+  const rows = typed.length >= 2 ? typed : matched;
+
+  return { rows, scope, usedFallback: typed.length < 2 && matched.length > typed.length };
+}
+
 export function comparablesList(own, reference) {
   const ownIds = new Set((own?.rows || []).map((row) => row.id));
   const rows = [

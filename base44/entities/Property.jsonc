@@ -63,6 +63,14 @@
       "type": "string",
       "title": "Direcci\u00f3n"
     },
+    "municipality": {
+      "type": "string",
+      "title": "Municipio"
+    },
+    "province": {
+      "type": "string",
+      "title": "Provincia"
+    },
     "price": {
       "type": "number",
       "title": "Precio"

@@ -45,6 +45,8 @@ const EMPTY = {
   zone: '',
   reference_zone: '',
   address: '',
+  municipality: '',
+  province: '',
   price: '',
   surface: '',
   useful_surface: '',
@@ -164,6 +166,8 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
       ...prev,
       cadastral_reference: data.rc,
       address: data.address || prev.address,
+      municipality: prev.municipality || data.municipality || '',
+      province: prev.province || data.province || '',
       zone: prev.zone || data.municipality || '',
       surface: data.surface ?? prev.surface,
       year_built: data.yearBuilt ?? prev.year_built,
@@ -191,6 +195,8 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
       zone: form.zone?.trim() || '',
       reference_zone: form.reference_zone?.trim() || '',
       address: form.address?.trim() || '',
+      municipality: form.municipality?.trim() || '',
+      province: form.province?.trim() || '',
       floor: form.floor?.trim() || '',
       description: form.description?.trim() || '',
       legal_notes: form.legal_notes?.trim() || '',
@@ -326,6 +332,24 @@ export default function PropertyFormDialog({ open, onOpenChange, property, clien
               <div>
                 <Label htmlFor="p-address">Dirección</Label>
                 <Input id="p-address" value={form.address} onChange={(e) => set('address', e.target.value)} />
+              </div>
+              <div>
+                <Label htmlFor="p-municipality">Municipio</Label>
+                <Input
+                  id="p-municipality"
+                  value={form.municipality}
+                  onChange={(e) => set('municipality', e.target.value)}
+                  placeholder="Estepona"
+                />
+              </div>
+              <div>
+                <Label htmlFor="p-province">Provincia</Label>
+                <Input
+                  id="p-province"
+                  value={form.province}
+                  onChange={(e) => set('province', e.target.value)}
+                  placeholder="Málaga"
+                />
               </div>
               <div>
                 <Label htmlFor="p-price">Precio (€)</Label>
