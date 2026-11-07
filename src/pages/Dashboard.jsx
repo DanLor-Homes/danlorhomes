@@ -34,6 +34,8 @@ import AutomationSwitches from '@/components/dashboard/AutomationSwitches';
 import { scoreLead } from '@/lib/leadScoring';
 
 const MANDATE_ALERT_LIMIT = 4;
+const AUTOMATION_RUN_KEY = 'danlor_last_automation_run';
+const AUTOMATION_INTERVAL_MS = 5 * 60 * 1000;
 
 export default function Dashboard() {
   const [opportunities, setOpportunities] = useState([]);
@@ -69,10 +71,14 @@ export default function Dashboard() {
   useEffect(() => {
     let active = true;
     (async () => {
-      try {
-        await base44.functions.invoke('crmAutomations', {});
-      } catch (error) {
-        // Las automatizaciones se reintentan en el siguiente acceso
+      const lastRun = Number(sessionStorage.getItem(AUTOMATION_RUN_KEY) || 0);
+      if (Date.now() - lastRun > AUTOMATION_INTERVAL_MS) {
+        try {
+          await base44.functions.invoke('crmAutomations', {});
+          sessionStorage.setItem(AUTOMATION_RUN_KEY, String(Date.now()));
+        } catch (error) {
+          // Las automatizaciones se reintentan en el siguiente acceso
+        }
       }
       if (active) await load();
     })();
