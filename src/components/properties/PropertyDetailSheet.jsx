@@ -30,6 +30,7 @@ import {
 } from '@/lib/properties';
 import MatchList from './MatchList';
 import PropertyVisits from './PropertyVisits';
+import PropertyDescriptionAI from './PropertyDescriptionAI';
 import { mandateLabel, mandateStatus } from '@/lib/mandates';
 
 const ROW = 'flex items-center justify-between gap-3 py-1.5 text-sm';
@@ -219,9 +220,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
             )}
           </div>
 
-          {property.description && (
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{property.description}</p>
-          )}
+          <PropertyDescriptionAI property={property} onChanged={onChanged} />
 
           {property.features?.length > 0 && (
             <div className="flex flex-wrap gap-1.5">

@@ -5,6 +5,7 @@ import { Brain, Check, Copy, Loader2, RefreshCw, Target } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
+import { aiErrorMessage } from '@/lib/aiError';
 
 const PRIORITY_STYLES = {
   alta: 'border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-300',
@@ -27,8 +28,8 @@ export default function ClientAiBrief({ client, open, onOpenChange }) {
     try {
       const response = await base44.functions.invoke('clientBrief', { clientId: client.id });
       setData(response.data || null);
-    } catch {
-      setError('No se ha podido analizar la ficha ahora mismo. Inténtalo de nuevo en unos minutos.');
+    } catch (err) {
+      setError(aiErrorMessage(err));
     } finally {
       setLoading(false);
     }

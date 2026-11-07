@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { aiErrorMessage } from '@/lib/aiError';
 
 const URGENCY_LABELS = { alta: 'Alta', media: 'Media', baja: 'Baja' };
 
@@ -22,8 +23,8 @@ export default function AiPriorities() {
     try {
       const response = await base44.functions.invoke('pipelineInsights', {});
       setData(response.data || null);
-    } catch {
-      setError('No se ha podido analizar el pipeline ahora mismo. Inténtalo de nuevo en unos minutos.');
+    } catch (err) {
+      setError(aiErrorMessage(err));
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,7 @@ import { Copy, Loader2, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
+import { aiErrorMessage } from '@/lib/aiError';
 
 const CHANNELS = [
   { value: 'email', label: 'Email' },
@@ -52,8 +53,8 @@ export default function MessageDraftDialog({ client, open, onOpenChange }) {
       });
       setSubject(response.data?.subject || '');
       setBody(response.data?.body || '');
-    } catch {
-      setError('No se ha podido generar el borrador ahora mismo. Inténtalo de nuevo en unos minutos.');
+    } catch (err) {
+      setError(aiErrorMessage(err));
     } finally {
       setBusy(false);
     }
