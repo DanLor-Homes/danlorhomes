@@ -18,6 +18,10 @@
       "type": "string",
       "title": "Enlace al anuncio"
     },
+    "image_url": {
+      "type": "string",
+      "title": "Foto del inmueble"
+    },
     "price": {
       "type": "number",
       "title": "Precio"

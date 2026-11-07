@@ -50,6 +50,7 @@ const LISTING_SCHEMA = {
         properties: {
           title: { type: 'string' },
           url: { type: 'string' },
+          image_url: { type: 'string' },
           price: { type: 'number' },
           zone: { type: 'string' },
           surface: { type: 'number' },
@@ -100,6 +101,7 @@ function buildPrompt(source) {
 Reglas obligatorias:
 - Solo páginas de anuncio del dominio ${domain}: fichas de inmueble con precio concreto. Descarta artículos de prensa, blogs, guías, índices de barrio, páginas de resultados, portadas y anuncios de otras zonas.
 - url: enlace directo a la ficha del anuncio, no a la home ni a un listado.
+- image_url: URL directa de la foto principal del inmueble tal como aparece en la ficha (debe terminar en .jpg, .jpeg, .png o .webp y ser una foto del inmueble, no un logo ni un icono). Cadena vacía si la ficha no muestra foto.
 - title: titular del anuncio (tipo de inmueble y zona).
 - price: entero en euros sin símbolos (en alquiler, la renta mensual).
 - zone: municipio o barrio exacto que figura en la ficha.
@@ -163,6 +165,7 @@ async function scanSource(base44, db, source) {
       portal: source.portal,
       title,
       url,
+      image_url: text(item?.image_url).slice(0, 500),
       price: positiveInt(item?.price),
       operation,
       property_type: text(item?.property_type) || source.property_type || 'cualquiera',
