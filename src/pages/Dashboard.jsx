@@ -33,7 +33,7 @@ export default function Dashboard() {
       base44.entities.CommercialTask.filter({}, { sort: 'due_date', limit: 500 }),
       base44.entities.Property.filter({}, { sort: 'mandate_end', limit: 500 }),
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
-      base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }),
+      base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }).catch(() => ({ rows: [] })),
     ]);
 
     const activityMap = {};
