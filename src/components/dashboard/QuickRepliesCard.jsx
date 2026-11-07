@@ -13,7 +13,7 @@ export default function QuickRepliesCard({ leads }) {
 
   return (
     <div className="ed-bc">
-      <p className="ed-sc" style={{ color: '#2D6A4F' }}>
+      <p className="ed-sc">
         Respuesta inmediata
       </p>
       <h3 style={{ marginTop: 8 }}>Contesta antes de que se enfríe</h3>
