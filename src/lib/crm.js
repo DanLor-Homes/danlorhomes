@@ -39,6 +39,12 @@ export const CHANNELS = [
   { id: 'whatsapp', label: 'WhatsApp' },
   { id: 'campana_email', label: 'Campaña email' },
   { id: 'publicidad', label: 'Publicidad' },
+  { id: 'portal_inmobiliario', label: 'Portal inmobiliario' },
+  { id: 'instagram', label: 'Instagram' },
+  { id: 'facebook', label: 'Facebook' },
+  { id: 'google_ads', label: 'Google Ads' },
+  { id: 'llamada_fria', label: 'Llamada fría' },
+  { id: 'cartel', label: 'Cartel / escaparate' },
 ];
 
 export const CHANNEL_LABELS = CHANNELS.reduce((acc, c) => {

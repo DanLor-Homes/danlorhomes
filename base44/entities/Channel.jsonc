@@ -11,7 +11,27 @@
         "linkedin",
         "whatsapp",
         "campana_email",
-        "publicidad"
+        "publicidad",
+        "portal_inmobiliario",
+        "instagram",
+        "facebook",
+        "google_ads",
+        "llamada_fria",
+        "cartel"
+      ],
+      "enumColors": [
+        "blue",
+        "green",
+        "blue",
+        "green",
+        "purple",
+        "yellow",
+        "blue",
+        "pink",
+        "blue",
+        "yellow",
+        "gray",
+        "gray"
       ]
     },
     "active": {

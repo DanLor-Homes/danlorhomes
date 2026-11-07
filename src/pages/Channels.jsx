@@ -77,7 +77,7 @@ export default function Channels() {
       <PageHeader
         eyebrow="Captación"
         title="Canales"
-        description="Origen de cada oportunidad: seis fuentes fijas definidas en el modelo comercial."
+        description="Origen de cada oportunidad: doce fuentes fijas definidas en el modelo comercial."
       >
         <Button onClick={() => setDialogOpen(true)} disabled={available.length === 0}>
           <Plus className="mr-1.5 h-4 w-4" /> Añadir canal
