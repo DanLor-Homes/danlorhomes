@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   CalendarClock,
   CalendarDays,
+  CalendarRange,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
   Clock,
   Loader2,
   Plus,
@@ -15,6 +17,7 @@ import StatCard from '@/components/crm/StatCard';
 import InteractionDialog from '@/components/interactions/InteractionDialog';
 import CalendarGrid from '@/components/calendar/CalendarGrid';
 import DayAgenda from '@/components/calendar/DayAgenda';
+import VisitAgendaDialog from '@/components/calendar/VisitAgendaDialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
@@ -32,20 +35,25 @@ export default function CalendarPage() {
   const [interactions, setInteractions] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [clients, setClients] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visitsOnly, setVisitsOnly] = useState(false);
+  const [visitDialogOpen, setVisitDialogOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
-    const [interactionRes, clientRes, taskRes] = await Promise.all([
+    const [interactionRes, clientRes, taskRes, propertyRes] = await Promise.all([
       base44.entities.Interaction.filter({}, { sort: 'date', limit: 500 }),
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
       base44.entities.CommercialTask.filter({}, { sort: 'due_date', limit: 300 }),
+      base44.entities.Property.filter({}, { sort: 'title', limit: 300 }),
     ]);
     setInteractions(interactionRes.items || []);
     setClients(clientRes.items || []);
     setTasks(taskRes.items || []);
+    setProperties(propertyRes.items || []);
     setLoading(false);
   }, []);
 
@@ -58,19 +66,29 @@ export default function CalendarPage() {
     [clients]
   );
 
+  const propertyMap = useMemo(
+    () => properties.reduce((acc, property) => ({ ...acc, [property.id]: property.title }), {}),
+    [properties]
+  );
+
   const events = useMemo(() => {
     const interactionEvents = interactions
       .filter((item) => item.date)
-      .map((item) => ({
-        id: `interaction-${item.id}`,
-        day: isoDayKey(item.date),
-        time: item.date,
-        sortKey: item.date,
-        type: item.type,
-        title: clientMap[item.client_id] || INTERACTION_LABELS[item.type] || item.type,
-        subtitle: INTERACTION_LABELS[item.type] || 'Interacción',
-        detail: item.content,
-      }));
+      .map((item) => {
+        const property = propertyMap[item.property_id];
+        return {
+          id: `interaction-${item.id}`,
+          day: isoDayKey(item.date),
+          time: item.date,
+          sortKey: item.date,
+          type: item.type,
+          title: clientMap[item.client_id] || property || INTERACTION_LABELS[item.type] || item.type,
+          subtitle: INTERACTION_LABELS[item.type] || 'Interacción',
+          property: item.type === 'visita' ? property : undefined,
+          result: item.type === 'visita' ? item.result : undefined,
+          detail: item.content,
+        };
+      });
 
     const taskEvents = tasks
       .filter((task) => task.due_date)
@@ -87,16 +105,20 @@ export default function CalendarPage() {
       }));
 
     return [...interactionEvents, ...taskEvents].sort((a, b) => String(a.sortKey).localeCompare(String(b.sortKey)));
-  }, [interactions, tasks, clientMap]);
+  }, [interactions, tasks, clientMap, propertyMap]);
 
-  const eventsByDay = useMemo(() => groupByDay(events), [events]);
+  const shownEvents = useMemo(
+    () => (visitsOnly ? events.filter((event) => event.type === 'visita') : events),
+    [events, visitsOnly]
+  );
+  const eventsByDay = useMemo(() => groupByDay(shownEvents), [shownEvents]);
   const cells = useMemo(() => monthCells(month), [month]);
 
   const todayKey = dayKey(new Date());
   const selectedKey = dayKey(selectedDate);
   const selectedEvents = eventsByDay[selectedKey] || [];
 
-  const monthEvents = events.filter((event) => {
+  const monthEvents = shownEvents.filter((event) => {
     const date = new Date(event.sortKey);
     return date.getFullYear() === month.getFullYear() && date.getMonth() === month.getMonth();
   }).length;
@@ -114,6 +136,14 @@ export default function CalendarPage() {
       const date = new Date(event.sortKey);
       return date >= start && date < end;
     }).length;
+  }, [events]);
+
+  const upcomingVisits = useMemo(() => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    return events
+      .filter((event) => event.type === 'visita' && new Date(event.sortKey) >= start)
+      .sort((a, b) => String(a.sortKey).localeCompare(String(b.sortKey)));
   }, [events]);
 
   const monthLabel = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(month);
@@ -179,6 +209,13 @@ export default function CalendarPage() {
           <RefreshCw className={cn('mr-1.5 h-4 w-4', syncing && 'animate-spin')} />
           Sincronizar Google Calendar
         </Button>
+        <Button variant="outline" onClick={() => setVisitDialogOpen(true)}>
+          <ClipboardList className="mr-1.5 h-4 w-4" /> Agenda de visitas
+        </Button>
+        <Button variant={visitsOnly ? 'secondary' : 'outline'} onClick={() => setVisitsOnly((prev) => !prev)}>
+          <CalendarRange className="mr-1.5 h-4 w-4" />
+          {visitsOnly ? 'Ver todo el calendario' : 'Calendario de visitas'}
+        </Button>
         <Button onClick={addToSelectedDay}>
           <Plus className="mr-1.5 h-4 w-4" /> Nueva interacción
         </Button>
@@ -237,6 +274,8 @@ export default function CalendarPage() {
 
         <DayAgenda date={selectedDate} events={selectedEvents} onAdd={addToSelectedDay} />
       </div>
+
+      <VisitAgendaDialog open={visitDialogOpen} onOpenChange={setVisitDialogOpen} visits={upcomingVisits} />
 
       <InteractionDialog
         open={dialogOpen}

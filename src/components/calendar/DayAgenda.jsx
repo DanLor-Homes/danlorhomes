@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus } from 'lucide-react';
+import { CalendarDays, CalendarPlus, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { eventStyle, formatTime, typeLabel } from '@/lib/calendar';
@@ -49,6 +49,12 @@ export default function DayAgenda({ date, events, onAdd }) {
                   <p className={cn('mt-0.5 truncate text-sm font-semibold', event.done && 'text-muted-foreground line-through')}>
                     {event.title}
                   </p>
+                  {event.property && (
+                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <MapPin className="h-3 w-3 flex-none" />
+                      <span className="truncate">{event.property}</span>
+                    </p>
+                  )}
                   {event.detail && (
                     <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{event.detail}</p>
                   )}
