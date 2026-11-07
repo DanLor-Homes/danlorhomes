@@ -1,10 +1,10 @@
 import React from 'react';
 import { Droppable } from '@hello-pangea/dnd';
-import { MoveRight, Trash2 } from 'lucide-react';
-import { DROP_STATUS_PREFIX, DROP_TRASH_ID } from '@/hooks/useStatusDragDrop';
+import { MoveRight } from 'lucide-react';
+import { DROP_STATUS_PREFIX } from '@/hooks/useStatusDragDrop';
 import { cn } from '@/lib/utils';
 
-export default function DragStatusDock({ statuses, dragging, hint, trashLabel = 'Eliminar' }) {
+export default function DragStatusDock({ statuses, dragging, hint }) {
   return (
     <div
       className={cn(
@@ -14,7 +14,7 @@ export default function DragStatusDock({ statuses, dragging, hint, trashLabel = 
     >
       <span className="mr-1 flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
         <MoveRight className="h-3.5 w-3.5" />
-        {dragging ? 'Suelta sobre un estado o en la papelera' : hint || 'Arrastra una ficha para moverla o eliminarla'}
+        {dragging ? 'Suelta sobre un estado' : hint || 'Arrastra una ficha para moverla de estado'}
       </span>
 
       {statuses.map((status) => (
@@ -34,22 +34,6 @@ export default function DragStatusDock({ statuses, dragging, hint, trashLabel = 
           )}
         </Droppable>
       ))}
-
-      <Droppable droppableId={DROP_TRASH_ID} direction="horizontal">
-        {(provided, snapshot) => (
-          <div
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className={cn(
-              'ml-auto flex items-center gap-1 rounded-full border border-rose-500/40 px-2.5 py-1 text-[11px] font-medium text-rose-600 transition-colors dark:text-rose-300',
-              snapshot.isDraggingOver && 'bg-rose-500/15'
-            )}
-          >
-            <Trash2 className="h-3 w-3" /> {trashLabel}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
     </div>
   );
 }

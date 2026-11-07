@@ -191,7 +191,7 @@ export default function Properties() {
           <DragStatusDock
             statuses={PROPERTY_STATUS}
             dragging={drag.dragging}
-            hint="Arrastra un inmueble para cambiar su estado o eliminarlo"
+            hint="Arrastra un inmueble para cambiar su estado"
           />
           <DragList className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
             {visible.map((property, index) => (
