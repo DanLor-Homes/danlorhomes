@@ -245,7 +245,7 @@ export default function Leads() {
       </div>
 
       <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
-        <ClientDropDock dragging={drag.dragging} />
+        <ClientDropDock dragging={drag.dragging} showTrash={false} />
 
         <div className="mt-3 overflow-hidden rounded-2xl border border-border/70 bg-card">
           {loading ? (
