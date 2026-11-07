@@ -1,0 +1,208 @@
+{
+  "name": "Invoice",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "string",
+      "title": "N\u00famero de factura"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "borrador",
+        "emitida",
+        "pagada",
+        "vencida"
+      ],
+      "enumColors": [
+        "gray",
+        "blue",
+        "green",
+        "red"
+      ],
+      "default": "emitida"
+    },
+    "issue_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de emisi\u00f3n"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de vencimiento"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de cobro"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "title": "Nombre o raz\u00f3n social"
+    },
+    "client_nif": {
+      "type": "string",
+      "title": "NIF / CIF"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "client_address": {
+      "type": "string",
+      "title": "Direcci\u00f3n"
+    },
+    "property_id": {
+      "type": "string",
+      "title": "Inmueble"
+    },
+    "property_title": {
+      "type": "string",
+      "title": "Referencia del inmueble"
+    },
+    "items": {
+      "type": "array",
+      "title": "L\u00edneas de factura",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "vat_rate": {
+      "type": "number",
+      "title": "IVA (%)",
+      "default": 21
+    },
+    "irpf_rate": {
+      "type": "number",
+      "title": "Retenci\u00f3n IRPF (%)",
+      "default": 0
+    },
+    "subtotal": {
+      "type": "number",
+      "title": "Base imponible"
+    },
+    "vat_amount": {
+      "type": "number",
+      "title": "Cuota de IVA"
+    },
+    "irpf_amount": {
+      "type": "number",
+      "title": "Retenci\u00f3n IRPF"
+    },
+    "total": {
+      "type": "number",
+      "title": "Total a cobrar"
+    },
+    "payment_method": {
+      "type": "string",
+      "title": "Forma de pago"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    },
+    "issuer": {
+      "type": "object",
+      "title": "Datos del emisor",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "nif": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "number",
+    "client_name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
