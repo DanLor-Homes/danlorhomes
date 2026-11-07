@@ -12,6 +12,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import BulkClientBar from '@/components/clients/BulkClientBar';
 import BulkTaskDialog from '@/components/clients/BulkTaskDialog';
 import BulkEmailDialog from '@/components/clients/BulkEmailDialog';
+import ExportClientsButton from '@/components/clients/ExportClientsButton';
+import ClientDropDock from '@/components/clients/drag/ClientDropDock';
+import DraggableClientRow from '@/components/clients/drag/DraggableClientRow';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   AlertDialog,
@@ -24,9 +27,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/components/ui/use-toast';
+import { DragDropContext } from '@hello-pangea/dnd';
 import { ruleForZone } from '@/lib/assignment';
 import { scoreLead } from '@/lib/leadScoring';
 import { statusMeta } from '@/lib/clientStatus';
+import useClientDragDrop from '@/hooks/useClientDragDrop';
 import { cn } from '@/lib/utils';
 
 export default function Clients() {
@@ -48,6 +53,20 @@ export default function Clients() {
   const [bulkEmailOpen, setBulkEmailOpen] = useState(false);
   const [applyingStatus, setApplyingStatus] = useState(false);
   const { toast } = useToast();
+
+  const drag = useClientDragDrop({
+    onMove: async (clientId, status) => {
+      const client = clients.find((item) => item.id === clientId);
+      if (!client || client.status === status) return;
+      setClients((list) => list.map((item) => (item.id === clientId ? { ...item, status } : item)));
+      await base44.entities.Client.update(clientId, { status });
+      toast({ title: 'Cliente movido', description: `${client.name} → ${statusMeta(status).label}` });
+    },
+    onTrash: (clientId) => {
+      const client = clients.find((item) => item.id === clientId);
+      if (client) setToDelete(client);
+    },
+  });
 
   const load = useCallback(async () => {
     const [clientRes, ruleRes, interactionAgg, opportunityAgg] = await Promise.all([
@@ -227,6 +246,7 @@ export default function Clients() {
           )}
           Repartir por zona
         </Button>
+        <ExportClientsButton clients={visible} filename="clientes" />
         <Button
           onClick={() => {
             setEditing(null);
@@ -270,87 +290,92 @@ export default function Clients() {
           }
         />
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border/70 bg-card">
-          <div className="hidden grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
-            <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} aria-label="Seleccionar todos" />
-            <span>Cliente</span>
-            <span>Contacto</span>
-            <span>Zona</span>
-            <span>Responsable</span>
-            <span>Score</span>
-            <span />
-          </div>
-          {visible.map((client) => (
-            <div
-              key={client.id}
-              onClick={() => openDetail(client)}
-              className="group grid cursor-pointer grid-cols-1 gap-1 border-b border-border/50 px-4 py-3 transition-colors last:border-0 hover:bg-accent/40 md:grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] md:items-center md:gap-4"
-            >
-              <div onClick={(event) => event.stopPropagation()} className="flex items-center">
-                <Checkbox
-                  checked={selectedIds.includes(client.id)}
-                  onCheckedChange={() => toggleSelect(client.id)}
-                  aria-label={`Seleccionar ${client.name}`}
-                />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="truncate text-sm font-medium">{client.name}</p>
-                  <span
-                    className={cn(
-                      'shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium',
-                      statusMeta(client.status).className
-                    )}
-                  >
-                    {statusMeta(client.status).label}
-                  </span>
-                </div>
-                <p className="truncate text-[11px] text-muted-foreground">{client.email || 'Sin email'}</p>
-              </div>
-              <div className="min-w-0 text-xs text-muted-foreground">
-                <p className="truncate">{client.contact_person || '—'}</p>
-                <p className="truncate">{client.phone || ''}</p>
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-xs text-muted-foreground">{client.geographic_zone || '—'}</p>
-                {client.daily_property_search && (
-                  <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                    Búsqueda diaria
-                  </span>
-                )}
-              </div>
-              <p className="truncate text-xs text-muted-foreground">{client.assigned_to || 'Sin asignar'}</p>
-              <div>
-                <LeadScoreBadge score={scores[client.id]?.score || 0} />
-              </div>
-              <div className="flex items-center justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setEditing(client);
-                    setFormOpen(true);
-                  }}
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setToDelete(client);
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
+        <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
+          <ClientDropDock dragging={drag.dragging} />
+
+          <div className="overflow-hidden rounded-2xl border border-border/70 bg-card">
+            <div className="hidden grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+              <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} aria-label="Seleccionar todos" />
+              <span>Cliente</span>
+              <span>Contacto</span>
+              <span>Zona</span>
+              <span>Responsable</span>
+              <span>Score</span>
+              <span />
             </div>
-          ))}
-        </div>
+            {visible.map((client, index) => (
+              <DraggableClientRow key={client.id} clientId={client.id} index={index}>
+                <div
+                  onClick={() => openDetail(client)}
+                  className="group grid cursor-pointer grid-cols-1 gap-1 border-b border-border/50 px-4 py-3 transition-colors last:border-0 hover:bg-accent/40 md:grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] md:items-center md:gap-4"
+                >
+                  <div onClick={(event) => event.stopPropagation()} className="flex items-center">
+                    <Checkbox
+                      checked={selectedIds.includes(client.id)}
+                      onCheckedChange={() => toggleSelect(client.id)}
+                      aria-label={`Seleccionar ${client.name}`}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-sm font-medium">{client.name}</p>
+                      <span
+                        className={cn(
+                          'shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium',
+                          statusMeta(client.status).className
+                        )}
+                      >
+                        {statusMeta(client.status).label}
+                      </span>
+                    </div>
+                    <p className="truncate text-[11px] text-muted-foreground">{client.email || 'Sin email'}</p>
+                  </div>
+                  <div className="min-w-0 text-xs text-muted-foreground">
+                    <p className="truncate">{client.contact_person || '—'}</p>
+                    <p className="truncate">{client.phone || ''}</p>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs text-muted-foreground">{client.geographic_zone || '—'}</p>
+                    {client.daily_property_search && (
+                      <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                        Búsqueda diaria
+                      </span>
+                    )}
+                  </div>
+                  <p className="truncate text-xs text-muted-foreground">{client.assigned_to || 'Sin asignar'}</p>
+                  <div>
+                    <LeadScoreBadge score={scores[client.id]?.score || 0} />
+                  </div>
+                  <div className="flex items-center justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setEditing(client);
+                        setFormOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setToDelete(client);
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </DraggableClientRow>
+            ))}
+          </div>
+        </DragDropContext>
       )}
 
       <ClientFormDialog open={formOpen} onOpenChange={setFormOpen} client={editing} onSaved={load} />

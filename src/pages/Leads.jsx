@@ -23,6 +23,13 @@ import {
 import { cn } from '@/lib/utils';
 import { formatCurrency, daysSince } from '@/lib/crm';
 import { scoreLead, SCORE_BANDS } from '@/lib/leadScoring';
+import { statusMeta } from '@/lib/clientStatus';
+import ExportClientsButton from '@/components/clients/ExportClientsButton';
+import ClientDropDock from '@/components/clients/drag/ClientDropDock';
+import DraggableClientRow from '@/components/clients/drag/DraggableClientRow';
+import useClientDragDrop from '@/hooks/useClientDragDrop';
+import { useToast } from '@/components/ui/use-toast';
+import { DragDropContext } from '@hello-pangea/dnd';
 
 const FILTERS = [
   { id: 'todos', label: 'Todos' },
@@ -47,6 +54,21 @@ export default function Leads() {
   const [logOpen, setLogOpen] = useState(false);
   const [logClientId, setLogClientId] = useState(null);
   const [toDelete, setToDelete] = useState(null);
+  const { toast } = useToast();
+
+  const drag = useClientDragDrop({
+    onMove: async (clientId, status) => {
+      const client = clients.find((item) => item.id === clientId);
+      if (!client || client.status === status) return;
+      setClients((list) => list.map((item) => (item.id === clientId ? { ...item, status } : item)));
+      await base44.entities.Client.update(clientId, { status });
+      toast({ title: 'Cliente movido', description: `${client.name} → ${statusMeta(status).label}` });
+    },
+    onTrash: (clientId) => {
+      const client = clients.find((item) => item.id === clientId);
+      if (client) setToDelete(client);
+    },
+  });
 
   const load = useCallback(async () => {
     const [clientRes, interactionAgg, opportunityAgg] = await Promise.all([
@@ -166,6 +188,7 @@ export default function Leads() {
             className="w-full pl-8 sm:w-56"
           />
         </div>
+        <ExportClientsButton clients={visible.map((lead) => lead.client)} filename="leads" />
       </PageHeader>
 
       <div className="grid gap-3 sm:grid-cols-3">
@@ -214,41 +237,46 @@ export default function Leads() {
         </Button>
       </div>
 
-      <div className="mt-3 overflow-hidden rounded-2xl border border-border/70 bg-card">
-        {loading ? (
-          <div className="flex h-40 items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : visible.length === 0 ? (
-          <div className="p-6">
-            <EmptyState
-              icon={UserRoundCheck}
-              title="Sin leads en este filtro"
-              description="Registra interacciones y completa el perfil de búsqueda de tus clientes para que su puntuación suba."
-            />
-          </div>
-        ) : (
-          <>
-            <div className="hidden grid-cols-[1.5fr_0.9fr_1.5fr_0.7fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
-              <span>Lead</span>
-              <span>Puntuación</span>
-              <span>Señales</span>
-              <span>Actividad</span>
-              <span />
+      <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
+        <ClientDropDock dragging={drag.dragging} />
+
+        <div className="mt-3 overflow-hidden rounded-2xl border border-border/70 bg-card">
+          {loading ? (
+            <div className="flex h-40 items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-            {visible.map((lead) => (
-              <LeadRow
-                key={lead.client.id}
-                client={lead.client}
-                lead={lead}
-                onOpen={openDetail}
-                onLog={openLog}
-                onDelete={setToDelete}
+          ) : visible.length === 0 ? (
+            <div className="p-6">
+              <EmptyState
+                icon={UserRoundCheck}
+                title="Sin leads en este filtro"
+                description="Registra interacciones y completa el perfil de búsqueda de tus clientes para que su puntuación suba."
               />
-            ))}
-          </>
-        )}
-      </div>
+            </div>
+          ) : (
+            <>
+              <div className="hidden grid-cols-[1.5fr_0.9fr_1.5fr_0.7fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
+                <span>Lead</span>
+                <span>Puntuación</span>
+                <span>Señales</span>
+                <span>Actividad</span>
+                <span />
+              </div>
+              {visible.map((lead, index) => (
+                <DraggableClientRow key={lead.client.id} clientId={lead.client.id} index={index}>
+                  <LeadRow
+                    client={lead.client}
+                    lead={lead}
+                    onOpen={openDetail}
+                    onLog={openLog}
+                    onDelete={setToDelete}
+                  />
+                </DraggableClientRow>
+              ))}
+            </>
+          )}
+        </div>
+      </DragDropContext>
 
       <ClientDetailSheet
         client={selected}
