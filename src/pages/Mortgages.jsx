@@ -7,10 +7,12 @@ import { useToast } from '@/components/ui/use-toast';
 import MortgageSimulator from '@/components/mortgages/MortgageSimulator';
 import BankRateTable from '@/components/mortgages/BankRateTable';
 import BankRateDialog from '@/components/mortgages/BankRateDialog';
+import PendingEntities from '@/components/mortgages/PendingEntities';
 import { MORTGAGE_DEFAULTS } from '@/lib/mortgage';
 
 export default function Mortgages() {
   const [offers, setOffers] = useState([]);
+  const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [form, setForm] = useState(MORTGAGE_DEFAULTS);
@@ -19,7 +21,9 @@ export default function Mortgages() {
 
   const load = useCallback(async () => {
     const response = await base44.entities.BankRate.filter({}, { sort: 'bank', limit: 200 });
-    setOffers((response.items || []).filter((offer) => offer.active !== false && offer.tin != null));
+    const items = (response.items || []).filter((offer) => offer.active !== false);
+    setOffers(items.filter((offer) => offer.tin != null));
+    setPending(items.filter((offer) => offer.tin == null));
     setLoading(false);
   }, []);
 
@@ -89,6 +93,8 @@ export default function Mortgages() {
           onEdit={(offer) => setDialog({ open: true, offer })}
           onDelete={remove}
         />
+
+        <PendingEntities offers={pending} onEdit={(offer) => setDialog({ open: true, offer })} />
 
         <p className="text-[11px] leading-relaxed text-muted-foreground">
           La lectura automática toma el TIN y la TAE publicados en la web de cada banco. Algunas entidades bloquean
