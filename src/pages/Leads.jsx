@@ -26,6 +26,7 @@ import { scoreLead, SCORE_BANDS } from '@/lib/leadScoring';
 import { statusMeta } from '@/lib/clientStatus';
 import ExportClientsButton from '@/components/clients/ExportClientsButton';
 import ClientDropDock from '@/components/clients/drag/ClientDropDock';
+import ClientDragList from '@/components/clients/drag/ClientDragList';
 import DraggableClientRow from '@/components/clients/drag/DraggableClientRow';
 import useClientDragDrop from '@/hooks/useClientDragDrop';
 import { useToast } from '@/components/ui/use-toast';
@@ -254,7 +255,7 @@ export default function Leads() {
               />
             </div>
           ) : (
-            <>
+            <ClientDragList>
               <div className="hidden grid-cols-[1.5fr_0.9fr_1.5fr_0.7fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
                 <span>Lead</span>
                 <span>Puntuación</span>
@@ -273,7 +274,7 @@ export default function Leads() {
                   />
                 </DraggableClientRow>
               ))}
-            </>
+            </ClientDragList>
           )}
         </div>
       </DragDropContext>

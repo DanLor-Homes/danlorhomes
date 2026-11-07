@@ -14,6 +14,7 @@ import BulkTaskDialog from '@/components/clients/BulkTaskDialog';
 import BulkEmailDialog from '@/components/clients/BulkEmailDialog';
 import ExportClientsButton from '@/components/clients/ExportClientsButton';
 import ClientDropDock from '@/components/clients/drag/ClientDropDock';
+import ClientDragList from '@/components/clients/drag/ClientDragList';
 import DraggableClientRow from '@/components/clients/drag/DraggableClientRow';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -293,7 +294,7 @@ export default function Clients() {
         <DragDropContext onDragStart={drag.handleDragStart} onDragEnd={drag.handleDragEnd}>
           <ClientDropDock dragging={drag.dragging} />
 
-          <div className="overflow-hidden rounded-2xl border border-border/70 bg-card">
+          <ClientDragList className="overflow-hidden rounded-2xl border border-border/70 bg-card">
             <div className="hidden grid-cols-[20px_1.6fr_1.3fr_1fr_0.9fr_0.6fr_auto] gap-4 border-b border-border/70 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground md:grid">
               <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} aria-label="Seleccionar todos" />
               <span>Cliente</span>
@@ -374,7 +375,7 @@ export default function Clients() {
                 </div>
               </DraggableClientRow>
             ))}
-          </div>
+          </ClientDragList>
         </DragDropContext>
       )}
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 export const STATUS_DROP_PREFIX = 'client-status:';
 export const TRASH_DROP_ID = 'client-trash';
+export const LIST_DROP_ID = 'client-list';
 
 export default function useClientDragDrop({ onMove, onTrash }) {
   const [dragging, setDragging] = useState(false);
