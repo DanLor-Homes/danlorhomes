@@ -25,6 +25,7 @@ import { formatCurrency, daysSince } from '@/lib/crm';
 import { scoreLead, SCORE_BANDS } from '@/lib/leadScoring';
 import { statusMeta } from '@/lib/clientStatus';
 import ExportClientsButton from '@/components/clients/ExportClientsButton';
+import SalesByClientTypeChart from '@/components/leads/SalesByClientTypeChart';
 import ClientDropDock from '@/components/clients/drag/ClientDropDock';
 import ClientDragList from '@/components/clients/drag/ClientDragList';
 import DraggableClientRow from '@/components/clients/drag/DraggableClientRow';
@@ -45,6 +46,7 @@ export default function Leads() {
   const [clients, setClients] = useState([]);
   const [activity, setActivity] = useState({});
   const [pipeline, setPipeline] = useState({});
+  const [wonSales, setWonSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('todos');
   const [search, setSearch] = useState('');
@@ -72,12 +74,13 @@ export default function Leads() {
   });
 
   const load = useCallback(async () => {
-    const [clientRes, interactionAgg, opportunityAgg] = await Promise.all([
+    const [clientRes, interactionAgg, opportunityAgg, wonRes] = await Promise.all([
       base44.entities.Client.filter({}, { sort: 'name', limit: 500 }),
       base44.entities.Interaction.aggregate({ groupBy: 'client_id', max: ['date'] }).catch(() => ({ rows: [] })),
       base44.entities.Opportunity.aggregate({ query: { status: 'open' }, groupBy: 'client_id', sum: ['amount'] }).catch(
         () => ({ rows: [] })
       ),
+      base44.entities.Opportunity.filter({ status: 'won' }, { sort: '-stage_changed_date', limit: 500 }),
     ]);
 
     const activityMap = {};
@@ -93,6 +96,7 @@ export default function Leads() {
     setClients(clientRes.items || []);
     setActivity(activityMap);
     setPipeline(pipelineMap);
+    setWonSales(wonRes.items || []);
     setLoading(false);
   }, []);
 
@@ -203,6 +207,8 @@ export default function Leads() {
           tone="emerald"
         />
       </div>
+
+      <SalesByClientTypeChart opportunities={wonSales} clients={clients} />
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-1.5">

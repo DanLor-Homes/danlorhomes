@@ -43,7 +43,7 @@ const NAV = [
   { to: '/particulares', label: 'Particulares', icon: UserRound },
   { to: '/tareas', label: 'Tareas', icon: ListChecks },
   { to: '/clientes', label: 'Clientes', icon: Users },
-  { to: '/leads', label: 'Leads', icon: Flame },
+  { to: '/leads', label: 'Leads y ventas', icon: Flame },
   { to: '/calendario', label: 'Calendario', icon: CalendarDays },
   { to: '/informes', label: 'Informes', icon: BarChart3 },
   { to: '/canales', label: 'Canales', icon: Megaphone },
