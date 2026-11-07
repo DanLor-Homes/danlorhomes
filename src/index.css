@@ -14,23 +14,23 @@
     --card-foreground: 218 54% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 218 54% 20%;
-    --primary: 216 100% 40%;
+    --primary: 212 52% 27%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 216 100% 94%;
-    --secondary-foreground: 216 100% 28%;
+    --secondary: 212 38% 94%;
+    --secondary-foreground: 212 50% 24%;
     --muted: 220 16% 96%;
     --muted-foreground: 218 20% 44%;
-    --accent: 216 100% 94%;
-    --accent-foreground: 216 100% 30%;
+    --accent: 212 38% 94%;
+    --accent-foreground: 212 50% 27%;
     --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 16% 89%;
     --input: 220 16% 89%;
-    --ring: 216 100% 40%;
-    --chart-1: 216 100% 40%;
-    --chart-2: 216 100% 60%;
+    --ring: 212 52% 27%;
+    --chart-1: 212 52% 27%;
+    --chart-2: 212 45% 45%;
     --chart-3: 218 54% 20%;
-    --chart-4: 216 70% 30%;
+    --chart-4: 212 40% 35%;
     --chart-5: 218 20% 55%;
     --radius: 0.85rem;
     --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -39,12 +39,12 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 218 54% 20%;
-    --sidebar-primary: 216 100% 40%;
+    --sidebar-primary: 212 52% 27%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 216 100% 94%;
-    --sidebar-accent-foreground: 216 100% 30%;
+    --sidebar-accent: 212 38% 94%;
+    --sidebar-accent-foreground: 212 50% 27%;
     --sidebar-border: 220 16% 90%;
-    --sidebar-ring: 216 100% 40%;
+    --sidebar-ring: 212 52% 27%;
   }
 
   .dark {
@@ -54,32 +54,32 @@
     --card-foreground: 220 16% 96%;
     --popover: 218 45% 15%;
     --popover-foreground: 220 16% 96%;
-    --primary: 214 100% 65%;
+    --primary: 210 50% 66%;
     --primary-foreground: 218 54% 10%;
     --secondary: 218 35% 22%;
     --secondary-foreground: 220 16% 96%;
     --muted: 218 30% 19%;
     --muted-foreground: 218 20% 70%;
-    --accent: 216 55% 24%;
-    --accent-foreground: 216 100% 88%;
+    --accent: 212 45% 25%;
+    --accent-foreground: 212 60% 85%;
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
     --border: 218 30% 22%;
     --input: 218 30% 24%;
-    --ring: 214 100% 65%;
-    --chart-1: 214 100% 65%;
+    --ring: 210 50% 66%;
+    --chart-1: 210 50% 66%;
     --chart-2: 220 16% 96%;
-    --chart-3: 216 100% 80%;
-    --chart-4: 216 70% 50%;
+    --chart-3: 212 55% 78%;
+    --chart-4: 212 45% 48%;
     --chart-5: 218 25% 45%;
     --sidebar-background: 219 45% 10%;
     --sidebar-foreground: 218 25% 82%;
-    --sidebar-primary: 214 100% 65%;
+    --sidebar-primary: 210 50% 66%;
     --sidebar-primary-foreground: 218 54% 10%;
-    --sidebar-accent: 216 50% 20%;
-    --sidebar-accent-foreground: 216 100% 88%;
+    --sidebar-accent: 212 42% 22%;
+    --sidebar-accent-foreground: 212 60% 85%;
     --sidebar-border: 218 30% 20%;
-    --sidebar-ring: 214 100% 65%;
+    --sidebar-ring: 210 50% 66%;
   }
 }
 
@@ -134,7 +134,7 @@
 
   .grid-glow {
     background-image: radial-gradient(circle at 15% 0%, hsl(var(--primary) / 0.14), transparent 45%),
-      radial-gradient(circle at 85% 10%, hsl(216 100% 50% / 0.12), transparent 40%);
+      radial-gradient(circle at 85% 10%, hsl(212 52% 40% / 0.12), transparent 40%);
   }
 }
 
@@ -145,9 +145,9 @@
   --ed-line: #e9e5db;
   --ed-line-soft: #f4f1e9;
   --ed-card: #ffffff;
-  --ed-green: #2d6a4f;
-  --ed-green-ink: #23543e;
-  --ed-green-soft: #e9f2ec;
+  --ed-accent: #1f3f63;
+  --ed-accent-ink: #16324e;
+  --ed-accent-soft: #e8eef5;
   --ed-gold: #b8912b;
   --ed-surface-soft: #f7f6f1;
   --ed-chip: #fbf3dc;
@@ -169,21 +169,21 @@
 .dark .ed-panel {
   --ed-ink: #ece9e2;
   --ed-muted: #a5a096;
-  --ed-line: #2e3a34;
-  --ed-line-soft: #253029;
-  --ed-card: #1b2420;
-  --ed-green: #52b788;
-  --ed-green-ink: #9ad9b6;
-  --ed-green-soft: #22322b;
+  --ed-line: #2a3742;
+  --ed-line-soft: #1f2b36;
+  --ed-card: #16212c;
+  --ed-accent: #8fb3d6;
+  --ed-accent-ink: #b6cfe6;
+  --ed-accent-soft: #1b2a39;
   --ed-gold: #d8b45a;
-  --ed-surface-soft: #202b26;
-  --ed-chip: #332a19;
+  --ed-surface-soft: #1b2833;
+  --ed-chip: #33301f;
   --ed-chip-ink: #e2c983;
-  --ed-tabs: #1f2a25;
-  --ed-raised: #26332d;
-  --ed-switch: #3c4a43;
+  --ed-tabs: #1d2a35;
+  --ed-raised: #22303c;
+  --ed-switch: #3a4a58;
   --ed-shadow: 0 1px 2px rgba(0, 0, 0, .4);
-  background: #131a17;
+  background: #101720;
   color: var(--ed-ink);
 }
 
@@ -305,7 +305,7 @@
   font-family: inherit;
   transition: background-color .15s ease, color .15s ease;
 }
-.ed-btn:hover { background: var(--ed-green-soft); color: var(--ed-green-ink); }
+.ed-btn:hover { background: var(--ed-accent-soft); color: var(--ed-accent-ink); }
 .ed-btn:active { opacity: .9; }
 .ed-btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
 
@@ -353,7 +353,7 @@
 }
 .ed-lk {
   flex: none;
-  color: var(--ed-green-ink);
+  color: var(--ed-accent-ink);
   background: transparent;
   border: 0;
   padding: 0;
@@ -366,7 +366,7 @@
   white-space: nowrap;
 }
 .ed-lk:hover { text-decoration: underline; }
-.ed-lk:focus-visible { outline: 2px solid var(--ed-green); outline-offset: 3px; border-radius: 4px; }
+.ed-lk:focus-visible { outline: 2px solid var(--ed-accent); outline-offset: 3px; border-radius: 4px; }
 
 /* Embudo */
 .ed-fr { padding: 12px 0; border-bottom: 1px solid var(--ed-line-soft); }
@@ -391,7 +391,7 @@
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #3d8965, var(--ed-green));
+  background: linear-gradient(90deg, #2f5d8c, var(--ed-accent));
   transition: width .5s ease;
 }
 
@@ -453,7 +453,7 @@
   box-shadow: var(--ed-shadow);
   animation: ed-fade .5s ease both;
 }
-.ed-bc .ed-sc { color: var(--ed-green-ink); }
+.ed-bc .ed-sc { color: var(--ed-accent-ink); }
 .ed-rp {
   display: flex;
   justify-content: flex-end;
@@ -463,8 +463,8 @@
 }
 .ed-btn2 {
   border: 0;
-  background: var(--ed-green-soft);
-  color: var(--ed-green-ink);
+  background: var(--ed-accent-soft);
+  color: var(--ed-accent-ink);
   border-radius: 999px;
   padding: 8px 15px;
   font-size: 12.5px;
@@ -473,11 +473,11 @@
   cursor: pointer;
   transition: background-color .15s ease, color .15s ease;
 }
-.ed-btn2:hover { background: var(--ed-green); color: #ffffff; }
+.ed-btn2:hover { background: var(--ed-accent); color: #ffffff; }
 .dark .ed-panel .ed-btn2:hover { color: #10221a; }
 .dark .ed-panel .ed-tabs button.ed-on { box-shadow: 0 1px 2px rgba(0, 0, 0, .45); }
 .ed-btn2:active { opacity: .9; }
-.ed-btn2:focus-visible { outline: 2px solid var(--ed-green); outline-offset: 2px; }
+.ed-btn2:focus-visible { outline: 2px solid var(--ed-accent); outline-offset: 2px; }
 
 /* Dos columnas: embudo y avisos */
 .ed-body {
@@ -528,7 +528,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, .18);
   transition: transform .18s ease;
 }
-.ed-sw input:checked + span { background: var(--ed-green); }
+.ed-sw input:checked + span { background: var(--ed-accent); }
 .ed-sw input:checked + span:after { transform: translateX(18px); }
 .ed-sw input:focus-visible + span { outline: 2px solid var(--ed-gold); outline-offset: 3px; }
 
@@ -562,8 +562,8 @@
   flex: none;
   font-size: 12px;
   font-weight: 700;
-  color: var(--ed-green-ink);
-  background: var(--ed-green-soft);
+  color: var(--ed-accent-ink);
+  background: var(--ed-accent-soft);
   border-radius: 999px;
   padding: 1px 8px;
 }
@@ -586,10 +586,10 @@
 .ed-tabs button:hover { color: var(--ed-ink); }
 .ed-tabs button.ed-on {
   background: var(--ed-raised);
-  color: var(--ed-green-ink);
+  color: var(--ed-accent-ink);
   box-shadow: 0 1px 2px rgba(31, 29, 26, .12);
 }
-.ed-tabs button:focus-visible { outline: 2px solid var(--ed-green); outline-offset: 2px; }
+.ed-tabs button:focus-visible { outline: 2px solid var(--ed-accent); outline-offset: 2px; }
 
 .ed-mrow {
   display: flex;
@@ -615,8 +615,8 @@ button.ed-mrow:hover { background: var(--ed-surface-soft); }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ed-mrow-active { background: var(--ed-green-soft); }
-.ed-mrow-active .ed-mrow-label { color: var(--ed-green-ink); font-weight: 700; }
+.ed-mrow-active { background: var(--ed-accent-soft); }
+.ed-mrow-active .ed-mrow-label { color: var(--ed-accent-ink); font-weight: 700; }
 
 @keyframes ed-fade {
   from { opacity: 0; transform: translateY(8px); }

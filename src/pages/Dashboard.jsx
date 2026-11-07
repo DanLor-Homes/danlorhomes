@@ -195,7 +195,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="ed-panel flex h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e4ddd0] border-t-[#2D6A4F] dark:border-[#333f39] dark:border-t-[#9ad9b6]" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e4ddd0] border-t-[#1f3f63] dark:border-[#33414f] dark:border-t-[#8fb3d6]" />
       </div>
     );
   }
