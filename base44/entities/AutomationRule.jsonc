@@ -1,0 +1,88 @@
+{
+  "name": "AutomationRule",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "title": "Regla",
+      "enum": [
+        "retomar",
+        "desbloquear",
+        "cierre",
+        "archivar"
+      ],
+      "enumColors": [
+        "blue",
+        "amber",
+        "purple",
+        "gray"
+      ]
+    },
+    "active": {
+      "type": "boolean",
+      "title": "Activa",
+      "default": true
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

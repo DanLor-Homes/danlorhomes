@@ -31,11 +31,18 @@ export default async function (req) {
     const user = await base44.auth.me().catch((e) => (e.status === 401 ? null : Promise.reject(e)));
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const [oppRes, interactionRes, taskRes] = await Promise.all([
+    const [oppRes, interactionRes, taskRes, ruleRes] = await Promise.all([
       base44.entities.Opportunity.filter({ archived: false }, { limit: 500 }),
       base44.entities.Interaction.filter({}, { sort: '-date', limit: 500 }),
       base44.entities.CommercialTask.filter({ status: 'pendiente' }, { limit: 500 }),
+      base44.entities.AutomationRule.filter({}, { limit: 50 }),
     ]);
+
+    const ruleState = {};
+    for (const rule of ruleRes.items || []) {
+      ruleState[rule.key] = rule.active !== false;
+    }
+    const ruleEnabled = (key) => ruleState[key] !== false;
 
     const opportunities = oppRes.items || [];
     const interactions = interactionRes.items || [];
@@ -72,7 +79,12 @@ export default async function (req) {
 
       const closingTime = toTime(opportunity.expected_closing_date);
       const remainingDays = closingTime === null ? null : Math.ceil((closingTime - now) / DAY_MS);
-      if (remainingDays !== null && remainingDays < CLOSING_SOON_DAYS && !autoTaskKeys.has(`${opportunity.id}:cierre`)) {
+      if (
+        ruleEnabled('cierre') &&
+        remainingDays !== null &&
+        remainingDays < CLOSING_SOON_DAYS &&
+        !autoTaskKeys.has(`${opportunity.id}:cierre`)
+      ) {
         closingSoon += 1;
         tasksToCreate.push({
           title: `Cierre previsto: ${opportunity.name}`,
@@ -89,7 +101,7 @@ export default async function (req) {
       const stageDays = Math.floor((now - stageAnchor) / DAY_MS);
 
       if (stageDays >= STALL_DAYS) {
-        if (!autoTaskKeys.has(`${opportunity.id}:etapa`)) {
+        if (ruleEnabled('desbloquear') && !autoTaskKeys.has(`${opportunity.id}:etapa`)) {
           stalled += 1;
           tasksToCreate.push({
             title: `Desbloquear ${opportunity.name}: ${stageDays} días en ${STAGE_LABELS[opportunity.stage] || 'la etapa actual'}`,
@@ -108,7 +120,7 @@ export default async function (req) {
         lastInteraction || toTime(opportunity.stage_changed_date) || toTime(opportunity.created_date) || now;
       const idleDays = Math.floor((now - reference) / DAY_MS);
 
-      if (idleDays >= 7 && !autoTaskKeys.has(`${opportunity.id}:retomar`)) {
+      if (ruleEnabled('retomar') && idleDays >= 7 && !autoTaskKeys.has(`${opportunity.id}:retomar`)) {
         tasksToCreate.push({
           title: `Retomar contacto con ${opportunity.name}`,
           due_date: new Date(now + 2 * DAY_MS).toISOString().slice(0, 10),
@@ -123,6 +135,7 @@ export default async function (req) {
 
     const toArchive = opportunities
       .filter((opportunity) => {
+        if (!ruleEnabled('archivar')) return false;
         if (!CLOSED_STATUSES.includes(opportunity.status)) return false;
         const closing = toTime(opportunity.stage_changed_date) || toTime(opportunity.updated_date);
         if (!closing) return false;

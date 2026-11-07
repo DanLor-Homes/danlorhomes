@@ -29,6 +29,8 @@ import { mandateStatus, mandateTypeOf } from '@/lib/mandates';
 import MandateAlertRow from '@/components/owners/MandateAlertRow';
 import MandatesSummary from '@/components/owners/MandatesSummary';
 import HotStaleLeads from '@/components/leads/HotStaleLeads';
+import QuickRepliesCard from '@/components/dashboard/QuickRepliesCard';
+import AutomationSwitches from '@/components/dashboard/AutomationSwitches';
 import { scoreLead } from '@/lib/leadScoring';
 
 const MANDATE_ALERT_LIMIT = 4;
@@ -339,7 +341,11 @@ export default function Dashboard() {
           <MandatesSummary rows={mandateRows} title="Resumen de mandatos" onSelect={openMandateGroup} />
         </div>
 
-        <section className="min-w-0 card-surface p-5">
+        <div className="min-w-0 space-y-4">
+          <QuickRepliesCard leads={hotLeads} />
+          <AutomationSwitches />
+
+        <section className="card-surface p-5">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-heading text-sm font-bold">Próximas tareas</h3>
             <Link to="/tareas" className="text-xs font-medium text-primary hover:underline">
@@ -368,6 +374,7 @@ export default function Dashboard() {
             </ul>
           )}
         </section>
+        </div>
       </div>
     </div>
   );
