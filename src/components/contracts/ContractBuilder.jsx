@@ -4,8 +4,9 @@ import ContractDocument from './ContractDocument';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CONTRACT_TYPES, buildContract } from '@/lib/contracts';
+import { CONTRACT_TYPES, DEFAULT_INVENTORY, buildContract } from '@/lib/contracts';
 import { downloadElementAsPdf } from '@/lib/pdf';
 import { today } from '@/lib/invoices';
 
@@ -22,6 +23,8 @@ export default function ContractBuilder({ properties = [], clients = [], loading
   const [guests, setGuests] = useState('');
   const [nightlyRate, setNightlyRate] = useState('');
   const [deposit, setDeposit] = useState('');
+  const [inventory, setInventory] = useState(DEFAULT_INVENTORY);
+  const [splitPercent, setSplitPercent] = useState('50');
   const [downloading, setDownloading] = useState(false);
   const documentRef = useRef(null);
 
@@ -43,6 +46,8 @@ export default function ContractBuilder({ properties = [], clients = [], loading
       guests,
       nightlyRate,
       deposit,
+      inventory,
+      splitPercent,
     });
   }, [
     type,
@@ -57,6 +62,8 @@ export default function ContractBuilder({ properties = [], clients = [], loading
     guests,
     nightlyRate,
     deposit,
+    inventory,
+    splitPercent,
   ]);
 
   const handleDownload = async () => {
@@ -126,7 +133,13 @@ export default function ContractBuilder({ properties = [], clients = [], loading
             </div>
 
             <div className="space-y-1.5">
-              <Label>{type === 'encargo' ? 'Propietario (opcional)' : 'Cliente'}</Label>
+              <Label>
+                {type === 'encargo'
+                  ? 'Propietario (opcional)'
+                  : type === 'colaboracion'
+                    ? 'Agencia colaboradora'
+                    : 'Cliente'}
+              </Label>
               <Select value={clientId} onValueChange={setClientId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecciona cliente" />
@@ -237,6 +250,41 @@ export default function ContractBuilder({ properties = [], clients = [], loading
                     min="0"
                     value={deposit}
                     onChange={(event) => setDeposit(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5 sm:col-span-2 xl:col-span-4">
+                  <Label htmlFor="contract-inventory">Inventario del anexo (un bien por línea)</Label>
+                  <Textarea
+                    id="contract-inventory"
+                    rows={8}
+                    value={inventory}
+                    onChange={(event) => setInventory(event.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
+            {type === 'colaboracion' && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-split">Reparto para DAN&amp;LOR (%)</Label>
+                  <Input
+                    id="contract-split"
+                    type="number"
+                    min="1"
+                    max="99"
+                    value={splitPercent}
+                    onChange={(event) => setSplitPercent(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-term">Duración (meses)</Label>
+                  <Input
+                    id="contract-term"
+                    type="number"
+                    min="1"
+                    value={months}
+                    onChange={(event) => setMonths(event.target.value)}
                   />
                 </div>
               </>

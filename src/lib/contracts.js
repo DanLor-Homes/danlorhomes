@@ -10,13 +10,32 @@ const text = (value, fallback = BLANK) => {
   return clean || fallback;
 };
 
+export const DEFAULT_INVENTORY = [
+  'Cocina: nevera combi, horno, microondas y vitrocerámica',
+  'Cocina: menaje completo, vajilla y cubertería para 6 personas',
+  'Cocina: cafetera, tostadora y lavavajillas',
+  'Lavadora, secadora, plancha y tabla de planchar',
+  'Salón: sofá, mesa de comedor con sillas, televisión y aire acondicionado',
+  'Dormitorio principal: cama de matrimonio, armario, mesillas y lámparas',
+  'Dormitorio 2: dos camas individuales y armario',
+  'Baños: toallas por ocupante, secador y mampara',
+  'Textil: juego de sábanas de repuesto por cama, mantas y edredones',
+  'Exterior: mesa y sillas de terraza, toldo y tendedero',
+  'Otros: router wifi, dos juegos de llaves, mando de garaje y extintor',
+].join('\n');
+
 export const CONTRACT_TYPES = [
   { id: 'arras', label: 'Arras penitenciales', hint: 'Reserva el inmueble y fija precio y fecha de escritura.' },
   { id: 'alquiler', label: 'Arrendamiento de vivienda', hint: 'Renta mensual, fianza y duración del contrato.' },
   {
     id: 'vacacional',
     label: 'Arrendamiento vacacional',
-    hint: 'Estancia temporal por noches: fechas, ocupantes y fianza.',
+    hint: 'Estancia temporal por noches: fechas, ocupantes, fianza e inventario.',
+  },
+  {
+    id: 'colaboracion',
+    label: 'Colaboración entre inmobiliarias',
+    hint: 'Acuerdo con otra agencia: reparto de honorarios y protección de clientes.',
   },
   { id: 'encargo', label: 'Hoja de encargo de venta', hint: 'Mandato de comercialización y honorarios.' },
 ];
@@ -70,6 +89,8 @@ export function buildContract({
   guests,
   nightlyRate,
   deposit,
+  inventory,
+  splitPercent,
 }) {
   const propertyData = property || {};
   const clientData = client || {};
@@ -196,6 +217,10 @@ export function buildContract({
     const total = rate && nights ? rate * nights : 0;
     const security = Number(deposit) || 0;
     const occupancy = Number(guests) || 0;
+    const annexItems = String(inventory || '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
 
     return {
       title: 'Contrato de arrendamiento de vivienda con fines turísticos',
@@ -308,7 +333,96 @@ export function buildContract({
           ],
         },
       ],
+      annex: annexItems.length
+        ? {
+            title: 'Anexo I. Inventario de mobiliario y equipamiento',
+            intro:
+              'El arrendatario declara haber recibido los siguientes bienes en buen estado de conservación y funcionamiento, comprometiéndose a devolverlos en las mismas condiciones al finalizar la estancia. Cualquier falta o desperfecto se valorará según su coste de reposición y se deducirá de la fianza.',
+            items: annexItems,
+          }
+        : null,
       signatures: ['El arrendador', 'El arrendatario'],
+    };
+  }
+
+  if (type === 'colaboracion') {
+    const agency = `D./Dña. ${text(clientData.name, 'agencia colaboradora')}${
+      clientData.contact_person ? `, representada por ${clientData.contact_person}` : ''
+    }, con NIF ${BLANK} y domicilio profesional ${BLANK}, teléfono ${text(
+      clientData.phone
+    )} y correo electrónico ${text(clientData.email)}`;
+    const term = Number(months) || 12;
+    const totalCommission = Number(propertyData.commission_percent) || 0;
+    const split = Number(splitPercent);
+    const ourShare = split > 0 && split < 100 ? split : 50;
+    const theirShare = 100 - ourShare;
+
+    return {
+      title: 'Contrato de colaboración entre agencias inmobiliarias',
+      place: `En ${text(propertyData.zone, BLANK)}, a ${signedOn}.`,
+      sections: [
+        {
+          title: 'Partes intervinientes',
+          paragraphs: [
+            'DAN&LOR HOMES, con NIF ____________________ y domicilio profesional ____________________, en calidad de agencia inmobiliaria.',
+            `${agency}, en calidad de agencia colaboradora.`,
+          ],
+        },
+        {
+          title: 'Objeto de la colaboración',
+          paragraphs: [
+            'Las partes suscriben el presente acuerdo con el fin de colaborar de forma coordinada en la comercialización del siguiente inmueble:',
+            propertyLines(propertyData),
+            'La colaboración comprende la difusión del inmueble en los canales de cada agencia y la captación y presentación de clientes interesados, con el objetivo de lograr su venta en las mejores condiciones de mercado.',
+          ],
+        },
+        {
+          title: 'Régimen de la colaboración',
+          paragraphs: [
+            'Las partes actuarán con lealtad y transparencia, compartiendo la información necesaria sobre el inmueble y los clientes interesados y coordinando las visitas para evitar duplicidades y molestias a la propiedad.',
+            'Ninguna de las partes ostenta representación legal de la otra ni puede comprometer su voluntad frente a propietarios o clientes sin autorización previa y escrita.',
+          ],
+        },
+        {
+          title: 'Honorarios y reparto de la comisión',
+          paragraphs: [
+            totalCommission
+              ? `Los honorarios totales de la intermediación se fijan en ${totalCommission} % del precio de venta del inmueble, más el IVA correspondiente.`
+              : `Los honorarios totales de la intermediación se fijan en ${BLANK} % del precio de venta del inmueble, más el IVA correspondiente.`,
+            `Dichos honorarios se repartirán en un ${ourShare} % a favor de DAN&LOR HOMES y un ${theirShare} % a favor de la agencia colaboradora, devengándose en el momento del otorgamiento de la escritura pública de compraventa y abonándose en el plazo de 30 días desde la emisión de la factura.`,
+            'En ningún caso se repercutirán honorarios duplicados a la propiedad: la retribución pactada se satisfará por una sola vez y se distribuirá conforme al reparto anterior.',
+          ],
+        },
+        {
+          title: 'Obligaciones de las partes',
+          paragraphs: [
+            'Cada parte identificará por escrito a los clientes que presente, con su nombre y datos de contacto, a fin de acreditar su intervención en la operación.',
+            'Las partes se comprometen a no contactar con los clientes o propietarios presentados por la otra parte para ofrecerles servicios distintos del objeto de este acuerdo, ni a captarlos para su propia cartera, durante la vigencia del contrato y en los seis meses siguientes a su finalización.',
+            'Cada parte asume los gastos propios de su actividad, responde de sus propios actos frente a clientes y propietarios y mantiene indemne a la otra parte de cualquier reclamación derivada de su actuación.',
+          ],
+        },
+        {
+          title: 'Vigencia y resolución',
+          paragraphs: [
+            `El presente acuerdo tendrá una vigencia de ${term} meses desde su firma, prorrogable por acuerdo escrito de las partes.`,
+            'Cualquiera de las partes podrá resolverlo por incumplimiento de la otra, mediante comunicación escrita con quince días de preaviso. La resolución no afectará a las operaciones ya iniciadas con clientes debidamente acreditados, que se liquidarán conforme a lo pactado.',
+          ],
+        },
+        {
+          title: 'Confidencialidad y protección de datos',
+          paragraphs: [
+            'Las partes mantendrán en confidencialidad la información comercial, la cartera de clientes y la documentación del inmueble a la que accedan con motivo de este acuerdo.',
+            'Los datos personales intercambiados se tratarán únicamente para la gestión de la colaboración y no se cederán a terceros, conforme al Reglamento (UE) 2016/679 y a la Ley Orgánica 3/2018.',
+          ],
+        },
+        {
+          title: 'Legislación aplicable y jurisdicción',
+          paragraphs: [
+            'El presente contrato se rige por el Código Civil y el Código de Comercio. Para cualquier controversia derivada del mismo, las partes se someten a los juzgados y tribunales del domicilio de DAN&LOR HOMES.',
+          ],
+        },
+      ],
+      signatures: ['DAN&LOR HOMES', 'Agencia colaboradora'],
     };
   }
 

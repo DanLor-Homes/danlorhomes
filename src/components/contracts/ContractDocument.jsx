@@ -35,6 +35,21 @@ export default function ContractDocument({ doc }) {
         ))}
       </div>
 
+      {doc.annex && (
+        <section className="mt-8">
+          <h2 className="text-sm font-bold">{doc.annex.title}</h2>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-slate-700">{doc.annex.intro}</p>
+          <ol className="mt-3 grid gap-1.5 sm:grid-cols-2">
+            {doc.annex.items.map((item, index) => (
+              <li key={index} className="flex gap-2 text-[13px] leading-relaxed text-slate-700">
+                <span className="w-4 flex-none text-right tabular-nums text-slate-400">{index + 1}.</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       <div className="mt-10 grid gap-8 sm:grid-cols-2">
         {doc.signatures.map((label) => (
           <div key={label}>
