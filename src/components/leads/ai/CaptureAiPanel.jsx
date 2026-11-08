@@ -34,7 +34,7 @@ export default function CaptureAiPanel({ leads }) {
 
       <div className="p-4">
         <TabsContent value="campaign" className="mt-0">
-          <CampaignTool />
+          <CampaignTool leads={leads} />
         </TabsContent>
         <TabsContent value="owner" className="mt-0">
           <OwnerCopyTool />

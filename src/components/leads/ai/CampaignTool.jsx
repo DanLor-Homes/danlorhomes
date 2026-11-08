@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Mail, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { aiErrorMessage } from '@/lib/aiError';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AiResultPanel from './AiResultPanel';
+import SendCampaignDialog from './SendCampaignDialog';
 
 const SEGMENTS = [
   { id: 'propietarios', label: 'Propietarios que quieren vender' },
@@ -15,13 +16,14 @@ const SEGMENTS = [
   { id: 'alquiler', label: 'Propietarios de alquiler' },
 ];
 
-export default function CampaignTool() {
+export default function CampaignTool({ leads = [] }) {
   const [zone, setZone] = useState('');
   const [segment, setSegment] = useState('propietarios');
   const [goal, setGoal] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
 
   const run = async () => {
     if (!zone.trim()) {
@@ -88,6 +90,15 @@ export default function CampaignTool() {
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       {result && (
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" onClick={() => setSendOpen(true)}>
+            <Mail className="mr-1.5 h-4 w-4" />
+            Enviar por email a leads
+          </Button>
+        </div>
+      )}
+
+      {result && (
         <AiResultPanel
           title={result.title}
           summary={result.summary}
@@ -108,6 +119,14 @@ export default function CampaignTool() {
           ]}
         />
       )}
+
+      <SendCampaignDialog
+        open={sendOpen}
+        onOpenChange={setSendOpen}
+        leads={leads}
+        campaign={result}
+        zone={zone}
+      />
     </div>
   );
 }
