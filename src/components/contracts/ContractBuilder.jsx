@@ -17,6 +17,11 @@ export default function ContractBuilder({ properties = [], clients = [], loading
   const [signal, setSignal] = useState('');
   const [months, setMonths] = useState('12');
   const [monthlyRent, setMonthlyRent] = useState('');
+  const [checkIn, setCheckIn] = useState(today);
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState('');
+  const [nightlyRate, setNightlyRate] = useState('');
+  const [deposit, setDeposit] = useState('');
   const [downloading, setDownloading] = useState(false);
   const documentRef = useRef(null);
 
@@ -33,8 +38,26 @@ export default function ContractBuilder({ properties = [], clients = [], loading
       signal,
       months,
       monthlyRent,
+      checkIn,
+      checkOut,
+      guests,
+      nightlyRate,
+      deposit,
     });
-  }, [type, selectedProperty, selectedClient, date, signal, months, monthlyRent]);
+  }, [
+    type,
+    selectedProperty,
+    selectedClient,
+    date,
+    signal,
+    months,
+    monthlyRent,
+    checkIn,
+    checkOut,
+    guests,
+    nightlyRate,
+    deposit,
+  ]);
 
   const handleDownload = async () => {
     if (!documentRef.current) return;
@@ -160,6 +183,60 @@ export default function ContractBuilder({ properties = [], clients = [], loading
                     min="1"
                     value={months}
                     onChange={(event) => setMonths(event.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
+            {type === 'vacacional' && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-checkin">Entrada</Label>
+                  <Input
+                    id="contract-checkin"
+                    type="date"
+                    value={checkIn}
+                    onChange={(event) => setCheckIn(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-checkout">Salida</Label>
+                  <Input
+                    id="contract-checkout"
+                    type="date"
+                    value={checkOut}
+                    onChange={(event) => setCheckOut(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-guests">Número de ocupantes</Label>
+                  <Input
+                    id="contract-guests"
+                    type="number"
+                    min="1"
+                    placeholder="2"
+                    value={guests}
+                    onChange={(event) => setGuests(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-nightly">Precio por noche (€)</Label>
+                  <Input
+                    id="contract-nightly"
+                    type="number"
+                    min="0"
+                    value={nightlyRate}
+                    onChange={(event) => setNightlyRate(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="contract-deposit">Fianza (€)</Label>
+                  <Input
+                    id="contract-deposit"
+                    type="number"
+                    min="0"
+                    value={deposit}
+                    onChange={(event) => setDeposit(event.target.value)}
                   />
                 </div>
               </>

@@ -13,6 +13,11 @@ const text = (value, fallback = BLANK) => {
 export const CONTRACT_TYPES = [
   { id: 'arras', label: 'Arras penitenciales', hint: 'Reserva el inmueble y fija precio y fecha de escritura.' },
   { id: 'alquiler', label: 'Arrendamiento de vivienda', hint: 'Renta mensual, fianza y duración del contrato.' },
+  {
+    id: 'vacacional',
+    label: 'Arrendamiento vacacional',
+    hint: 'Estancia temporal por noches: fechas, ocupantes y fianza.',
+  },
   { id: 'encargo', label: 'Hoja de encargo de venta', hint: 'Mandato de comercialización y honorarios.' },
 ];
 
@@ -44,7 +49,28 @@ function propertyLines(property) {
   }. Referencia catastral: ${text(property.cadastral_reference)}. Referencia interna: ${text(property.reference)}.`;
 }
 
-export function buildContract({ type, property, client, date, signal, months, monthlyRent }) {
+function nightsBetween(from, to) {
+  if (!from || !to) return 0;
+  const start = new Date(`${from}T00:00:00`);
+  const end = new Date(`${to}T00:00:00`);
+  const nights = Math.round((end - start) / 86400000);
+  return nights > 0 ? nights : 0;
+}
+
+export function buildContract({
+  type,
+  property,
+  client,
+  date,
+  signal,
+  months,
+  monthlyRent,
+  checkIn,
+  checkOut,
+  guests,
+  nightlyRate,
+  deposit,
+}) {
   const propertyData = property || {};
   const clientData = client || {};
   const signedOn = longDate(date || today());
@@ -157,6 +183,128 @@ export function buildContract({ type, property, client, date, signal, months, mo
           title: 'Legislación aplicable',
           paragraphs: [
             'En lo no previsto en este contrato se aplicará la Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos, y el Código Civil.',
+          ],
+        },
+      ],
+      signatures: ['El arrendador', 'El arrendatario'],
+    };
+  }
+
+  if (type === 'vacacional') {
+    const nights = nightsBetween(checkIn, checkOut);
+    const rate = Number(nightlyRate) || 0;
+    const total = rate && nights ? rate * nights : 0;
+    const security = Number(deposit) || 0;
+    const occupancy = Number(guests) || 0;
+
+    return {
+      title: 'Contrato de arrendamiento de vivienda con fines turísticos',
+      place: `En ${text(propertyData.zone, BLANK)}, a ${signedOn}.`,
+      sections: [
+        {
+          title: 'Partes intervinientes',
+          paragraphs: [
+            `${seller}, en calidad de arrendador.`,
+            `${buyer}, en calidad de arrendatario y responsable de la reserva.`,
+          ],
+        },
+        {
+          title: 'Vivienda objeto del contrato',
+          paragraphs: [
+            propertyLines(propertyData),
+            'La vivienda se entrega completamente amueblada y equipada para su uso inmediato, con el ajuar, menaje y lencería que se detallan en el inventario anexo, que las partes firman junto con este contrato.',
+          ],
+        },
+        {
+          title: 'Destino y naturaleza temporal',
+          paragraphs: [
+            'El presente contrato se otorga para el uso temporal de la vivienda por el arrendatario y los ocupantes autorizados, con exclusión de cualquier otro destino.',
+            'Esta relación queda excluida del ámbito de la Ley 29/1994, de 24 de noviembre, de Arrendamientos Urbanos, conforme a su artículo 3.2, al tratarse de un arrendamiento de temporada por motivos turísticos o vacacionales. El arrendatario declara expresamente que la vivienda no constituirá su residencia habitual ni permanente y que no empadronará en ella a persona alguna.',
+          ],
+        },
+        {
+          title: 'Duración, entrada y salida',
+          paragraphs: [
+            nights
+              ? `La estancia comprende ${nights} ${nights === 1 ? 'noche' : 'noches'}, con entrada el ${longDate(
+                  checkIn
+                )} a partir de las 16:00 horas y salida el ${longDate(
+                  checkOut
+                )} antes de las 12:00 horas.`
+              : `La estancia se extiende desde el ${text(
+                  checkIn,
+                  BLANK
+                )} hasta el ${text(checkOut, BLANK)}, con entrada a partir de las 16:00 horas y salida antes de las 12:00 horas.`,
+            'Cualquier prolongación de la estancia requerirá acuerdo escrito entre las partes y disponibilidad de la vivienda. La permanencia en la vivienda fuera del horario de salida podrá generar el correspondiente suplemento.',
+          ],
+        },
+        {
+          title: 'Precio y forma de pago',
+          paragraphs: [
+            rate
+              ? `El precio de la estancia se fija en ${money(rate)} por noche, resultando un importe total de ${money(
+                  total
+                )} por las noches contratadas.`
+              : `El precio de la estancia se fija en ${BLANK} € por noche, resultando un importe total de ${money(total)}.`,
+            'El precio incluye el uso de la vivienda con su mobiliario y equipamiento, así como los suministros ordinarios de agua, luz, gas y conexión a internet, y la limpieza final. No incluye los consumos extraordinarios, los servicios adicionales solicitados por el arrendatario ni los gastos derivados de un uso indebido.',
+            'El importe total se abonará mediante transferencia bancaria a la cuenta designada por el arrendador antes de la entrada en la vivienda. El impago en el plazo acordado faculta al arrendador para resolver el contrato y dejar sin efecto la reserva.',
+          ],
+        },
+        {
+          title: 'Fianza y garantía',
+          paragraphs: [
+            security
+              ? `El arrendatario entrega en este acto la cantidad de ${money(
+                  security
+                )} en concepto de fianza, que no se imputa al precio de la estancia.`
+              : `El arrendatario entrega en este acto la cantidad de ${BLANK} € en concepto de fianza, que no se imputa al precio de la estancia.`,
+            'La fianza será devuelta en el plazo máximo de siete días naturales desde la salida, previa comprobación del estado de la vivienda y del inventario, con deducción de los desperfectos, faltas, pérdida de llaves o consumos extraordinarios que se acrediten.',
+          ],
+        },
+        {
+          title: 'Ocupantes y cesión',
+          paragraphs: [
+            occupancy
+              ? `La vivienda se destina a un máximo de ${occupancy} ${
+                  occupancy === 1 ? 'ocupante' : 'ocupantes'
+                }, incluidos los menores de edad, sin que pueda alojarse a más personas ni siquiera de forma temporal.`
+              : `La vivienda se destina a un máximo de ${BLANK} ocupantes, incluidos los menores de edad, sin que pueda alojarse a más personas ni siquiera de forma temporal.`,
+            'Queda prohibido subarrendar la vivienda, ceder el contrato o alojar a terceros no autorizados. El incumplimiento de este pacto faculta al arrendador para resolver el contrato y exigir el desalojo inmediato, sin derecho a devolución del precio.',
+          ],
+        },
+        {
+          title: 'Normas de uso y convivencia',
+          paragraphs: [
+            'El arrendatario se compromete a respetar el descanso de los vecinos, especialmente entre las 22:00 y las 08:00 horas, a no celebrar fiestas ni reuniones que alteren la convivencia, y a cumplir las normas de la comunidad de propietarios y las ordenanzas municipales.',
+            'No se permite fumar en el interior de la vivienda ni el alojamiento de mascotas, salvo autorización escrita del arrendador. El arrendatario responderá de las molestias o sanciones que su conducta genere.',
+          ],
+        },
+        {
+          title: 'Conservación, inventario y responsabilidad',
+          paragraphs: [
+            'El arrendatario recibe la vivienda en buen estado de conservación y limpieza, obligándose a mantenerla en las mismas condiciones y a comunicar de inmediato cualquier incidencia.',
+            'El arrendatario responderá de los daños causados en la vivienda, su mobiliario o su equipamiento, así como del coste de sustitución de las llaves o del cambio de cerradura en caso de pérdida, y de los daños causados a terceros derivados de un uso inadecuado del inmueble.',
+          ],
+        },
+        {
+          title: 'Cancelación y desistimiento',
+          paragraphs: [
+            'Si el arrendatario cancela con más de 30 días de antelación a la fecha de entrada, se devolverá el importe abonado salvo la fianza en concepto de gastos de gestión. Si la cancelación se produce entre 30 y 7 días antes, se devolverá el 50 % del importe. Con menos de 7 días de antelación no procederá devolución alguna.',
+            'Si el arrendador no pudiera entregar la vivienda por causas ajenas a su voluntad, lo comunicará de inmediato y devolverá íntegramente las cantidades percibidas, sin que proceda indemnización adicional.',
+          ],
+        },
+        {
+          title: 'Registro de viajeros y protección de datos',
+          paragraphs: [
+            'El arrendatario y los ocupantes se comprometen a facilitar los datos exigidos por el Real Decreto 933/2021, de 26 de octubre, y a identificarse a su llegada. Dichos datos se comunicarán a las Fuerzas y Cuerpos de Seguridad del Estado conforme a la normativa aplicable.',
+            'Los datos personales facilitados se tratarán con la finalidad de formalizar y ejecutar esta relación contractual y se conservarán durante los plazos legalmente exigibles, conforme al Reglamento (UE) 2016/679 y a la Ley Orgánica 3/2018.',
+          ],
+        },
+        {
+          title: 'Habilitación turística y legislación aplicable',
+          paragraphs: [
+            `La vivienda cuenta con el número de registro de vivienda de uso turístico ${BLANK} y con la cédula de habitabilidad u ocupación en vigor.`,
+            'En lo no previsto en este contrato se aplicará el Código Civil, la normativa autonómica reguladora de las viviendas de uso turístico y las ordenanzas municipales que resulten de aplicación. Las partes se someten para cualquier controversia a los juzgados y tribunales del lugar del inmueble.',
           ],
         },
       ],

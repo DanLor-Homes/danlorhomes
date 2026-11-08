@@ -29,7 +29,7 @@ export default function Contracts() {
       <PageHeader
         eyebrow="Documentación"
         title="Contratos y facturas"
-        description="Genera arras, alquileres y hojas de encargo, emite facturas con IVA y descarga ambos documentos en PDF."
+        description="Genera arras, alquileres, estancias vacacionales y hojas de encargo, emite facturas con IVA y descarga ambos documentos en PDF."
       />
 
       <Tabs defaultValue="contratos">
