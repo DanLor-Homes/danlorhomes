@@ -89,6 +89,80 @@ const SCHEMAS = {
     },
     required: ['summary', 'ranked', 'quick_wins'],
   },
+  listing: {
+    type: 'object',
+    properties: {
+      headline: { type: 'string' },
+      attraction: { type: 'string', enum: ['alta', 'media', 'baja'] },
+      summary: { type: 'string' },
+      signals: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: { title: { type: 'string' }, detail: { type: 'string' } },
+          required: ['title', 'detail'],
+        },
+      },
+      angles: { type: 'array', items: { type: 'string' } },
+      whatsapp: { type: 'string' },
+      email: {
+        type: 'object',
+        properties: { subject: { type: 'string' }, body: { type: 'string' } },
+        required: ['subject', 'body'],
+      },
+      call_script: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: { step: { type: 'string' }, text: { type: 'string' } },
+          required: ['step', 'text'],
+        },
+      },
+      next_action: { type: 'string' },
+    },
+    required: ['headline', 'attraction', 'summary', 'signals', 'angles', 'whatsapp', 'email', 'next_action'],
+  },
+  priority: {
+    type: 'object',
+    properties: {
+      summary: { type: 'string' },
+      ranked: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            ref: { type: 'number' },
+            title: { type: 'string' },
+            priority: { type: 'string', enum: ['alta', 'media', 'baja'] },
+            reason: { type: 'string' },
+            next_action: { type: 'string' },
+          },
+          required: ['ref', 'priority', 'reason', 'next_action'],
+        },
+      },
+      quick_wins: { type: 'array', items: { type: 'string' } },
+    },
+    required: ['summary', 'ranked', 'quick_wins'],
+  },
+  duplicates: {
+    type: 'object',
+    properties: {
+      summary: { type: 'string' },
+      groups: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            match_reason: { type: 'string' },
+            listing_ids: { type: 'array', items: { type: 'string' } },
+            keep_id: { type: 'string' },
+          },
+          required: ['match_reason', 'listing_ids', 'keep_id'],
+        },
+      },
+    },
+    required: ['summary', 'groups'],
+  },
 };
 
 function campaignPrompt(input) {
@@ -148,6 +222,81 @@ Devuelve:
 No inventes datos que no aparezcan en la lista ni añadas leads que no estén.`;
 }
 
+function listingPrompt(input) {
+  const perM2 = input.price && input.surface ? Math.round(input.price / input.surface) : null;
+  return `${CONTEXT}
+
+ANALIZA UN ANUNCIO DE UN PROPIETARIO PARTICULAR Y PREPARA SU CAPTACIÓN.
+PORTAL: ${input.portal || 'sin especificar'}
+TÍTULO: ${input.title}
+OPERACIÓN: ${input.operation} · TIPO: ${input.propertyType}
+ZONA: ${input.zone || 'sin especificar'}
+PRECIO: ${input.price ? `${input.price} €` : 'no publicado'}${perM2 ? ` (${perM2} €/m²)` : ''}
+SUPERFICIE: ${input.surface ? `${input.surface} m²` : 'sin especificar'}
+HABITACIONES: ${input.rooms || 'sin dato'} · BAÑOS: ${input.bathrooms || 'sin dato'}
+ANTIGÜEDAD PUBLICADO: ${input.publishedHint || 'sin dato'}
+CONTACTO: ${input.contactName || 'sin nombre'} · teléfono ${input.hasPhone ? 'publicado' : 'no publicado'} · email ${input.hasEmail ? 'publicado' : 'no publicado'}
+DESCRIPCIÓN: ${input.description || 'sin descripción'}
+
+Devuelve:
+- headline: titular de ocho palabras máximo con el ángulo de captación.
+- attraction: alta, media o baja según el interés real de captar este inmueble (señales de propietario directo, precio, tiempo publicado, anuncio incompleto, urgencia).
+- summary: dos frases con la lectura comercial del anuncio.
+- signals: de tres a cuatro señales concretas del anuncio; en title el aspecto y en detail qué implica.
+- angles: tres argumentos de negociación o de valor para la llamada, concretos y sin promesas.
+- whatsapp: mensaje de 40 a 70 palabras para el propietario, sin fechas ni días concretos, preguntando su disponibilidad.
+- email: subject de 70 caracteres máximo y body de 90 a 140 palabras.
+- call_script: cuatro pasos de llamada; en step el momento y en text lo que dice el agente.
+- next_action: la siguiente gestión concreta, en una frase.
+Usa solo los datos del anuncio; no inventes superficies, estado, año ni extras.`;
+}
+
+function priorityPrompt(listings) {
+  const lines = listings
+    .map(
+      (item) =>
+        `${item.ref}. ${item.title} · ${item.portal || 'portal'} · ${item.zone || 'sin zona'} · ${item.operation} · ${item.price ? `${item.price} €` : 'precio no publicado'} · ${item.surface ? `${item.surface} m²` : 'superficie sin dato'} · ${item.days} días detectado · estado ${item.status}`
+    )
+    .join('\n');
+
+  return `${CONTEXT}
+
+PRIORIZA QUÉ ANUNCIO DE PROPIETARIO PARTICULAR DEBEMOS LLAMAR ANTES.
+ANUNCIOS CAPTADOS EN VARIOS PORTALES:
+${lines}
+
+Devuelve:
+- summary: dos frases sobre dónde está la mejor captación hoy y qué la frena.
+- ranked: una entrada por cada anuncio recibido, de más a menos urgente, con el número recibido en ref; priority alta, media o baja; reason con el dato concreto que lo justifica; next_action con la gestión y el canal.
+- quick_wins: tres llamadas o mensajes para hoy, muy breves.
+No añadas anuncios que no estén en la lista ni inventes datos.`;
+}
+
+function duplicatesPrompt(listings) {
+  const lines = listings
+    .map(
+      (item) =>
+        `ID ${item.id} | ${item.title} | ${item.portal} | ${item.zone || 'sin zona'} | ${item.operation} | ${item.price ? `${item.price} €` : 'sin precio'} | ${item.surface ? `${item.surface} m²` : 'sin superficie'} | ${item.rooms || 'sin dato'} hab.`
+    )
+    .join('\n');
+
+  return `${CONTEXT}
+
+DETECTA EL MISMO INMUEBLE PUBLICADO EN VARIOS PORTALES.
+ANUNCIOS:
+${lines}
+
+Reglas:
+- Solo agrupa anuncios que parezcan el mismo inmueble (título y descripción equivalentes, misma zona, superficie y precio compatibles). Ante la duda, no los agrupes.
+- Un anuncio no puede estar en dos grupos.
+- Devuelve únicamente grupos de dos o más anuncios; si no hay coincidencias, groups vacío.
+- Usa exactamente los ID recibidos, sin inventar ninguno.
+- keep_id: el ID del anuncio más completo y con el precio más bajo del grupo.
+- match_reason: en una frase, por qué son el mismo inmueble.
+- summary: una frase con el resultado.
+Además, quick_wins no aplica aquí: no lo devuelvas.`;
+}
+
 export default async function (req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -155,9 +304,12 @@ export default async function (req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const payload = await req.json().catch(() => ({}));
-    const tool = ['campaign', 'owner', 'qualify'].includes(payload.tool) ? payload.tool : '';
+    const tool = ['campaign', 'owner', 'qualify', 'listing', 'priority', 'duplicates'].includes(payload.tool)
+      ? payload.tool
+      : '';
 
     let prompt = '';
+    let allowedIds = null;
 
     if (tool === 'campaign') {
       const input = {
@@ -189,6 +341,62 @@ export default async function (req) {
         .filter((lead) => lead.name);
       if (leads.length === 0) return Response.json({ error: 'No hay leads que analizar' }, { status: 400 });
       prompt = qualifyPrompt(leads);
+    } else if (tool === 'listing') {
+      const raw = payload.listing || {};
+      const input = {
+        portal: clean(raw.portal, 40),
+        title: clean(raw.title, 160),
+        operation: clean(raw.operation, 20) === 'alquiler' ? 'alquiler' : 'venta',
+        propertyType: PROPERTY_TYPES.includes(raw.propertyType) ? raw.propertyType : 'piso',
+        zone: clean(raw.zone, 80),
+        price: Number.isFinite(raw.price) ? Math.round(raw.price) : 0,
+        surface: Number.isFinite(raw.surface) ? Math.round(raw.surface) : 0,
+        rooms: Number.isFinite(raw.rooms) ? Math.round(raw.rooms) : 0,
+        bathrooms: Number.isFinite(raw.bathrooms) ? Math.round(raw.bathrooms) : 0,
+        publishedHint: clean(raw.publishedHint, 80),
+        description: clean(raw.description, 700),
+        contactName: clean(raw.contactName, 80),
+        hasPhone: Boolean(raw.hasPhone),
+        hasEmail: Boolean(raw.hasEmail),
+      };
+      if (!input.title) return Response.json({ error: 'Falta el anuncio que analizar' }, { status: 400 });
+      prompt = listingPrompt(input);
+    } else if (tool === 'priority') {
+      const listings = (Array.isArray(payload.listings) ? payload.listings : [])
+        .slice(0, 15)
+        .map((item, index) => ({
+          ref: index + 1,
+          title: clean(item?.title, 120),
+          portal: clean(item?.portal, 40),
+          zone: clean(item?.zone, 60),
+          operation: clean(item?.operation, 20) === 'alquiler' ? 'alquiler' : 'venta',
+          price: Number.isFinite(item?.price) ? Math.round(item.price) : 0,
+          surface: Number.isFinite(item?.surface) ? Math.round(item.surface) : 0,
+          days: Number.isFinite(item?.days) ? Math.max(0, Math.round(item.days)) : 0,
+          status: clean(item?.status, 30),
+        }))
+        .filter((item) => item.title);
+      if (listings.length === 0) return Response.json({ error: 'No hay anuncios que priorizar' }, { status: 400 });
+      prompt = priorityPrompt(listings);
+    } else if (tool === 'duplicates') {
+      const listings = (Array.isArray(payload.listings) ? payload.listings : [])
+        .slice(0, 40)
+        .map((item) => ({
+          id: clean(item?.id, 60),
+          title: clean(item?.title, 120),
+          portal: clean(item?.portal, 40),
+          zone: clean(item?.zone, 60),
+          operation: clean(item?.operation, 20) === 'alquiler' ? 'alquiler' : 'venta',
+          price: Number.isFinite(item?.price) ? Math.round(item.price) : 0,
+          surface: Number.isFinite(item?.surface) ? Math.round(item.surface) : 0,
+          rooms: Number.isFinite(item?.rooms) ? Math.round(item.rooms) : 0,
+        }))
+        .filter((item) => item.id && item.title);
+      if (listings.length < 2) {
+        return Response.json({ error: 'Necesitas al menos dos anuncios para comparar' }, { status: 400 });
+      }
+      allowedIds = new Set(listings.map((item) => item.id));
+      prompt = duplicatesPrompt(listings);
     } else {
       return Response.json({ error: 'Herramienta no válida' }, { status: 400 });
     }
@@ -197,6 +405,19 @@ export default async function (req) {
       prompt,
       response_json_schema: SCHEMAS[tool],
     });
+
+    if (tool === 'duplicates' && result && allowedIds) {
+      result.groups = (Array.isArray(result.groups) ? result.groups : [])
+        .map((group) => {
+          const ids = (Array.isArray(group?.listing_ids) ? group.listing_ids : []).filter((id) => allowedIds.has(id));
+          return {
+            match_reason: clean(group?.match_reason, 200),
+            listing_ids: ids,
+            keep_id: ids.includes(group?.keep_id) ? group.keep_id : ids[0],
+          };
+        })
+        .filter((group) => group.listing_ids.length > 1);
+    }
 
     return Response.json(result || {});
   } catch (error) {
