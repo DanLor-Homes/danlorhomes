@@ -14,6 +14,7 @@ import ExportClientsButton from '@/components/clients/ExportClientsButton';
 import ClientDropDock from '@/components/clients/drag/ClientDropDock';
 import LeadsTable from '@/components/leads/LeadsTable';
 import SalesByClientTypeChart from '@/components/leads/SalesByClientTypeChart';
+import CaptureAiPanel from '@/components/leads/ai/CaptureAiPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -324,6 +325,8 @@ export default function Leads() {
       </div>
 
       <SalesByClientTypeChart opportunities={wonSales} clients={clients} />
+
+      <CaptureAiPanel leads={leads} />
 
       <div className="mt-5 flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-wrap items-center gap-1.5">
