@@ -19,6 +19,7 @@ import Properties from '@/pages/Properties';
 import Tasks from '@/pages/Tasks';
 import Leads from '@/pages/Leads';
 import CalendarPage from '@/pages/Calendar';
+import VideoCalls from '@/pages/VideoCalls';
 import Reports from '@/pages/Reports';
 import Channels from '@/pages/Channels';
 import Archive from '@/pages/Archive';
@@ -84,6 +85,7 @@ const AuthenticatedApp = () => {
           <Route path="/tareas" element={<Tasks />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/calendario" element={<CalendarPage />} />
+          <Route path="/videollamadas" element={<VideoCalls />} />
           <Route path="/informes" element={<Reports />} />
           <Route path="/canales" element={<Channels />} />
           <Route path="/archivo" element={<Archive />} />

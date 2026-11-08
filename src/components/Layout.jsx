@@ -15,6 +15,7 @@ import {
   UserPlus,
   ListChecks,
   CalendarDays,
+  Video,
   BarChart3,
   Megaphone,
   Archive,
@@ -42,6 +43,7 @@ const NAV_GROUPS = [
       { to: '/leads', label: 'Leads y ventas', icon: Flame },
       { to: '/tareas', label: 'Tareas', icon: ListChecks },
       { to: '/calendario', label: 'Calendario', icon: CalendarDays },
+      { to: '/videollamadas', label: 'Videollamadas', icon: Video },
     ],
   },
   {
