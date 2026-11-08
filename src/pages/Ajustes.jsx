@@ -3,6 +3,7 @@ import { CalendarDays, Check, Loader2, LogOut, Mail, Moon, Sparkles, Sun } from 
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
 import AssignmentRules from '@/components/settings/AssignmentRules';
+import WebsiteSync from '@/components/settings/WebsiteSync';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { STAGES, STATUS_LABELS } from '@/lib/crm';
@@ -167,6 +168,8 @@ export default function Ajustes() {
             </div>
           ))}
         </section>
+
+        <WebsiteSync />
 
         <AssignmentRules />
 
