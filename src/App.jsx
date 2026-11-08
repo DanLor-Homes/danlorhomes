@@ -27,6 +27,7 @@ import Portales from '@/pages/Portales';
 import Particulares from '@/pages/Particulares';
 import Owners from '@/pages/Owners';
 import Captacion from '@/pages/Captacion';
+import WebListings from '@/pages/WebListings';
 import Contracts from '@/pages/Contracts';
 import PropertySheet from '@/pages/PropertySheet';
 import PropertyPanel from '@/pages/Panel';
@@ -65,6 +66,7 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/captacion" element={<Captacion />} />
+      <Route path="/web" element={<WebListings />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/panel" element={<PropertyPanel />} />
         <Route path="/inmuebles/:id/ficha" element={<PropertySheet />} />
