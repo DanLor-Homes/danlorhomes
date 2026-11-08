@@ -26,6 +26,7 @@ import Archive from '@/pages/Archive';
 import Ajustes from '@/pages/Ajustes';
 import Portales from '@/pages/Portales';
 import Particulares from '@/pages/Particulares';
+import Seguimiento from '@/pages/Seguimiento';
 import Owners from '@/pages/Owners';
 import Captacion from '@/pages/Captacion';
 import WebListings from '@/pages/WebListings';
@@ -82,6 +83,7 @@ const AuthenticatedApp = () => {
           <Route path="/propietarios" element={<Owners />} />
           <Route path="/portales" element={<Portales />} />
           <Route path="/particulares" element={<Particulares />} />
+          <Route path="/seguimiento" element={<Seguimiento />} />
           <Route path="/tareas" element={<Tasks />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/calendario" element={<CalendarPage />} />

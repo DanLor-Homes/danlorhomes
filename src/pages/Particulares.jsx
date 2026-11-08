@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, Search, UserRound, Wand2 } from 'lucide-react';
+import { Copy, RefreshCw, Search, Sparkles, UserRound, Wand2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,9 @@ import PageHeader from '@/components/crm/PageHeader';
 import StatCard from '@/components/crm/StatCard';
 import EmptyState from '@/components/crm/EmptyState';
 import ListingCard from '@/components/portals/ListingCard';
+import ListingAiDialog from '@/components/portals/ListingAiDialog';
+import PriorityDialog from '@/components/portals/PriorityDialog';
+import DuplicatesDialog from '@/components/portals/DuplicatesDialog';
 import ContactDialog from '@/components/portals/ContactDialog';
 import PendingClassificationRow from '@/components/particulares/PendingClassificationRow';
 import PortalCoverage from '@/components/particulares/PortalCoverage';
@@ -47,6 +50,9 @@ export default function Particulares() {
   const [operation, setOperation] = useState('todas');
   const [term, setTerm] = useState('');
   const [contactListing, setContactListing] = useState(null);
+  const [aiListing, setAiListing] = useState(null);
+  const [priorityOpen, setPriorityOpen] = useState(false);
+  const [duplicatesOpen, setDuplicatesOpen] = useState(false);
   const [formDialog, setFormDialog] = useState({ open: false, client: null, listing: null });
 
   const load = async () => {
@@ -201,6 +207,12 @@ export default function Particulares() {
         title="Particulares"
         description="Inmuebles publicados por propietarios, en venta o alquiler, detectados y clasificados automáticamente en todos los portales vigilados."
       >
+        <Button variant="outline" onClick={() => setDuplicatesOpen(true)} disabled={particular.length < 2}>
+          <Copy className="h-4 w-4" /> Duplicados
+        </Button>
+        <Button variant="outline" onClick={() => setPriorityOpen(true)} disabled={!particular.length}>
+          <Sparkles className="h-4 w-4" /> A quién llamar
+        </Button>
         <Button variant="outline" onClick={handleScan} disabled={scanning || !sources.length}>
           <RefreshCw className={cn('h-4 w-4', scanning && 'animate-spin')} />
           {scanning ? 'Buscando…' : 'Buscar en todas las webs'}
@@ -275,6 +287,7 @@ export default function Particulares() {
                     listing={listing}
                     publisherHint={classificationHint(listing)}
                     onContact={setContactListing}
+                    onAnalyze={setAiListing}
                     onConvert={handleConvert}
                     onDiscard={handleDiscard}
                   />
@@ -310,6 +323,28 @@ export default function Particulares() {
       )}
 
       <PortalCoverage sources={sources} />
+
+      <ListingAiDialog
+        listing={aiListing}
+        open={Boolean(aiListing)}
+        onOpenChange={(open) => !open && setAiListing(null)}
+        onContact={setContactListing}
+        onConvert={handleConvert}
+      />
+
+      <PriorityDialog
+        open={priorityOpen}
+        onOpenChange={setPriorityOpen}
+        listings={particular}
+        onAnalyze={setAiListing}
+      />
+
+      <DuplicatesDialog
+        open={duplicatesOpen}
+        onOpenChange={setDuplicatesOpen}
+        listings={active.filter((item) => item.publisher_type === 'particular')}
+        onDone={load}
+      />
 
       <ContactDialog
         listing={contactListing}

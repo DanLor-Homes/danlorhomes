@@ -1,11 +1,11 @@
 import React from 'react';
-import { Bath, BedDouble, Building2, ExternalLink, Mail, MapPin, MessageCircle, Phone, Ruler, UserPlus, X } from 'lucide-react';
+import { Bath, BedDouble, Building2, ExternalLink, Mail, MapPin, MessageCircle, Phone, Ruler, Sparkles, UserPlus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Image } from '@/components/ui/image';
 import { formatCurrency } from '@/lib/crm';
 import { LISTING_STATUS, portalLabel, propertyTypeLabel } from '@/lib/portals';
 
-export default function ListingCard({ listing, publisherHint, onContact, onConvert, onDiscard }) {
+export default function ListingCard({ listing, publisherHint, onContact, onConvert, onDiscard, onAnalyze }) {
   const status = LISTING_STATUS[listing.status] || LISTING_STATUS.nuevo;
   const summary = [
     { icon: Ruler, value: listing.surface ? `${listing.surface} m²` : null },
@@ -105,6 +105,11 @@ export default function ListingCard({ listing, publisherHint, onContact, onConve
           <Button size="sm" onClick={() => onContact(listing)}>
             <MessageCircle className="h-3.5 w-3.5" /> Contactar
           </Button>
+          {onAnalyze && (
+            <Button size="sm" variant="outline" onClick={() => onAnalyze(listing)}>
+              <Sparkles className="h-3.5 w-3.5" /> IA
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={() => onConvert(listing)}>
             <UserPlus className="h-3.5 w-3.5" /> Cliente
           </Button>

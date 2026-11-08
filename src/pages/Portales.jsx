@@ -9,6 +9,7 @@ import EmptyState from '@/components/crm/EmptyState';
 import SourceCard from '@/components/portals/SourceCard';
 import SourceDialog from '@/components/portals/SourceDialog';
 import ListingCard from '@/components/portals/ListingCard';
+import ListingAiDialog from '@/components/portals/ListingAiDialog';
 import ContactDialog from '@/components/portals/ContactDialog';
 import ClientFormDialog from '@/components/clients/ClientFormDialog';
 import { DragDropContext } from '@hello-pangea/dnd';
@@ -50,6 +51,7 @@ export default function Portales() {
   const [publisher, setPublisher] = useState('particular');
   const [sourceDialog, setSourceDialog] = useState({ open: false, source: null });
   const [contactListing, setContactListing] = useState(null);
+  const [aiListing, setAiListing] = useState(null);
   const [formDialog, setFormDialog] = useState({ open: false, client: null, listing: null });
   const photosLoaded = useRef(false);
 
@@ -338,6 +340,7 @@ export default function Portales() {
                   <ListingCard
                     listing={listing}
                     onContact={setContactListing}
+                    onAnalyze={setAiListing}
                     onConvert={handleConvert}
                     onDiscard={handleDiscard}
                   />
@@ -384,6 +387,14 @@ export default function Portales() {
         source={sourceDialog.source}
         onOpenChange={(open) => setSourceDialog({ open, source: open ? sourceDialog.source : null })}
         onSaved={load}
+      />
+
+      <ListingAiDialog
+        listing={aiListing}
+        open={Boolean(aiListing)}
+        onOpenChange={(open) => !open && setAiListing(null)}
+        onContact={setContactListing}
+        onConvert={handleConvert}
       />
 
       <ContactDialog
