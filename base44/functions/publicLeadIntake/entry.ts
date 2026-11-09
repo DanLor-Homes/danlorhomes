@@ -76,26 +76,24 @@ export default async function (req) {
     const rule = ruleForZone(zone, rules);
     const origin = new URL(req.url).origin;
 
-    const client = await base44.asServiceRole.entities.Client.create({
+    // La captación queda pendiente de revisión: no se crea ficha de cliente ni tarea.
+    const lead = await base44.asServiceRole.entities.WebLead.create({
       name,
       phone,
       email,
-      operation_interest: operation,
-      search_zones: zone,
+      zone,
+      operation,
       budget_max: budgetMax,
       property_types: types,
-      notes: notes ? `${notes}\n\nAlta desde el formulario web (${origin})` : `Alta desde el formulario web (${origin})`,
-      assigned_to: rule?.assignee || '',
+      notes,
+      source: origin,
+      consent: true,
+      status: 'nuevo',
+      suggested_assignee: rule?.assignee || '',
+      received_at: new Date().toISOString(),
     });
 
-    await base44.asServiceRole.entities.CommercialTask.create({
-      title: `Primer contacto con ${client.name}`,
-      due_date: new Date().toISOString().slice(0, 10),
-      assignee: rule?.assignee || '',
-      auto_generated: true,
-    });
-
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, id: lead.id });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

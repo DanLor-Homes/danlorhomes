@@ -1,13 +1,13 @@
 {
   "name": "Revisi\u00f3n diaria de portales",
-  "description": "Cada ma\u00f1ana a las 7:30 escanea las b\u00fasquedas de portales activas, guarda los anuncios nuevos y deja constancia de la ejecuci\u00f3n.",
+  "description": "Cada ma\u00f1ana a las 8:00 escanea las b\u00fasquedas de portales activas, guarda los anuncios nuevos como leads pendientes de revisi\u00f3n y deja constancia de la ejecuci\u00f3n.",
   "trigger": {
     "condition": null,
     "config": {
       "trigger_type": "scheduled",
       "events": [],
       "schedule_mode": "recurring",
-      "cron_expression": "30 7 * * *",
+      "cron_expression": "0 8 * * *",
       "one_time_date": null,
       "timezone": "Europe/Madrid",
       "interval_value": null,

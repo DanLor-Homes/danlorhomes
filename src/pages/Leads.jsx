@@ -15,6 +15,7 @@ import ClientDropDock from '@/components/clients/drag/ClientDropDock';
 import LeadsTable from '@/components/leads/LeadsTable';
 import SalesByClientTypeChart from '@/components/leads/SalesByClientTypeChart';
 import CaptureAiPanel from '@/components/leads/ai/CaptureAiPanel';
+import WebLeadQueue from '@/components/leads/WebLeadQueue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -305,7 +306,9 @@ export default function Leads() {
         </Button>
       </PageHeader>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <WebLeadQueue onConverted={load} />
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Leads calientes" value={counts.hot} hint="Score 70 o superior" icon={Flame} tone="rose" />
         <StatCard label="Leads templados" value={counts.warm} hint="Score entre 40 y 69" icon={Thermometer} tone="amber" />
         <StatCard

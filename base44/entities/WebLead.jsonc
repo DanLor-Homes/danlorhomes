@@ -1,0 +1,150 @@
+{
+  "name": "WebLead",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Nombre"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona de inter\u00e9s"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler",
+        "ambas"
+      ],
+      "enumColors": [
+        "blue",
+        "purple",
+        "gray"
+      ],
+      "default": "venta"
+    },
+    "budget_max": {
+      "type": "number",
+      "title": "Presupuesto m\u00e1ximo"
+    },
+    "property_types": {
+      "type": "array",
+      "title": "Tipos de inmueble",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string",
+      "title": "Mensaje del lead"
+    },
+    "source": {
+      "type": "string",
+      "title": "Origen"
+    },
+    "consent": {
+      "type": "boolean",
+      "title": "Consentimiento",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "nuevo",
+        "convertido",
+        "descartado"
+      ],
+      "enumColors": [
+        "yellow",
+        "green",
+        "gray"
+      ],
+      "default": "nuevo"
+    },
+    "suggested_assignee": {
+      "type": "string",
+      "title": "Responsable sugerido por zona"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Cliente creado"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Recibido el"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
