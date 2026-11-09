@@ -1,0 +1,59 @@
+{
+  "description": "Cada ma\u00f1ana a las 8:00 revisa el pipeline (retomar contacto, desbloquear etapas, cierres previstos y archivado) y genera el recordatorio diario de clientes sin contacto.",
+  "name": "Automatizaciones CRM",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 8 * * *",
+      "one_time_date": null,
+      "timezone": "Europe/Madrid",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "automatizaciones_crm",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "pipeline": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "crmAutomations",
+            "args": {}
+          },
+          "then": "seguimiento",
+          "x-base44": {
+            "title": "Revisar pipeline",
+            "description": "Tareas autom\u00e1ticas y archivado"
+          }
+        }
+      },
+      {
+        "seguimiento": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "dailyFollowUpReminder",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Recordatorio de seguimiento",
+            "description": "Clientes sin contacto"
+          }
+        }
+      }
+    ]
+  }
+}

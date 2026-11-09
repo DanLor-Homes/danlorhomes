@@ -81,7 +81,9 @@ export default function AutomationSwitches() {
       <div className="ed-sh">
         <h3>Automatizaciones</h3>
       </div>
-      <p className="ed-sub">Activa o pausa cada flujo automático sin tocar nada técnico.</p>
+      <p className="ed-sub">
+        Activa o pausa cada flujo automático sin tocar nada técnico. Se ejecutan solos cada día a las 8:00.
+      </p>
 
       {loading ? (
         <div className="flex justify-center py-6">
