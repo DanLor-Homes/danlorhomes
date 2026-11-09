@@ -8,6 +8,7 @@ import MandatesSummary from '@/components/owners/MandatesSummary';
 import HotStaleLeads from '@/components/leads/HotStaleLeads';
 import QuickRepliesCard from '@/components/dashboard/QuickRepliesCard';
 import AutomationSwitches from '@/components/dashboard/AutomationSwitches';
+import AutomationStatus from '@/components/dashboard/AutomationStatus';
 import { scoreLead } from '@/lib/leadScoring';
 import EditorialHero from '@/components/dashboard/editorial/EditorialHero';
 import MetricsStrip from '@/components/dashboard/editorial/MetricsStrip';
@@ -239,6 +240,7 @@ export default function Dashboard() {
       </div>
 
       <div className="ed-low">
+        <AutomationStatus />
         <AutomationSwitches />
         <UpcomingTasks tasks={upcomingTasks} />
         <MandatesSummary

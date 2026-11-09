@@ -1,6 +1,6 @@
 {
-  "description": "Cada ma\u00f1ana a las 8:00 revisa el pipeline (retomar contacto, desbloquear etapas, cierres previstos y archivado) y genera el recordatorio diario de clientes sin contacto.",
   "name": "Automatizaciones CRM",
+  "description": "Cada ma\u00f1ana a las 8:00 revisa el pipeline (retomar contacto, desbloquear etapas, cierres previstos y archivado), genera el recordatorio diario de clientes sin contacto y deja constancia de la ejecuci\u00f3n.",
   "trigger": {
     "condition": null,
     "config": {
@@ -47,10 +47,44 @@
             "function_name": "dailyFollowUpReminder",
             "args": {}
           },
-          "then": "end",
+          "then": "registro_pipeline",
           "x-base44": {
             "title": "Recordatorio de seguimiento",
             "description": "Clientes sin contacto"
+          }
+        }
+      },
+      {
+        "registro_pipeline": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "logAutomationRun",
+            "args": {
+              "key": "pipeline",
+              "summary": "Tareas nuevas: ${ .pipeline.tasksCreated } \u00b7 archivadas: ${ .pipeline.archived }"
+            }
+          },
+          "then": "registro_seguimiento",
+          "x-base44": {
+            "title": "Registrar ejecuci\u00f3n del pipeline",
+            "description": "Guarda fecha y resultado"
+          }
+        }
+      },
+      {
+        "registro_seguimiento": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "logAutomationRun",
+            "args": {
+              "key": "seguimiento",
+              "summary": "Clientes pendientes de contacto: ${ .seguimiento.pendingClients }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Registrar ejecuci\u00f3n del seguimiento",
+            "description": "Guarda fecha y resultado"
           }
         }
       }

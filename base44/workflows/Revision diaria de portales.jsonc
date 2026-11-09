@@ -1,6 +1,6 @@
 {
-  "description": "Cada ma\u00f1ana a las 7:30 escanea las b\u00fasquedas de portales activas y guarda los anuncios nuevos para poder contactar al propietario.",
   "name": "Revisi\u00f3n diaria de portales",
+  "description": "Cada ma\u00f1ana a las 7:30 escanea las b\u00fasquedas de portales activas, guarda los anuncios nuevos y deja constancia de la ejecuci\u00f3n.",
   "trigger": {
     "condition": null,
     "config": {
@@ -33,10 +33,27 @@
             "function_name": "portalMonitor",
             "args": {}
           },
-          "then": "end",
+          "then": "registro_portales",
           "x-base44": {
             "title": "Escanear portales",
             "description": "Anuncios nuevos de captaci\u00f3n"
+          }
+        }
+      },
+      {
+        "registro_portales": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "logAutomationRun",
+            "args": {
+              "key": "portales",
+              "summary": "Anuncios nuevos: ${ .escaneo.created } de ${ .escaneo.scanned } b\u00fasquedas"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Registrar ejecuci\u00f3n de portales",
+            "description": "Guarda fecha y resultado"
           }
         }
       }
