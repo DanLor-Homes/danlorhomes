@@ -2,6 +2,9 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 
 const OPERATIONS = ['venta', 'alquiler', 'ambas'];
 const PROPERTY_TYPES = ['piso', 'atico', 'adosado', 'chalet', 'local', 'oficina', 'garaje', 'nave', 'terreno'];
+// Límites anti-abuso del formulario público (la captación web la envían visitantes sin sesión).
+const MAX_PER_HOUR = 25;
+const DUPLICATE_WINDOW_MINUTES = 10;
 
 function clean(value, max) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -71,6 +74,30 @@ export default async function (req) {
     const types = Array.isArray(body.property_types)
       ? body.property_types.filter((type) => PROPERTY_TYPES.includes(type)).slice(0, 9)
       : [];
+
+    // Protección anti-abuso: este endpoint es público, así que limitamos el volumen
+    // de altas por hora e ignoramos repeticiones idénticas seguidas.
+    const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const recentLeads = await base44.asServiceRole.entities.WebLead.count({
+      created_date: { $gte: hourAgo },
+    });
+    if (recentLeads >= MAX_PER_HOUR) {
+      return Response.json(
+        { error: 'Estamos recibiendo muchas solicitudes. Inténtalo de nuevo más tarde.' },
+        { status: 429 }
+      );
+    }
+
+    const duplicateSince = new Date(
+      Date.now() - DUPLICATE_WINDOW_MINUTES * 60 * 1000
+    ).toISOString();
+    const duplicate = await base44.asServiceRole.entities.WebLead.count({
+      ...(email ? { email } : { phone }),
+      created_date: { $gte: duplicateSince },
+    });
+    if (duplicate > 0) {
+      return Response.json({ ok: true });
+    }
 
     const rules = await base44.asServiceRole.entities.AssignmentRule.filter({ active: true });
     const rule = ruleForZone(zone, rules);
