@@ -25,7 +25,9 @@ export default function StatCard({ label, value, hint, icon: Icon, tone = 'prima
           </span>
         )}
       </div>
-      <p className="mt-2 font-heading text-[26px] font-extrabold leading-none tracking-tight">{value}</p>
+      <p className="mt-2 font-heading text-[26px] font-extrabold leading-none tracking-tight tabular-nums">
+        {value}
+      </p>
       {hint && <p className="mt-2 text-xs text-muted-foreground">{hint}</p>}
     </div>
   );

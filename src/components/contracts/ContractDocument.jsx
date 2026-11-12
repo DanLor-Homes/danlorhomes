@@ -4,7 +4,7 @@ export default function ContractDocument({ doc }) {
   if (!doc) return null;
 
   return (
-    <article className="mx-auto w-full max-w-[820px] bg-white px-8 py-10 text-slate-900 shadow-sm print:shadow-none">
+    <article className="doc-print mx-auto w-full max-w-[820px] bg-white px-8 py-10 text-slate-900 shadow-sm print:shadow-none">
       <header className="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
           <p className="font-heading text-lg font-extrabold tracking-tight">DAN&amp;LOR HOMES</p>

@@ -24,7 +24,7 @@ export default function InvoiceDocument({ invoice }) {
   const meta = statusMeta(invoice.status);
 
   return (
-    <article className="mx-auto w-full max-w-[820px] bg-white text-slate-900">
+    <article className="doc-print mx-auto w-full max-w-[820px] bg-white text-slate-900">
       <header className="flex flex-wrap items-start justify-between gap-6 bg-slate-900 px-9 py-8 text-white">
         <div className="min-w-0">
           <p className="font-heading text-xl font-extrabold tracking-tight">{issuer.name}</p>

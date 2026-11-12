@@ -48,7 +48,7 @@ export default function CalendarDayCell({ date, outside, events, isToday, isSele
           );
         })}
         {events.length > visible.length && (
-          <span className="pl-1 text-[9px] font-semibold text-muted-foreground">
+          <span className="pl-1 text-[10px] font-semibold text-muted-foreground">
             +{events.length - visible.length} más
           </span>
         )}

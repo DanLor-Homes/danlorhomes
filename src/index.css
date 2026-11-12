@@ -19,13 +19,13 @@
     --secondary: 212 38% 94%;
     --secondary-foreground: 212 50% 24%;
     --muted: 220 16% 96%;
-    --muted-foreground: 218 20% 44%;
+    --muted-foreground: 218 24% 36%;
     --accent: 212 38% 94%;
     --accent-foreground: 212 50% 27%;
     --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 16% 89%;
-    --input: 220 16% 89%;
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
     --ring: 212 52% 27%;
     --chart-1: 212 52% 27%;
     --chart-2: 212 45% 45%;
@@ -59,13 +59,13 @@
     --secondary: 218 35% 22%;
     --secondary-foreground: 220 16% 96%;
     --muted: 218 30% 19%;
-    --muted-foreground: 218 20% 70%;
+    --muted-foreground: 218 22% 76%;
     --accent: 212 45% 25%;
     --accent-foreground: 212 60% 85%;
     --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 218 30% 22%;
-    --input: 218 30% 24%;
+    --border: 218 26% 28%;
+    --input: 218 26% 30%;
     --ring: 210 50% 66%;
     --chart-1: 210 50% 66%;
     --chart-2: 220 16% 96%;
@@ -85,12 +85,19 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    font-size: 16px;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   h1, h2, h3, h4, h5 {
@@ -742,4 +749,28 @@ button.ed-mrow:hover { background: var(--ed-surface-soft); }
   .ed-mand { grid-column: auto; }
   .ed-alerts-grid { grid-template-columns: 1fr; gap: 0; }
   .ed-ph { display: none; }
+}
+
+/* Suelo de legibilidad: ningún texto de interfaz por debajo de 11,5 px.
+   Se ancla en html para superar en especificidad a las utilidades de Tailwind. */
+html .text-\[10px\],
+html .text-\[10\.5px\] {
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+html .text-\[11px\] {
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* Facturas y contratos imprimibles: conservan su escala para no romper el A4 */
+html .doc-print .text-\[10px\] {
+  font-size: 10px;
+}
+html .doc-print .text-\[10\.5px\] {
+  font-size: 10.5px;
+}
+html .doc-print .text-\[11px\] {
+  font-size: 11px;
 }
