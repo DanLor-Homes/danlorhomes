@@ -28,6 +28,7 @@ import { formatCurrency, formatDate } from '@/lib/crm';
 import { operationLabel, propertyTypeLabel, pricePerM2 } from '@/lib/properties';
 import { INTEREST_STATUS_STYLES, interestStatusLabel, DEFAULT_AGENCY } from '@/lib/mls';
 import MlsStatusSelect from '@/components/mls/MlsStatusSelect';
+import MlsSharePanel from '@/components/mls/MlsSharePanel';
 import {
   Bath,
   BedDouble,
@@ -53,7 +54,15 @@ function Field({ label, value }) {
   );
 }
 
-export default function MlsListingDialog({ listing, onClose, isMine, interests = [], user, onChanged }) {
+export default function MlsListingDialog({
+  listing,
+  onClose,
+  isMine,
+  interests = [],
+  partners = [],
+  user,
+  onChanged,
+}) {
   const { toast } = useToast();
   const [form, setForm] = useState({ agent_name: '', agency: '', email: '', phone: '', message: '' });
   const [sending, setSending] = useState(false);
@@ -241,6 +250,8 @@ export default function MlsListingDialog({ listing, onClose, isMine, interests =
                   </AlertDialog>
                 </div>
               </div>
+
+              <MlsSharePanel listing={listing} partners={partners} />
 
               <div>
                 <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold">

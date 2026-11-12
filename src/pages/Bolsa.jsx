@@ -174,6 +174,7 @@ export default function Bolsa() {
         onClose={() => setSelected(null)}
         isMine={isMineListing(selected, user?.id)}
         interests={selected ? interests.filter((item) => item.mls_listing_id === selected.id) : []}
+        partners={partners}
         user={user}
         onChanged={refresh}
       />
