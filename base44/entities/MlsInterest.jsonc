@@ -1,0 +1,111 @@
+{
+  "name": "MlsInterest",
+  "type": "object",
+  "properties": {
+    "mls_listing_id": {
+      "type": "string",
+      "title": "Inmueble de la bolsa"
+    },
+    "listing_title": {
+      "type": "string",
+      "title": "Referencia del inmueble"
+    },
+    "agency": {
+      "type": "string",
+      "title": "Agencia interesada"
+    },
+    "agent_name": {
+      "type": "string",
+      "title": "Persona de contacto"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono"
+    },
+    "message": {
+      "type": "string",
+      "title": "Mensaje"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "nuevo",
+        "contactado",
+        "cerrado"
+      ],
+      "enumColors": [
+        "yellow",
+        "blue",
+        "green"
+      ],
+      "default": "nuevo"
+    }
+  },
+  "required": [
+    "mls_listing_id",
+    "agency"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

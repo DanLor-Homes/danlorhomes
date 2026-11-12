@@ -16,6 +16,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Dashboard from '@/pages/Dashboard';
 import Pipeline from '@/pages/Pipeline';
 import Properties from '@/pages/Properties';
+import Bolsa from '@/pages/Bolsa';
 import Tasks from '@/pages/Tasks';
 import Leads from '@/pages/Leads';
 import CalendarPage from '@/pages/Calendar';
@@ -76,6 +77,7 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/inmuebles" element={<Properties />} />
+          <Route path="/bolsa" element={<Bolsa />} />
           <Route path="/tasacion" element={<Valuation />} />
           <Route path="/hipotecas" element={<Mortgages />} />
           <Route path="/correo" element={<Mail />} />

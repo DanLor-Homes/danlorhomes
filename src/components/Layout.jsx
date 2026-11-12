@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Globe,
+  Network,
   ScanSearch,
   UserRound,
   UserPlus,
@@ -51,6 +52,7 @@ const NAV_GROUPS = [
     label: 'Inmuebles',
     items: [
       { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
+      { to: '/bolsa', label: 'Bolsa (MLS)', icon: Network },
       { to: '/propietarios', label: 'Propietarios', icon: KeyRound },
       { to: '/portales', label: 'Portales', icon: Globe },
       { to: '/particulares', label: 'Particulares', icon: UserRound },

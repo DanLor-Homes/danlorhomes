@@ -1,0 +1,100 @@
+{
+  "name": "MlsPartner",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Agencia"
+    },
+    "contact_person": {
+      "type": "string",
+      "title": "Persona de contacto"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona de trabajo"
+    },
+    "commission_notes": {
+      "type": "string",
+      "title": "Acuerdo de colaboraci\u00f3n"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "Activa",
+      "default": true
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

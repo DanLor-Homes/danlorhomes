@@ -1,0 +1,215 @@
+{
+  "name": "MlsListing",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "T\u00edtulo del inmueble"
+    },
+    "reference": {
+      "type": "string",
+      "title": "Referencia"
+    },
+    "property_id": {
+      "type": "string",
+      "title": "Inmueble de la cartera"
+    },
+    "agency": {
+      "type": "string",
+      "title": "Agencia que comparte"
+    },
+    "agent_name": {
+      "type": "string",
+      "title": "Persona de contacto"
+    },
+    "agent_email": {
+      "type": "string",
+      "title": "Email de contacto"
+    },
+    "agent_phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono de contacto"
+    },
+    "origin": {
+      "type": "string",
+      "title": "Origen",
+      "enum": [
+        "propia",
+        "red"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ],
+      "default": "propia"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ],
+      "default": "venta"
+    },
+    "property_type": {
+      "type": "string",
+      "title": "Tipo de inmueble",
+      "enum": [
+        "piso",
+        "atico",
+        "adosado",
+        "chalet",
+        "local",
+        "oficina",
+        "garaje",
+        "nave",
+        "terreno"
+      ],
+      "default": "piso"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "municipality": {
+      "type": "string",
+      "title": "Municipio"
+    },
+    "price": {
+      "type": "number",
+      "title": "Precio"
+    },
+    "surface": {
+      "type": "number",
+      "title": "Superficie (m\u00b2)"
+    },
+    "rooms": {
+      "type": "number",
+      "title": "Habitaciones"
+    },
+    "bathrooms": {
+      "type": "number",
+      "title": "Ba\u00f1os"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descripci\u00f3n"
+    },
+    "photos": {
+      "type": "array",
+      "title": "Fotos",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "commission_percent": {
+      "type": "number",
+      "title": "Honorarios compartidos (%)"
+    },
+    "commission_notes": {
+      "type": "string",
+      "title": "Condiciones de colaboraci\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado en la bolsa",
+      "enum": [
+        "disponible",
+        "reservado",
+        "vendido",
+        "retirado"
+      ],
+      "enumColors": [
+        "green",
+        "yellow",
+        "blue",
+        "gray"
+      ],
+      "default": "disponible"
+    },
+    "published_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Publicado el"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas internas"
+    }
+  },
+  "required": [
+    "title",
+    "agency"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
