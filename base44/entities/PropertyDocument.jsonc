@@ -1,0 +1,131 @@
+{
+  "name": "PropertyDocument",
+  "type": "object",
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "title": "Inmueble"
+    },
+    "property_title": {
+      "type": "string",
+      "title": "Referencia del inmueble"
+    },
+    "operation": {
+      "type": "string",
+      "title": "Operaci\u00f3n",
+      "enum": [
+        "venta",
+        "alquiler"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ]
+    },
+    "doc_key": {
+      "type": "string",
+      "title": "Documento"
+    },
+    "label": {
+      "type": "string",
+      "title": "Nombre del documento"
+    },
+    "required": {
+      "type": "boolean",
+      "title": "Obligatorio",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "pendiente",
+        "recibido",
+        "validado",
+        "no_aplica"
+      ],
+      "enumColors": [
+        "yellow",
+        "blue",
+        "green",
+        "gray"
+      ],
+      "default": "pendiente"
+    },
+    "file_uri": {
+      "type": "string",
+      "title": "Archivo"
+    },
+    "file_name": {
+      "type": "string",
+      "title": "Nombre del archivo"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    }
+  },
+  "required": [
+    "property_id",
+    "doc_key",
+    "label"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

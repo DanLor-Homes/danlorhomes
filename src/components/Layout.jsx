@@ -6,6 +6,7 @@ import {
   Landmark,
   Mail,
   FileSignature,
+  ClipboardCheck,
   Flame,
   KeyRound,
   LayoutDashboard,
@@ -67,6 +68,7 @@ const NAV_GROUPS = [
     label: 'Gestión',
     items: [
       { to: '/contratos', label: 'Documentos', icon: FileSignature },
+      { to: '/documentacion', label: 'Checklist documental', icon: ClipboardCheck },
       { to: '/correo', label: 'Correo', icon: Mail },
       { to: '/informes', label: 'Informes', icon: BarChart3 },
       { to: '/canales', label: 'Canales', icon: Megaphone },
