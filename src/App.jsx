@@ -35,6 +35,7 @@ import WebListings from '@/pages/WebListings';
 import SharedListing from '@/pages/SharedListing';
 import Contracts from '@/pages/Contracts';
 import Documents from '@/pages/Documents';
+import Duplicates from '@/pages/Duplicates';
 import PropertySheet from '@/pages/PropertySheet';
 import PropertyPanel from '@/pages/Panel';
 import Valuation from '@/pages/Valuation';
@@ -88,6 +89,7 @@ const AuthenticatedApp = () => {
           <Route path="/correo" element={<Mail />} />
           <Route path="/contratos" element={<Contracts />} />
           <Route path="/documentacion" element={<Documents />} />
+          <Route path="/duplicados" element={<Duplicates />} />
           <Route path="/propietarios" element={<Owners />} />
           <Route path="/portales" element={<Portales />} />
           <Route path="/particulares" element={<Particulares />} />

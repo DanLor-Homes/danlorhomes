@@ -26,6 +26,8 @@ import {
   Settings,
   Menu,
   Moon,
+  Search,
+  Copy,
   Sun,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -35,6 +37,7 @@ import { cn } from '@/lib/utils';
 import AssistantPanel from '@/components/agent/AssistantPanel';
 import NotificationsBell from '@/components/notifications/NotificationsBell';
 import QuickLeadDialog from '@/components/leads/QuickLeadDialog';
+import GlobalSearchDialog from '@/components/search/GlobalSearchDialog';
 import brandLogo from '@/assets/danlor-logo.webp';
 import SessionCard from '@/components/SessionCard';
 
@@ -45,6 +48,7 @@ const NAV_GROUPS = [
       { to: '/', label: 'Panel de control', icon: LayoutDashboard },
       { to: '/pipeline', label: 'Pipeline', icon: LayoutGrid },
       { to: '/leads', label: 'Leads y ventas', icon: Flame },
+      { to: '/duplicados', label: 'Duplicados', icon: Copy },
       { to: '/tareas', label: 'Tareas', icon: ListChecks },
       { to: '/calendario', label: 'Calendario', icon: CalendarDays },
       { to: '/videollamadas', label: 'Videollamadas', icon: Video },
@@ -160,6 +164,18 @@ export default function Layout() {
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
   const [leadOpen, setLeadOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -223,6 +239,27 @@ export default function Layout() {
           </div>
           <div className="flex items-center gap-1.5">
             <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSearchOpen(true)}
+              className="hidden items-center gap-2 rounded-full text-muted-foreground md:inline-flex"
+            >
+              <Search className="h-4 w-4" />
+              Buscar en el CRM
+              <kbd className="rounded border border-border/70 bg-muted/60 px-1.5 py-0.5 text-[11px] font-semibold">
+                ⌘K
+              </kbd>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full md:hidden"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Buscar en el CRM"
+            >
+              <Search className="h-[18px] w-[18px]" />
+            </Button>
+            <Button
               size="sm"
               className="hidden gap-1.5 rounded-full shadow-sm shadow-primary/20 sm:inline-flex"
               onClick={() => setLeadOpen(true)}
@@ -259,6 +296,7 @@ export default function Layout() {
         </main>
       </div>
       <QuickLeadDialog open={leadOpen} onOpenChange={setLeadOpen} />
+      <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
       <AssistantPanel />
     </div>
   );
