@@ -18,6 +18,7 @@ import {
   ListChecks,
   CalendarDays,
   Video,
+  Wallet,
   BarChart3,
   Megaphone,
   Archive,
@@ -52,6 +53,7 @@ const NAV_GROUPS = [
     label: 'Inmuebles',
     items: [
       { to: '/inmuebles', label: 'Inmuebles', icon: Building2 },
+      { to: '/alquileres', label: 'Alquileres', icon: Wallet },
       { to: '/bolsa', label: 'Bolsa (MLS)', icon: Network },
       { to: '/propietarios', label: 'Propietarios', icon: KeyRound },
       { to: '/portales', label: 'Portales', icon: Globe },

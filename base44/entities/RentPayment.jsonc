@@ -1,0 +1,139 @@
+{
+  "name": "RentPayment",
+  "type": "object",
+  "properties": {
+    "lease_id": {
+      "type": "string",
+      "title": "Contrato"
+    },
+    "tenant_name": {
+      "type": "string",
+      "title": "Inquilino"
+    },
+    "property_title": {
+      "type": "string",
+      "title": "Inmueble"
+    },
+    "period": {
+      "type": "string",
+      "title": "Periodo (AAAA-MM)"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de vencimiento"
+    },
+    "amount": {
+      "type": "number",
+      "title": "Importe (\u20ac)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "pendiente",
+        "cobrado"
+      ],
+      "enumColors": [
+        "yellow",
+        "green"
+      ],
+      "default": "pendiente"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fecha de cobro"
+    },
+    "paid_amount": {
+      "type": "number",
+      "title": "Importe cobrado (\u20ac)"
+    },
+    "method": {
+      "type": "string",
+      "title": "Forma de cobro",
+      "enum": [
+        "transferencia",
+        "domiciliado",
+        "efectivo",
+        "bizum",
+        "otro"
+      ],
+      "enumColors": [
+        "blue",
+        "blue",
+        "gray",
+        "purple",
+        "gray"
+      ]
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    }
+  },
+  "required": [
+    "lease_id",
+    "period",
+    "due_date",
+    "amount"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}

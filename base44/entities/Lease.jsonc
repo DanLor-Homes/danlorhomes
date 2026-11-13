@@ -1,0 +1,134 @@
+{
+  "name": "Lease",
+  "type": "object",
+  "properties": {
+    "tenant_name": {
+      "type": "string",
+      "title": "Inquilino"
+    },
+    "tenant_phone": {
+      "type": "string",
+      "title": "Tel\u00e9fono del inquilino"
+    },
+    "tenant_email": {
+      "type": "string",
+      "title": "Email del inquilino"
+    },
+    "property_id": {
+      "type": "string",
+      "title": "Inmueble de la cartera"
+    },
+    "property_title": {
+      "type": "string",
+      "title": "Inmueble alquilado"
+    },
+    "monthly_rent": {
+      "type": "number",
+      "title": "Renta mensual (\u20ac)"
+    },
+    "deposit": {
+      "type": "number",
+      "title": "Fianza (\u20ac)"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Inicio del contrato"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Fin del contrato"
+    },
+    "payment_day": {
+      "type": "number",
+      "title": "D\u00eda de cobro",
+      "default": 1
+    },
+    "next_review_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Pr\u00f3xima revisi\u00f3n (IPC)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Estado",
+      "enum": [
+        "activo",
+        "finalizado",
+        "cancelado"
+      ],
+      "enumColors": [
+        "green",
+        "gray",
+        "red"
+      ],
+      "default": "activo"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notas"
+    }
+  },
+  "required": [
+    "tenant_name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    }
+  }
+}
