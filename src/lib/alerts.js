@@ -14,8 +14,7 @@ const TYPE_WEIGHT = {
   stalled: 3,
   quote: 4,
   portal: 5,
-  duplicate: 6,
-  mandate: 7,
+  mandate: 6,
 };
 
 /**
@@ -28,7 +27,6 @@ export function buildDashboardAlerts({
   properties = [],
   hotLeads = [],
   listings = [],
-  clientDuplicates = [],
 }) {
   const alerts = [];
   const openStageIds = new Set(OPEN_STAGES.map((stage) => stage.id));
@@ -145,26 +143,6 @@ export function buildDashboardAlerts({
       urgency: days,
     });
   });
-
-  if (clientDuplicates.length) {
-    const duplicates = new Set();
-    clientDuplicates.forEach((group) => group.records.forEach((record) => duplicates.add(record.id)));
-    alerts.push({
-      key: `duplicates:${clientDuplicates
-        .map((group) => group.id)
-        .sort()
-        .join('|')}`,
-      type: 'duplicate',
-      tag: 'Duplicados',
-      title:
-        clientDuplicates.length === 1
-          ? '1 grupo de fichas repetidas'
-          : `${clientDuplicates.length} grupos de fichas repetidas`,
-      detail: `${duplicates.size} fichas de cliente comparten email, teléfono o nombre · revísalas y consolida`,
-      to: '/duplicados',
-      urgency: clientDuplicates.length,
-    });
-  }
 
   return alerts.sort(
     (a, b) => TYPE_WEIGHT[a.type] - TYPE_WEIGHT[b.type] || a.urgency - b.urgency || a.title.localeCompare(b.title)
