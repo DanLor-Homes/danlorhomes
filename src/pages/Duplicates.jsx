@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Info, Loader2, Users2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/crm/PageHeader';
@@ -16,7 +16,7 @@ const LEAD_STATUS = {
 
 const join = (...parts) => parts.filter(Boolean).join(' · ');
 
-function Section({ title, description, groups, recordsById, to }) {
+function Section({ title, description, groups, recordsById, to, entity, onMerged }) {
   return (
     <section className="mb-8">
       <div className="mb-3 flex items-end justify-between gap-3">
@@ -38,7 +38,9 @@ function Section({ title, description, groups, recordsById, to }) {
               key={group.id}
               reasons={group.reasons}
               to={to}
-              records={group.records.map((record) => recordsById[record.id])}
+              entity={entity}
+              onMerged={onMerged}
+              records={group.records.map((record) => recordsById[record.id]).filter(Boolean)}
             />
           ))}
         </div>
@@ -52,18 +54,19 @@ export default function Duplicates() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      const [clientPage, leadPage] = await Promise.all([
-        base44.entities.Client.list({ sort: '-created_date', limit: 1000 }),
-        base44.entities.WebLead.list({ sort: '-created_date', limit: 1000 }),
-      ]);
-      setClients(clientPage.items || []);
-      setLeads(leadPage.items || []);
-      setLoading(false);
-    };
-    load();
+  const load = useCallback(async () => {
+    const [clientPage, leadPage] = await Promise.all([
+      base44.entities.Client.list({ sort: '-created_date', limit: 1000 }),
+      base44.entities.WebLead.list({ sort: '-created_date', limit: 1000 }),
+    ]);
+    setClients(clientPage.items || []);
+    setLeads(leadPage.items || []);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const clientGroups = useMemo(() => findDuplicates(clients, CLIENT_DUPLICATE_SPECS), [clients]);
   const leadGroups = useMemo(() => findDuplicates(leads, LEAD_DUPLICATE_SPECS), [leads]);
@@ -74,6 +77,7 @@ export default function Duplicates() {
         const status = statusMeta(client.status);
         acc[client.id] = {
           id: client.id,
+          raw: client,
           name: client.name || 'Sin nombre',
           meta: join(client.phone, client.email, client.assigned_to),
           badge: { label: status.label, className: status.className },
@@ -89,6 +93,7 @@ export default function Duplicates() {
         const status = LEAD_STATUS[lead.status] || LEAD_STATUS.nuevo;
         acc[lead.id] = {
           id: lead.id,
+          raw: lead,
           name: lead.name || 'Sin nombre',
           meta: join(lead.phone, lead.email, lead.zone, lead.source),
           badge: status,
@@ -106,7 +111,7 @@ export default function Duplicates() {
       <PageHeader
         eyebrow="Calidad de datos"
         title="Posibles duplicados"
-        description="Revisión automática de fichas que comparten email, teléfono o nombre. Solo es un aviso: nada se fusiona ni se modifica."
+        description="Fichas que comparten email, teléfono o nombre. Selecciona las repetidas, elige cuál conservar y fusiónalas en un paso."
       />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
@@ -115,7 +120,7 @@ export default function Duplicates() {
         <StatCard
           label="Fichas afectadas"
           value={affectedClients + affectedLeads}
-          hint="Para revisar a mano"
+          hint="Listas para fusionar"
           icon={Users2}
         />
       </div>
@@ -123,8 +128,8 @@ export default function Duplicates() {
       <div className="mb-6 flex items-start gap-2.5 rounded-xl border border-border/70 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <p>
-          Las coincidencias por nombre pueden ser personas distintas. Abre cada ficha, comprueba los datos y decide cuál
-          conservar.
+          Las coincidencias por nombre pueden ser personas distintas. Marca las fichas repetidas y pulsa «Fusionar»: la
+          ficha que elijas conservará sus datos completos, sus registros vinculados y las demás se eliminarán.
         </p>
       </div>
 
@@ -140,6 +145,8 @@ export default function Duplicates() {
             groups={clientGroups}
             recordsById={clientRecords}
             to="/leads"
+            entity="Client"
+            onMerged={load}
           />
           <Section
             title="Leads web"
@@ -147,6 +154,8 @@ export default function Duplicates() {
             groups={leadGroups}
             recordsById={leadRecords}
             to="/leads"
+            entity="WebLead"
+            onMerged={load}
           />
         </>
       )}
