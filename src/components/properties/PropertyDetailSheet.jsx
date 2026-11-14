@@ -28,6 +28,7 @@ import {
   propertyStatusLabel,
   propertyTypeLabel,
 } from '@/lib/properties';
+import CatastroShortcut from './CatastroShortcut';
 import MatchList from './MatchList';
 import PropertyVisits from './PropertyVisits';
 import PropertyDescriptionAI from './PropertyDescriptionAI';
@@ -280,6 +281,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
                 </span>
               </div>
             </div>
+            <CatastroShortcut cadastralReference={property.cadastral_reference} />
             {property.legal_notes && (
               <p className="mt-2 whitespace-pre-wrap rounded-lg bg-muted/30 px-2.5 py-2 text-xs text-muted-foreground">
                 {property.legal_notes}
