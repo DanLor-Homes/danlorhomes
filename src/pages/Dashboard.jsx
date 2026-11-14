@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { OPEN_STAGES, daysSince, formatCurrency, todayISO } from '@/lib/crm';
 import { mandateStatus } from '@/lib/mandates';
 import { buildDashboardAlerts } from '@/lib/alerts';
+import { findDuplicates } from '@/lib/duplicates';
 import MandatesSummary from '@/components/owners/MandatesSummary';
 import HotStaleLeads from '@/components/leads/HotStaleLeads';
 import QuickRepliesCard from '@/components/dashboard/QuickRepliesCard';
@@ -136,6 +137,8 @@ export default function Dashboard() {
     [scoredLeads]
   );
 
+  const clientDuplicates = useMemo(() => findDuplicates(clients), [clients]);
+
   const alertItems = useMemo(
     () =>
       buildDashboardAlerts({
@@ -144,8 +147,9 @@ export default function Dashboard() {
         properties,
         hotLeads: scoredLeads,
         listings,
+        clientDuplicates,
       }).filter((alert) => !dismissed.has(alert.key)),
-    [opportunities, tasks, properties, scoredLeads, listings, dismissed]
+    [opportunities, tasks, properties, scoredLeads, listings, clientDuplicates, dismissed]
   );
 
   const overdueCount = useMemo(
