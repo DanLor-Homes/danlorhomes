@@ -34,6 +34,23 @@
       "type": "boolean",
       "title": "Activa",
       "default": true
+    },
+    "feed_url": {
+      "type": "string",
+      "title": "Enlace del feed de la agencia"
+    },
+    "last_sync_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "\u00daltima sincronizaci\u00f3n"
+    },
+    "last_sync_count": {
+      "type": "number",
+      "title": "Inmuebles sincronizados"
+    },
+    "last_sync_error": {
+      "type": "string",
+      "title": "\u00daltimo error"
     }
   },
   "required": [

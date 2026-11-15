@@ -11,6 +11,7 @@ import MlsPublishDialog from '@/components/mls/MlsPublishDialog';
 import MyMlsListings from '@/components/mls/MyMlsListings';
 import MlsInterestsPanel from '@/components/mls/MlsInterestsPanel';
 import MlsPartnersPanel from '@/components/mls/MlsPartnersPanel';
+import MlsFeedCard from '@/components/mls/MlsFeedCard';
 import { emptyMlsFilters, isMineListing } from '@/lib/mls';
 import { MessageSquare, Network, Plus, Search, Share2 } from 'lucide-react';
 
@@ -165,7 +166,10 @@ export default function Bolsa() {
         </TabsContent>
 
         <TabsContent value="red">
-          <MlsPartnersPanel partners={partners} onChanged={refresh} />
+          <div className="space-y-4">
+            <MlsFeedCard />
+            <MlsPartnersPanel partners={partners} onChanged={refresh} />
+          </div>
         </TabsContent>
       </Tabs>
 

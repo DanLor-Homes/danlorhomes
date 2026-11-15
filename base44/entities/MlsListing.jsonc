@@ -148,6 +148,14 @@
     "notes": {
       "type": "string",
       "title": "Notas internas"
+    },
+    "external_id": {
+      "type": "string",
+      "title": "Identificador en el feed de origen"
+    },
+    "feed_partner_id": {
+      "type": "string",
+      "title": "Agencia del feed"
     }
   },
   "required": [

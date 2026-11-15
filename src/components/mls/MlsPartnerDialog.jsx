@@ -17,6 +17,7 @@ const emptyPartner = {
   commission_notes: '',
   notes: '',
   active: true,
+  feed_url: '',
 };
 
 export default function MlsPartnerDialog({ open, partner, onOpenChange, onSaved }) {
@@ -41,6 +42,7 @@ export default function MlsPartnerDialog({ open, partner, onOpenChange, onSaved 
       commission_notes: form.commission_notes.trim(),
       notes: form.notes.trim(),
       active: form.active !== false,
+      feed_url: form.feed_url.trim(),
     };
     setSaving(true);
     try {
@@ -89,6 +91,19 @@ export default function MlsPartnerDialog({ open, partner, onOpenChange, onSaved 
               <Label htmlFor="partner-zone">Zona de trabajo</Label>
               <Input id="partner-zone" value={form.zone} onChange={set('zone')} />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="partner-feed">Enlace de feed de la agencia</Label>
+            <Input
+              id="partner-feed"
+              value={form.feed_url}
+              onChange={set('feed_url')}
+              placeholder="https://…/functions/mlsFeed?token=…"
+            />
+            <p className="text-[11.5px] leading-relaxed text-muted-foreground">
+              Pégalo para traer su cartera a tu bolsa con el botón de sincronizar.
+            </p>
           </div>
 
           <div className="space-y-1.5">
