@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Image } from '@/components/ui/image';
 import SharedListingForm from '@/components/mls/SharedListingForm';
+import CatastroShortcut from '@/components/properties/CatastroShortcut';
 import { formatCurrency, formatDate } from '@/lib/crm';
 import { operationLabel, propertyTypeLabel, pricePerM2 } from '@/lib/properties';
 import {
@@ -184,10 +185,13 @@ export default function SharedListing() {
                   </div>
                 </div>
 
-                <div className="card-surface grid gap-3 p-4 sm:grid-cols-3">
-                  <Detail label="Referencia" value={listing.reference} />
-                  <Detail label="Municipio" value={listing.municipality} />
-                  <Detail label="Zona" value={listing.zone} />
+                <div className="card-surface p-4">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <Detail label="Referencia" value={listing.reference} />
+                    <Detail label="Municipio" value={listing.municipality} />
+                    <Detail label="Zona" value={listing.zone} />
+                  </div>
+                  <CatastroShortcut cadastralReference={listing.cadastral_reference} className="mt-3" />
                 </div>
 
                 {listing.description && (

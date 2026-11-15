@@ -11,11 +11,12 @@ function clean(value, max) {
 const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 
 // Solo los datos del inmueble: el contacto personal de la agencia nunca viaja en el enlace.
-function publicListing(listing) {
+function publicListing(listing, cadastralReference) {
   return {
     id: listing.id,
     title: listing.title,
     reference: listing.reference || '',
+    cadastral_reference: cadastralReference || '',
     agency: listing.agency || '',
     operation: listing.operation || 'venta',
     property_type: listing.property_type || 'piso',
@@ -54,7 +55,15 @@ export default async function (req) {
     }
 
     if (body.action !== 'interest') {
-      return Response.json({ listing: publicListing(listing) });
+      // Referencia catastral de la ficha de origen, para la consulta gratuita en el Catastro.
+      let cadastralReference = '';
+      if (listing.property_id) {
+        const property = await base44.asServiceRole.entities.Property.get(listing.property_id).catch((error) =>
+          error.status === 404 ? null : Promise.reject(error)
+        );
+        cadastralReference = property?.cadastral_reference || '';
+      }
+      return Response.json({ listing: publicListing(listing, cadastralReference) });
     }
 
     // Honeypot: los bots rellenan el campo oculto.
