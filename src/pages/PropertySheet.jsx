@@ -4,6 +4,7 @@ import { ArrowLeft, Loader2, MapPin, Printer } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Image } from '@/components/ui/image';
 import { Button } from '@/components/ui/button';
+import CatastroShortcut from '@/components/properties/CatastroShortcut';
 import { formatCurrency, formatDate } from '@/lib/crm';
 import {
   conditionLabel,
@@ -153,6 +154,13 @@ export default function PropertySheet() {
               <span className="font-medium">{value}</span>
             </div>
           ))}
+        </div>
+
+        <div className="mt-4 flex justify-end print:hidden">
+          <CatastroShortcut
+            cadastralReference={property.cadastral_reference}
+            className="mt-0 border-slate-200 bg-white text-slate-700 hover:border-slate-400 hover:text-slate-900"
+          />
         </div>
 
         <footer className="mt-8 border-t border-slate-200 pt-3 text-[10px] leading-relaxed text-slate-500">

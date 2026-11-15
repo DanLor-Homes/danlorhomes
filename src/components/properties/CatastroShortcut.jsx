@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, Landmark } from 'lucide-react';
 import { normalizeRc } from '@/lib/catastro';
+import { cn } from '@/lib/utils';
 
 // Consulta gratuita de datos de la finca en la Sede Electrónica del Catastro.
 const catastroUrl = (rc) =>
@@ -8,7 +9,7 @@ const catastroUrl = (rc) =>
     ? `https://www1.sedecatastro.gob.es/CYCBienInmueble/OVCListaBienes.aspx?rc=${encodeURIComponent(rc)}`
     : 'https://www.sedecatastro.gob.es/';
 
-export default function CatastroShortcut({ cadastralReference }) {
+export default function CatastroShortcut({ cadastralReference, className }) {
   const rc = normalizeRc(cadastralReference);
 
   return (
@@ -16,7 +17,10 @@ export default function CatastroShortcut({ cadastralReference }) {
       href={catastroUrl(rc)}
       target="_blank"
       rel="noopener noreferrer"
-      className="mt-2 flex items-center gap-2 rounded-lg border border-border/70 bg-card px-2.5 py-2 text-left text-xs transition-colors hover:border-primary/40 hover:text-primary"
+      className={cn(
+        'mt-2 flex items-center gap-2 rounded-lg border border-border/70 bg-card px-2.5 py-2 text-left text-xs transition-colors hover:border-primary/40 hover:text-primary',
+        className
+      )}
     >
       <Landmark className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span className="flex-1">
