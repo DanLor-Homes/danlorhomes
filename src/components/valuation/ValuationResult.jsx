@@ -11,13 +11,17 @@ const CONFIDENCE = {
 };
 
 export default function ValuationResult({ valuation, saving, onSave, canSave = true }) {
-  const { estimate, low, high, pricePerM2, confidence, count, deltaPercent, marketPrice, canValue, surface } = valuation;
+  const { estimate, low, high, pricePerM2, confidence, count, deltaPercent, marketPrice, canValue, surface, operation, warnings } =
+    valuation;
   const badge = CONFIDENCE[confidence] || CONFIDENCE.referencia;
+  const rent = operation === 'alquiler';
 
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">Tasación estimada</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
+          {rent ? 'Renta mensual estimada' : 'Tasación estimada'}
+        </p>
         {canValue && (
           <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${badge.className}`}>{badge.label}</span>
         )}
@@ -29,10 +33,12 @@ export default function ValuationResult({ valuation, saving, onSave, canSave = t
             <p className="font-heading text-3xl font-extrabold tracking-tight">{formatCurrency(estimate)}</p>
             <p className="pb-1 text-xs text-muted-foreground">
               {formatCurrency(low)} – {formatCurrency(high)}
+              {rent ? '/mes' : ''}
             </p>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            {surface} m² · {formatCurrency(pricePerM2)}/m² ·{' '}
+            {surface} m² · {formatCurrency(pricePerM2)}
+            {rent ? '/m²·mes' : '/m²'} ·{' '}
             {count > 0 ? `${count} comparable${count === 1 ? '' : 's'}` : 'sin comparables, referencia de mercado'}
           </p>
 
@@ -46,6 +52,17 @@ export default function ValuationResult({ valuation, saving, onSave, canSave = t
                 frente a la referencia de la zona ({formatCurrency(marketPrice)}/m²)
               </span>
             </p>
+          )}
+
+          {warnings?.length > 0 && (
+            <ul className="mt-3 space-y-1 rounded-xl bg-muted/60 p-2.5 text-[11px] leading-relaxed text-muted-foreground">
+              {warnings.map((warning) => (
+                <li key={warning} className="flex gap-1.5">
+                  <span aria-hidden>·</span>
+                  <span>{warning}</span>
+                </li>
+              ))}
+            </ul>
           )}
 
           {canSave && (

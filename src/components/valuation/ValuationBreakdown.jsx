@@ -9,7 +9,10 @@ const scopeLabel = {
 };
 
 export default function ValuationBreakdown({ valuation }) {
-  const { basis, basisSource, count, scope, factorRows, factor, surface, estimate, marketEstimate, marketPrice } = valuation;
+  const { basis, basisSource, count, scope, factorRows, factor, surface, estimate, marketEstimate, marketPrice, operation } =
+    valuation;
+  const rent = operation === 'alquiler';
+  const unit = rent ? '/m²·mes' : '/m²';
 
   if (!basis) {
     return (
@@ -34,7 +37,10 @@ export default function ValuationBreakdown({ valuation }) {
             €/m² base ·{' '}
             {basisSource === 'comparables' ? `${count} comparables, ${scopeLabel[scope] || scope}` : 'referencia de mercado'}
           </dt>
-          <dd className="font-semibold tabular-nums">{formatCurrency(basis)}</dd>
+          <dd className="font-semibold tabular-nums">
+            {formatCurrency(basis)}
+            {unit}
+          </dd>
         </div>
         {visibleRows.map((row) => (
           <div key={row.key} className="flex items-baseline justify-between gap-3">
@@ -60,8 +66,9 @@ export default function ValuationBreakdown({ valuation }) {
 
       {marketPrice && marketEstimate && (
         <p className="mt-3 border-t border-border/60 pt-2 text-[11px] leading-relaxed text-muted-foreground">
-          Referencia de mercado de la zona: {formatCurrency(marketPrice)}/m², equivalente a{' '}
-          {formatCurrency(marketEstimate)} para este inmueble.
+          Referencia de mercado de la zona: {formatCurrency(marketPrice)}
+          {unit}, equivalente a {formatCurrency(marketEstimate)}
+          {rent ? '/mes' : ''} para este inmueble.
         </p>
       )}
     </div>

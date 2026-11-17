@@ -29,17 +29,23 @@ const EMPTY = {
 
 function valuesFrom(property) {
   const town = property.municipality || property.zone || '';
-  const reference = marketReference({ municipality: town, province: property.province });
+  const operation = property.operation || 'venta';
+  const reference = marketReference({
+    municipality: town,
+    province: property.province,
+    property_type: property.property_type,
+    operation,
+  });
   return {
     address: property.address || '',
     municipality: town,
     province: property.province || '',
     surface: property.surface || '',
     property_type: property.property_type || 'piso',
-    operation: property.operation || 'venta',
+    operation,
     condition: property.condition || 'buen_estado',
     year_built: property.year_built || '',
-    reference_m2: property.valuation_price_m2 || reference.priceM2 || '',
+    reference_m2: reference.priceM2 || '',
   };
 }
 
@@ -78,30 +84,41 @@ export default function Valuation() {
   const updateForm = (patch) =>
     setForm((prev) => {
       const next = { ...prev, ...patch };
-      if ('municipality' in patch || 'province' in patch) {
-        const reference = marketReference({ municipality: next.municipality, province: next.province });
-        if (reference.priceM2) next.reference_m2 = reference.priceM2;
+      if (['municipality', 'province', 'operation', 'property_type'].some((key) => key in patch)) {
+        const reference = marketReference({
+          municipality: next.municipality,
+          province: next.province,
+          property_type: next.property_type,
+          operation: next.operation,
+        });
+        next.reference_m2 = reference.priceM2 || '';
       }
       return next;
     });
 
   const market = useMemo(() => {
-    const reference = marketReference({ municipality: form.municipality, province: form.province });
+    const reference = marketReference({
+      municipality: form.municipality,
+      province: form.province,
+      property_type: form.property_type,
+      operation: form.operation,
+    });
     const manual = Number(form.reference_m2) || 0;
     return {
       priceM2: manual || reference.priceM2 || null,
       scope: reference.scope,
       label: reference.label || form.municipality || form.province,
       source: manual && manual !== reference.priceM2 ? 'valor indicado por ti' : reference.source,
+      operation: form.operation,
     };
-  }, [form.municipality, form.province, form.reference_m2]);
+  }, [form.municipality, form.province, form.property_type, form.operation, form.reference_m2]);
 
   const comparables = useMemo(
     () =>
       collectComparables({
         properties,
         testigos,
-        subject: { ...form, id: subjectId, zone: form.municipality || form.province },
+        subject: { ...form, id: subjectId },
         operation: form.operation,
         propertyType: form.property_type,
       }),

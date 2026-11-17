@@ -7,6 +7,8 @@ import { formatCurrency } from '@/lib/crm';
 
 export default function SubjectForm({ value, onChange, market }) {
   const set = (patch) => onChange(patch);
+  const rent = value.operation === 'alquiler';
+  const unit = rent ? '/m²·mes' : '/m²';
 
   return (
     <div className="mb-5 rounded-2xl border border-border bg-card p-4">
@@ -106,7 +108,7 @@ export default function SubjectForm({ value, onChange, market }) {
           />
         </div>
         <div>
-          <Label htmlFor="v-reference">€/m² de referencia de la zona</Label>
+          <Label htmlFor="v-reference">{rent ? '€/m² de referencia (renta mensual)' : '€/m² de referencia de la zona'}</Label>
           <Input
             id="v-reference"
             type="number"
@@ -119,8 +121,10 @@ export default function SubjectForm({ value, onChange, market }) {
       </div>
       <p className="mt-3 text-[11px] text-muted-foreground">
         {market?.priceM2
-          ? `Referencia de ${market.label || 'la zona'}: ${formatCurrency(market.priceM2)}/m² (${market.source}). Puedes ajustarla si conoces el mercado.`
-          : 'Sin referencia para esta ubicación: indica el €/m² de la zona o añade testigos de mercado.'}
+          ? `Referencia de ${market.label || 'la zona'}: ${formatCurrency(market.priceM2)}${unit} (${market.source}). Puedes ajustarla si conoces el mercado.`
+          : rent
+            ? 'Sin referencia de renta para esta ubicación: indica el €/m²·mes o añade testigos de alquiler.'
+            : 'Sin referencia para esta ubicación: indica el €/m² de la zona o añade testigos de mercado.'}
       </p>
     </div>
   );
