@@ -12,7 +12,9 @@ export default function AssistantPanel() {
           <div className="flex items-center justify-between gap-2 border-b border-border/60 px-3.5 py-3">
             <div className="min-w-0">
               <p className="truncate font-heading text-sm font-semibold">Asistente DAN&amp;LOR</p>
-              <p className="truncate text-[11px] text-muted-foreground">Clientes, pipeline, tareas y portales</p>
+              <p className="truncate text-[11px] text-muted-foreground">
+                Clientes, pipeline, alquileres, bolsa y tasación
+              </p>
             </div>
             <button
               type="button"

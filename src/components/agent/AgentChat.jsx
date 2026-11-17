@@ -11,7 +11,9 @@ const STORAGE_KEY = 'danlor-agent-conversation';
 const SUGGESTIONS = [
   '¿Qué tareas tengo pendientes esta semana?',
   'Resume el pipeline y qué oportunidades están frías',
-  '¿Hay anuncios nuevos en portales?',
+  '¿Cómo va la cartera de alquileres y quién debe la renta?',
+  'Busca cruces en la bolsa para mis demandantes',
+  'Justifica la tasación de un inmueble de la cartera',
 ];
 
 export default function AgentChat() {
@@ -107,8 +109,9 @@ export default function AgentChat() {
         {messages.length === 0 && (
           <div className="space-y-3">
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Hola, soy tu asistente. Puedo consultar clientes, oportunidades, tareas y anuncios de portales, y
-              dejarte hecho lo que necesites: tareas, notas de llamadas o cambios de etapa.
+              Hola, soy tu asistente. Consulto clientes, oportunidades, tareas, portales, alquileres y la bolsa de la
+              red, justifico tasaciones y te dejo hecho lo que necesites: tareas, notas de llamadas o cambios de
+              etapa.
             </p>
             <div className="flex flex-col gap-1.5">
               {SUGGESTIONS.map((suggestion) => (

@@ -10,6 +10,7 @@ import ValuationResult from '@/components/valuation/ValuationResult';
 import ValuationBreakdown from '@/components/valuation/ValuationBreakdown';
 import ComparableTable from '@/components/valuation/ComparableTable';
 import ComparableDialog from '@/components/valuation/ComparableDialog';
+import ValuationAdvisor from '@/components/valuation/ValuationAdvisor';
 import { buildValuation, collectComparables, marketReference } from '@/lib/valuation';
 import { formatCurrency } from '@/lib/crm';
 import { propertyTypeLabel } from '@/lib/properties';
@@ -108,6 +109,49 @@ export default function Valuation() {
   );
 
   const valuation = useMemo(() => buildValuation({ subject: form, comparables, market }), [form, comparables, market]);
+
+  const advisorPayload = useMemo(
+    () => ({
+      subject: {
+        address: form.address,
+        municipality: form.municipality,
+        province: form.province,
+        surface: Number(form.surface) || 0,
+        property_type: form.property_type,
+        operation: form.operation,
+        condition: form.condition,
+        year_built: Number(form.year_built) || null,
+      },
+      valuation: {
+        estimate: valuation.estimate,
+        pricePerM2: valuation.pricePerM2,
+        low: valuation.low,
+        high: valuation.high,
+        margin: valuation.margin,
+        confidence: valuation.confidence,
+        count: valuation.count,
+        scope: valuation.scope,
+        basisSource: valuation.basisSource,
+        basis: valuation.basis,
+        marketPrice: valuation.marketPrice,
+        deltaPercent: valuation.deltaPercent,
+        factorRows: valuation.factorRows,
+      },
+      comparables: comparables.rows.map((row) => ({
+        title: row.title,
+        zone: row.zone,
+        price: row.price,
+        surface: row.surface,
+        price_m2: row.price_m2,
+        normalized_m2: row.normalized_m2,
+        condition: row.condition,
+        year_built: row.year_built,
+        origin: row.origin,
+      })),
+      market,
+    }),
+    [form, valuation, comparables, market]
+  );
 
   const selectProperty = (id) => {
     const property = properties.find((item) => item.id === id);
@@ -251,6 +295,8 @@ export default function Valuation() {
               <ComparableTable rows={comparables.rows} onDelete={removeTestigo} />
             </div>
           </div>
+
+          <ValuationAdvisor payload={advisorPayload} canValue={valuation.canValue} />
         </>
       )}
 
