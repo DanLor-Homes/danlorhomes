@@ -1,30 +1,26 @@
 import React, { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { CHANNELS } from '@/lib/crm';
+import {
+  AXIS_TICK,
+  CURSOR_FILL,
+  GRID_STROKE,
+  SERIES_ACCENTS,
+  TOOLTIP_STYLE,
+  TOOLTIP_ITEM_STYLE,
+  TOOLTIP_LABEL_STYLE,
+} from '@/lib/chartTheme';
 
 const MONTHS_BACK = 12;
 
-const CHANNEL_COLORS = {
-  web: '#0052CC',
-  referido: '#14b8a6',
-  linkedin: '#0ea5e9',
-  whatsapp: '#22c55e',
-  campana_email: '#8b5cf6',
-  publicidad: '#f59e0b',
-  sin_origen: '#94a3b8',
-};
-
 const SERIES = [
-  ...CHANNELS.map((channel) => ({ id: channel.id, label: channel.label, color: CHANNEL_COLORS[channel.id] })),
-  { id: 'sin_origen', label: 'Sin origen', color: CHANNEL_COLORS.sin_origen },
+  ...CHANNELS.map((channel, index) => ({
+    id: channel.id,
+    label: channel.label,
+    color: SERIES_ACCENTS[index % SERIES_ACCENTS.length],
+  })),
+  { id: 'sin_origen', label: 'Sin origen', color: '#b3b1a9' },
 ];
-
-const tooltipStyle = {
-  background: 'hsl(var(--popover))',
-  border: '1px solid hsl(var(--border))',
-  borderRadius: 12,
-  fontSize: 12,
-};
 
 function monthKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -94,20 +90,20 @@ export default function MonthlyOutcomeChart({ opportunities, channelSlugById }) 
   );
 
   return (
-    <section className="card-surface mt-4 p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className="card-surface mt-5 p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 pb-4">
         <div>
-          <h3 className="font-heading text-sm font-bold">Ganadas y perdidas por mes</h3>
-          <p className="text-xs text-muted-foreground">Últimos 12 meses, segmentadas por origen del contacto</p>
+          <h3 className="font-heading text-[15px] font-semibold tracking-tight">Ganadas y perdidas por mes</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">Últimos 12 meses, segmentadas por origen del contacto</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-[11px]">
-          <span className="rounded-lg bg-emerald-500/15 px-2 py-1 font-semibold text-emerald-400">
+        <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em]">
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-emerald-700 ring-1 ring-emerald-500/20 dark:text-emerald-400">
             {totals.won} ganadas
           </span>
-          <span className="rounded-lg bg-rose-500/15 px-2 py-1 font-semibold text-rose-400">
+          <span className="rounded-full bg-rose-500/10 px-2.5 py-1 text-rose-700 ring-1 ring-rose-500/20 dark:text-rose-400">
             {totals.lost} perdidas
           </span>
-          <span className="rounded-lg bg-primary/10 px-2 py-1 font-semibold text-primary">{rate}% de cierre</span>
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-primary ring-1 ring-primary/15">{rate}% de cierre</span>
         </div>
       </div>
 
@@ -115,24 +111,27 @@ export default function MonthlyOutcomeChart({ opportunities, channelSlugById }) 
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ left: 0, right: 8, top: 8, bottom: 4 }} barGap={2}>
-              <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
+              <CartesianGrid vertical={false} stroke={GRID_STROKE} strokeDasharray="2 6" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                tick={AXIS_TICK}
                 axisLine={false}
                 tickLine={false}
                 interval={0}
+                tickMargin={8}
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                tick={AXIS_TICK}
                 axisLine={false}
                 tickLine={false}
                 width={28}
               />
               <Tooltip
-                contentStyle={tooltipStyle}
-                cursor={{ fill: 'hsl(var(--muted) / 0.4)' }}
+                contentStyle={TOOLTIP_STYLE}
+                labelStyle={TOOLTIP_LABEL_STYLE}
+                itemStyle={TOOLTIP_ITEM_STYLE}
+                cursor={CURSOR_FILL}
               />
               {SERIES.map((serie) => (
                 <Bar

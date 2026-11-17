@@ -34,14 +34,24 @@ import PropertyVisits from './PropertyVisits';
 import PropertyDescriptionAI from './PropertyDescriptionAI';
 import { mandateLabel, mandateStatus } from '@/lib/mandates';
 
-const ROW = 'flex items-center justify-between gap-3 py-1.5 text-sm';
+const ROW = 'flex items-center justify-between gap-3 py-2 text-sm';
+
+function SectionLabel({ icon: Icon, children }) {
+  return (
+    <p className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <span className="gold-rule" />
+      {Icon && <Icon className="h-3 w-3" />}
+      {children}
+    </p>
+  );
+}
 
 function FileRow({ label, file, onOpen }) {
   return (
     <button
       type="button"
       onClick={() => onOpen(file)}
-      className="flex w-full items-center gap-2 rounded-lg border border-border/70 bg-card px-2.5 py-1.5 text-left text-xs transition-colors hover:border-primary/40"
+      className="flex w-full items-center gap-2 rounded-xl border border-border/80 bg-card px-3 py-2 text-left text-xs transition-colors hover:border-primary/40 hover:bg-muted/40"
     >
       <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span className="flex-1 truncate">{file.name}</span>
@@ -103,13 +113,13 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+      <SheetContent className="w-full overflow-y-auto border-l border-border/80 bg-background sm:max-w-xl">
         <SheetHeader className="text-left">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <SheetTitle className="font-heading text-xl leading-tight">{property.title}</SheetTitle>
-              <SheetDescription className="mt-1 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
+              <SheetTitle className="display-title text-[26px]">{property.title}</SheetTitle>
+              <SheetDescription className="mt-2 flex items-center gap-1.5 text-[12px]">
+                <MapPin className="h-3.5 w-3.5" />
                 {property.zone || 'Sin zona'} · {propertyTypeLabel(property.property_type)} ·{' '}
                 {operationLabel(property.operation)}
               </SheetDescription>
@@ -138,38 +148,48 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
 
         <div className="mt-5 space-y-4">
           {photos.length > 0 && (
-            <div className="grid grid-cols-3 gap-1.5 overflow-hidden rounded-xl">
+            <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-2xl ring-1 ring-border/70">
               {photos.slice(0, 3).map((photo, index) => (
                 <button
                   key={`${photo.file_url}-${index}`}
                   type="button"
                   onClick={() => openFile(photo)}
-                  className={index === 0 ? 'col-span-2 row-span-2 h-40' : 'h-[76px]'}
+                  className={`group overflow-hidden ${index === 0 ? 'col-span-2 row-span-2 h-44' : 'h-[84px]'}`}
                 >
-                  <Image src={photo.file_url} alt={photo.name || property.title} className="h-full w-full rounded-lg" />
+                  <Image
+                    src={photo.file_url}
+                    alt={photo.name || property.title}
+                    className="h-full w-full rounded-xl transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
                 </button>
               ))}
             </div>
           )}
 
-          <div className="rounded-xl border border-border/70 bg-muted/20 p-3.5">
+          <div className="card-surface p-4">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <p className="font-heading text-2xl font-bold leading-none">{formatCurrency(property.price)}</p>
-                <p className="mt-1 text-[11px] text-muted-foreground">
+                <p className="display-title text-[30px] leading-none tabular-nums">{formatCurrency(property.price)}</p>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
                   {perM2 ? `${formatCurrency(perM2)}/m² · ` : ''}
                   {property.surface ? `${property.surface} m²` : 'Superficie sin definir'}
                 </p>
               </div>
-              <span className="rounded-md bg-primary/12 px-2 py-1 text-[11px] font-semibold text-primary">
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-primary ring-1 ring-primary/15">
                 {propertyStatusLabel(property.status)}
               </span>
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
-              {property.reference && <span className="rounded bg-background/60 px-1.5 py-0.5">Ref. {property.reference}</span>}
-              {property.exclusive && <span className="rounded bg-primary/15 px-1.5 py-0.5 text-primary">Exclusiva</span>}
+            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border/60 pt-3 text-[10px] uppercase tracking-[0.08em]">
+              {property.reference && (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">Ref. {property.reference}</span>
+              )}
+              {property.exclusive && (
+                <span className="rounded-full bg-gold/15 px-2 py-0.5 font-semibold text-gold">Exclusiva</span>
+              )}
               {property.capture_date && (
-                <span className="rounded bg-background/60 px-1.5 py-0.5">Captado {formatDate(property.capture_date)}</span>
+                <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+                  Captado {formatDate(property.capture_date)}
+                </span>
               )}
             </div>
           </div>
@@ -180,23 +200,23 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
               { icon: BedDouble, value: property.rooms || '—', label: 'Habitaciones' },
               { icon: Zap, value: property.energy_rating ? String(property.energy_rating).toUpperCase() : '—', label: 'Energía' },
             ].map(({ icon: Icon, value, label }) => (
-              <div key={label} className="rounded-xl border border-border/70 bg-card px-2 py-2.5">
-                <Icon className="mx-auto h-3.5 w-3.5 text-muted-foreground" />
-                <p className="mt-1 text-sm font-semibold leading-none">{value}</p>
-                <p className="mt-0.5 text-[10px] text-muted-foreground">{label}</p>
+              <div key={label} className="rounded-xl border border-border/80 bg-card px-2 py-3">
+                <Icon className="mx-auto h-3.5 w-3.5 text-gold" />
+                <p className="mt-1.5 font-heading text-[15px] font-semibold leading-none tabular-nums">{value}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
               </div>
             ))}
           </div>
 
-          <div className="rounded-xl border border-primary/25 bg-primary/5 p-3">
-            <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary">
+          <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-4">
+            <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
               <TrendingUp className="h-3 w-3" /> Valoración por comparables
             </p>
             {loading ? (
               <p className="mt-2 text-xs text-muted-foreground">Calculando…</p>
             ) : valuation ? (
               <>
-                <p className="mt-1.5 font-heading text-lg font-bold leading-none">
+                <p className="mt-2 font-heading text-[19px] font-semibold leading-none tabular-nums">
                   {formatCurrency(valuation.low)} – {formatCurrency(valuation.high)}
                 </p>
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -226,7 +246,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
           {property.features?.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {property.features.map((feature) => (
-                <span key={feature} className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] text-muted-foreground">
+                <span key={feature} className="rounded-full border border-border/80 bg-card px-2.5 py-1 text-[11px] text-muted-foreground">
                   {feature}
                 </span>
               ))}
@@ -236,10 +256,8 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
           <Separator />
 
           <div>
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Situación legal y honorarios
-            </p>
-            <div className="divide-y divide-border/50">
+            <SectionLabel>Legal y honorarios</SectionLabel>
+            <div className="divide-y divide-border/60">
               <div className={ROW}>
                 <span className="text-muted-foreground">Situación legal</span>
                 <span className="font-medium">{legalStatusLabel(property.legal_status)}</span>
@@ -283,7 +301,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
             </div>
             <CatastroShortcut cadastralReference={property.cadastral_reference} />
             {property.legal_notes && (
-              <p className="mt-2 whitespace-pre-wrap rounded-lg bg-muted/30 px-2.5 py-2 text-xs text-muted-foreground">
+              <p className="mt-2 whitespace-pre-wrap rounded-xl bg-muted/30 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
                 {property.legal_notes}
               </p>
             )}
@@ -291,9 +309,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
 
           <Separator />
           <div>
-            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              <MapPin className="h-3 w-3" /> Visitas registradas
-            </p>
+            <SectionLabel icon={MapPin}>Visitas registradas</SectionLabel>
             <PropertyVisits propertyId={property.id} clients={clients} />
           </div>
 
@@ -301,9 +317,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
             <>
               <Separator />
               <div>
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Vídeos, planos y documentos
-                </p>
+                <SectionLabel>Vídeos, planos y documentos</SectionLabel>
                 <div className="space-y-1.5">
                   {(property.videos || []).map((file, index) => (
                     <FileRow key={`v-${index}`} label="Vídeo" file={file} onOpen={openFile} />
@@ -322,9 +336,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
 
           {property.published_portals?.length > 0 && (
             <div>
-              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Difundido en
-              </p>
+              <SectionLabel>Difundido en</SectionLabel>
               <div className="flex flex-wrap gap-1.5">
                 {property.published_portals.map((portal) => (
                   <span key={portal} className="rounded-full bg-accent px-2 py-0.5 text-[11px] text-accent-foreground">
@@ -338,9 +350,7 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
           <Separator />
 
           <div>
-            <p className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              <CalendarDays className="h-3 w-3" /> Demandantes que encajan
-            </p>
+            <SectionLabel icon={CalendarDays}>Demandantes que encajan</SectionLabel>
             {loading ? (
               <div className="flex justify-center py-4">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -352,8 +362,10 @@ export default function PropertyDetailSheet({ property, open, onOpenChange, onEd
 
           {property.notes && (
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Notas internas</p>
-              <p className="whitespace-pre-wrap rounded-lg border border-border/70 bg-card px-2.5 py-2 text-sm">{property.notes}</p>
+              <SectionLabel>Notas internas</SectionLabel>
+              <p className="whitespace-pre-wrap rounded-xl border border-border/80 bg-muted/30 px-3 py-2.5 text-sm leading-relaxed">
+                {property.notes}
+              </p>
             </div>
           )}
 

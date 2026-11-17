@@ -17,13 +17,15 @@ import { Loader2, Percent, Target, Trophy } from 'lucide-react';
 import { CHANNELS, CHANNEL_LABELS, STAGES, formatCurrency } from '@/lib/crm';
 import MonthlyOutcomeChart from '@/components/reports/MonthlyOutcomeChart';
 import ChannelPdfButton from '@/components/reports/ChannelPdfButton';
-
-const tooltipStyle = {
-  background: 'hsl(var(--popover))',
-  border: '1px solid hsl(var(--border))',
-  borderRadius: 12,
-  fontSize: 12,
-};
+import {
+  AXIS_TICK,
+  CURSOR_FILL,
+  GRID_STROKE,
+  SERIES_ACCENTS,
+  TOOLTIP_STYLE,
+  TOOLTIP_ITEM_STYLE,
+  TOOLTIP_LABEL_STYLE,
+} from '@/lib/chartTheme';
 
 export default function Reports() {
   const [opportunities, setOpportunities] = useState([]);
@@ -123,17 +125,17 @@ export default function Reports() {
       <MonthlyOutcomeChart opportunities={opportunities} channelSlugById={channelSlugById} />
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="card-surface p-5">
-          <h3 className="font-heading text-sm font-bold">Embudo de ventas</h3>
-          <p className="mb-3 text-xs text-muted-foreground">Valor acumulado por etapa</p>
+        <section className="card-surface p-6">
+          <h3 className="font-heading text-[15px] font-semibold tracking-tight">Embudo de ventas</h3>
+          <p className="mb-4 text-xs text-muted-foreground">Valor acumulado por etapa</p>
           <div className="h-[340px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={funnel} layout="vertical" margin={{ left: 4, right: 12, top: 4, bottom: 4 }}>
-                <CartesianGrid horizontal={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
+                <CartesianGrid horizontal={false} stroke={GRID_STROKE} strokeDasharray="2 6" />
                 <XAxis
                   type="number"
                   tickFormatter={(value) => formatCurrency(value, true)}
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={AXIS_TICK}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -141,14 +143,14 @@ export default function Reports() {
                   type="category"
                   dataKey="label"
                   width={104}
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={AXIS_TICK}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={tooltipStyle}
+                  contentStyle={TOOLTIP_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} itemStyle={TOOLTIP_ITEM_STYLE}
                   formatter={(value) => [formatCurrency(value), 'Valor']}
-                  cursor={{ fill: 'hsl(var(--muted) / 0.4)' }}
+                  cursor={CURSOR_FILL}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} maxBarSize={22}>
                   {funnel.map((entry) => (
@@ -160,9 +162,9 @@ export default function Reports() {
           </div>
         </section>
 
-        <section className="card-surface p-5">
-          <h3 className="font-heading text-sm font-bold">Rendimiento por canal</h3>
-          <p className="mb-3 text-xs text-muted-foreground">Pipeline generado frente a importe ganado</p>
+        <section className="card-surface p-6">
+          <h3 className="font-heading text-[15px] font-semibold tracking-tight">Rendimiento por canal</h3>
+          <p className="mb-4 text-xs text-muted-foreground">Pipeline generado frente a importe ganado</p>
           <div className="h-[340px]">
             {channelData.length === 0 ? (
               <p className="grid h-full place-items-center text-xs text-muted-foreground">
@@ -171,25 +173,37 @@ export default function Reports() {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={channelData} margin={{ left: 0, right: 8, top: 4, bottom: 4 }}>
-                  <CartesianGrid vertical={false} stroke="hsl(var(--border))" strokeDasharray="3 3" />
+                  <CartesianGrid vertical={false} stroke={GRID_STROKE} strokeDasharray="2 6" />
                   <XAxis
                     dataKey="label"
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={AXIS_TICK}
                     axisLine={false}
                     tickLine={false}
                     interval={0}
                   />
                   <YAxis
                     tickFormatter={(value) => formatCurrency(value, true)}
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={AXIS_TICK}
                     axisLine={false}
                     tickLine={false}
                     width={52}
                   />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(value) => formatCurrency(value)} cursor={{ fill: 'hsl(var(--muted) / 0.4)' }} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="pipeline" name="Pipeline" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} maxBarSize={26} />
-                  <Bar dataKey="ganado" name="Ganado" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} maxBarSize={26} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} formatter={(value) => formatCurrency(value)} cursor={CURSOR_FILL} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: 'hsl(var(--muted-foreground))' }} iconType="circle" iconSize={8} />
+                  <Bar
+                    dataKey="pipeline"
+                    name="Pipeline"
+                    fill={SERIES_ACCENTS[3]}
+                    radius={[5, 5, 0, 0]}
+                    maxBarSize={26}
+                  />
+                  <Bar
+                    dataKey="ganado"
+                    name="Ganado"
+                    fill={SERIES_ACCENTS[2]}
+                    radius={[5, 5, 0, 0]}
+                    maxBarSize={26}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}

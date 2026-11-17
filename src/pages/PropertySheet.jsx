@@ -95,19 +95,19 @@ export default function PropertySheet() {
           </Button>
         </div>
 
-        <header className="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+        <header className="flex items-start justify-between gap-4 border-b border-slate-300 pb-4">
           <div>
-            <p className="font-heading text-lg font-extrabold tracking-tight">DAN&amp;LOR HOMES</p>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Servicios inmobiliarios</p>
+            <p className="font-display text-[19px] font-medium tracking-[0.06em]">DAN&amp;LOR HOMES</p>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.24em] text-slate-500">Servicios inmobiliarios</p>
           </div>
-          <div className="text-right text-[11px] text-slate-500">
-            <p>Ficha del inmueble</p>
-            <p>{new Date().toLocaleDateString('es-ES')}</p>
+          <div className="text-right text-[10px] uppercase tracking-[0.14em] text-slate-500">
+            <p className="font-semibold text-slate-700">Ficha del inmueble</p>
+            <p className="mt-0.5">{new Date().toLocaleDateString('es-ES')}</p>
           </div>
         </header>
 
         {photos.length > 0 && (
-          <div className="mt-5 grid grid-cols-3 gap-1.5 overflow-hidden rounded-xl">
+          <div className="mt-5 grid grid-cols-3 gap-2 overflow-hidden rounded-2xl ring-1 ring-slate-200">
             {photos.map((photo, index) => (
               <Image
                 key={`${photo.file_url}-${index}`}
@@ -121,15 +121,17 @@ export default function PropertySheet() {
 
         <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-heading text-2xl font-extrabold leading-tight">{property.title}</h1>
-            <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
+            <h1 className="display-title text-[28px] text-slate-900">{property.title}</h1>
+            <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-slate-500">
               <MapPin className="h-3.5 w-3.5" />
               {[property.address, property.zone].filter(Boolean).join(' · ') || 'Ubicación sin definir'}
             </p>
           </div>
           <div className="text-right">
-            <p className="font-heading text-2xl font-extrabold leading-none">{formatCurrency(property.price)}</p>
-            {perM2 && <p className="mt-1 text-[11px] text-slate-500">{formatCurrency(perM2)}/m²</p>}
+            <p className="font-heading text-[24px] font-bold leading-none tabular-nums">{formatCurrency(property.price)}</p>
+            {perM2 && (
+              <p className="mt-1.5 text-[10px] uppercase tracking-[0.12em] text-slate-500">{formatCurrency(perM2)}/m²</p>
+            )}
           </div>
         </div>
 
@@ -140,7 +142,7 @@ export default function PropertySheet() {
         {property.features?.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
             {property.features.map((feature) => (
-              <span key={feature} className="rounded-full border border-slate-200 px-2 py-0.5 text-[11px] text-slate-600">
+              <span key={feature} className="rounded-full border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] text-slate-600">
                 {feature}
               </span>
             ))}
@@ -149,9 +151,9 @@ export default function PropertySheet() {
 
         <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-1 border-t border-slate-200 pt-4 sm:grid-cols-3">
           {DATA.map(([label, value]) => (
-            <div key={label} className="flex justify-between gap-2 border-b border-slate-100 py-1.5 text-[12px]">
-              <span className="text-slate-500">{label}</span>
-              <span className="font-medium">{value}</span>
+            <div key={label} className="flex items-baseline justify-between gap-2 border-b border-slate-100 py-2 text-[12px]">
+              <span className="text-[10px] uppercase tracking-[0.1em] text-slate-500">{label}</span>
+              <span className="font-medium tabular-nums">{value}</span>
             </div>
           ))}
         </div>
