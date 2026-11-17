@@ -12,8 +12,9 @@ import MyMlsListings from '@/components/mls/MyMlsListings';
 import MlsInterestsPanel from '@/components/mls/MlsInterestsPanel';
 import MlsPartnersPanel from '@/components/mls/MlsPartnersPanel';
 import MlsFeedCard from '@/components/mls/MlsFeedCard';
+import MlsAdvisorPanel from '@/components/mls/MlsAdvisorPanel';
 import { emptyMlsFilters, isMineListing } from '@/lib/mls';
-import { MessageSquare, Network, Plus, Search, Share2 } from 'lucide-react';
+import { MessageSquare, Network, Plus, Search, Share2, Sparkles } from 'lucide-react';
 
 const buildQuery = (filters) => {
   const query = {};
@@ -122,6 +123,9 @@ export default function Bolsa() {
           <TabsTrigger value="red" className="gap-1.5">
             <Network className="h-3.5 w-3.5" /> Red ({partners.length})
           </TabsTrigger>
+          <TabsTrigger value="asesor" className="gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" /> Asesor IA
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="bolsa">
@@ -170,6 +174,10 @@ export default function Bolsa() {
             <MlsFeedCard />
             <MlsPartnersPanel partners={partners} onChanged={refresh} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="asesor">
+          <MlsAdvisorPanel />
         </TabsContent>
       </Tabs>
 

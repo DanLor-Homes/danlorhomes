@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import PageHeader from '@/components/crm/PageHeader';
 import RentSummary from '@/components/rentals/RentSummary';
+import RentalAdvisorPanel from '@/components/rentals/RentalAdvisorPanel';
 import LeasesList from '@/components/rentals/LeasesList';
 import PaymentsList from '@/components/rentals/PaymentsList';
 import LeaseDialog from '@/components/rentals/LeaseDialog';
@@ -100,6 +101,8 @@ export default function Rentals() {
       </PageHeader>
 
       <RentSummary contracted={contracted} totals={totals} activeLeases={activeLeases} />
+
+      <RentalAdvisorPanel />
 
       <div className="mb-4 mt-6 flex flex-wrap items-center gap-1.5">
         {tabs.map((item) => (
