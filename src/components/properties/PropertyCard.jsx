@@ -20,7 +20,7 @@ export default function PropertyCard({ property, matches = 0, onClick }) {
   return (
     <article
       onClick={onClick}
-      className="card-surface group flex cursor-pointer flex-col overflow-hidden transition-colors hover:border-primary/40"
+      className="card-surface card-hover group flex cursor-pointer flex-col overflow-hidden"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
         {photo ? (

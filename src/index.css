@@ -8,78 +8,82 @@
 
 @layer base {
   :root {
-    --background: 220 16% 96%;
-    --foreground: 218 54% 20%;
+    --background: 40 32% 97%;
+    --foreground: 219 40% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 218 54% 20%;
+    --card-foreground: 219 40% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 218 54% 20%;
-    --primary: 212 52% 27%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 212 38% 94%;
-    --secondary-foreground: 212 50% 24%;
-    --muted: 220 16% 96%;
-    --muted-foreground: 218 24% 36%;
-    --accent: 212 38% 94%;
-    --accent-foreground: 212 50% 27%;
-    --destructive: 0 72% 45%;
+    --popover-foreground: 219 40% 15%;
+    --primary: 213 50% 24%;
+    --primary-foreground: 40 33% 98%;
+    --secondary: 40 20% 93%;
+    --secondary-foreground: 213 44% 22%;
+    --muted: 40 18% 94%;
+    --muted-foreground: 219 14% 40%;
+    --accent: 40 26% 92%;
+    --accent-foreground: 213 44% 22%;
+    --gold: 38 46% 45%;
+    --gold-foreground: 40 40% 98%;
+    --destructive: 0 65% 44%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 85%;
-    --input: 220 15% 85%;
-    --ring: 212 52% 27%;
-    --chart-1: 212 52% 27%;
-    --chart-2: 212 45% 45%;
-    --chart-3: 218 54% 20%;
-    --chart-4: 212 40% 35%;
-    --chart-5: 218 20% 55%;
-    --radius: 0.85rem;
-    --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --border: 38 16% 86%;
+    --input: 38 16% 86%;
+    --ring: 213 50% 24%;
+    --chart-1: 213 50% 24%;
+    --chart-2: 202 34% 42%;
+    --chart-3: 38 46% 45%;
+    --chart-4: 188 22% 38%;
+    --chart-5: 219 14% 55%;
+    --radius: 0.75rem;
+    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Playfair Display', Georgia, serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 218 54% 20%;
-    --sidebar-primary: 212 52% 27%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 212 38% 94%;
-    --sidebar-accent-foreground: 212 50% 27%;
-    --sidebar-border: 220 16% 90%;
-    --sidebar-ring: 212 52% 27%;
+    --sidebar-background: 40 30% 98%;
+    --sidebar-foreground: 219 40% 15%;
+    --sidebar-primary: 213 50% 24%;
+    --sidebar-primary-foreground: 40 33% 98%;
+    --sidebar-accent: 40 24% 93%;
+    --sidebar-accent-foreground: 213 44% 22%;
+    --sidebar-border: 38 18% 89%;
+    --sidebar-ring: 213 50% 24%;
   }
 
   .dark {
-    --background: 219 50% 8%;
-    --foreground: 220 16% 96%;
-    --card: 218 45% 13%;
-    --card-foreground: 220 16% 96%;
-    --popover: 218 45% 15%;
-    --popover-foreground: 220 16% 96%;
-    --primary: 210 50% 66%;
-    --primary-foreground: 218 54% 10%;
-    --secondary: 218 35% 22%;
-    --secondary-foreground: 220 16% 96%;
-    --muted: 218 30% 19%;
-    --muted-foreground: 218 22% 76%;
-    --accent: 212 45% 25%;
-    --accent-foreground: 212 60% 85%;
-    --destructive: 0 65% 55%;
+    --background: 220 26% 7%;
+    --foreground: 40 18% 94%;
+    --card: 220 22% 11%;
+    --card-foreground: 40 18% 94%;
+    --popover: 220 22% 13%;
+    --popover-foreground: 40 18% 94%;
+    --primary: 205 52% 68%;
+    --primary-foreground: 220 30% 9%;
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 40 18% 94%;
+    --muted: 220 16% 16%;
+    --muted-foreground: 40 10% 72%;
+    --accent: 220 20% 20%;
+    --accent-foreground: 205 55% 82%;
+    --gold: 38 50% 62%;
+    --gold-foreground: 220 30% 9%;
+    --destructive: 0 62% 54%;
     --destructive-foreground: 0 0% 100%;
-    --border: 218 26% 28%;
-    --input: 218 26% 30%;
-    --ring: 210 50% 66%;
-    --chart-1: 210 50% 66%;
-    --chart-2: 220 16% 96%;
-    --chart-3: 212 55% 78%;
-    --chart-4: 212 45% 48%;
-    --chart-5: 218 25% 45%;
-    --sidebar-background: 219 45% 10%;
-    --sidebar-foreground: 218 25% 82%;
-    --sidebar-primary: 210 50% 66%;
-    --sidebar-primary-foreground: 218 54% 10%;
-    --sidebar-accent: 212 42% 22%;
-    --sidebar-accent-foreground: 212 60% 85%;
-    --sidebar-border: 218 30% 20%;
-    --sidebar-ring: 210 50% 66%;
+    --border: 220 15% 23%;
+    --input: 220 15% 25%;
+    --ring: 205 52% 68%;
+    --chart-1: 205 52% 68%;
+    --chart-2: 40 18% 90%;
+    --chart-3: 38 50% 62%;
+    --chart-4: 205 40% 48%;
+    --chart-5: 220 15% 45%;
+    --sidebar-background: 220 24% 9%;
+    --sidebar-foreground: 40 14% 84%;
+    --sidebar-primary: 205 52% 68%;
+    --sidebar-primary-foreground: 220 30% 9%;
+    --sidebar-accent: 220 18% 18%;
+    --sidebar-accent-foreground: 205 55% 82%;
+    --sidebar-border: 220 15% 19%;
+    --sidebar-ring: 205 52% 68%;
   }
 }
 
@@ -136,46 +140,83 @@
   }
 
   .card-surface {
-    @apply rounded-2xl border border-border/70 bg-card;
+    @apply rounded-2xl border border-border/80 bg-card;
+    box-shadow: 0 1px 2px rgba(26, 34, 44, .05), 0 18px 40px -34px rgba(26, 34, 44, .45);
+  }
+
+  /* Superficie interactiva: se eleva con suavidad al pasar el cursor */
+  .card-hover {
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    border-color: hsl(var(--primary) / .35);
+    box-shadow: 0 2px 4px rgba(26, 34, 44, .06), 0 26px 52px -34px rgba(26, 34, 44, .55);
   }
 
   .grid-glow {
     background-image: radial-gradient(circle at 15% 0%, hsl(var(--primary) / 0.14), transparent 45%),
-      radial-gradient(circle at 85% 10%, hsl(212 52% 40% / 0.12), transparent 40%);
+      radial-gradient(circle at 85% 10%, hsl(var(--gold) / 0.10), transparent 40%);
   }
 
-  /* Lienzo de la aplicación: profundidad suave bajo las tarjetas */
+  /* Lienzo de la aplicación: papel cálido con veladuras de azul y oro */
   .app-canvas {
+    background-color: hsl(var(--background));
     background-image:
-      radial-gradient(900px 420px at 12% -8%, hsl(var(--primary) / 0.10), transparent 70%),
-      radial-gradient(720px 380px at 92% 0%, hsl(var(--primary) / 0.06), transparent 70%);
+      radial-gradient(1100px 520px at 10% -12%, hsl(var(--primary) / 0.09), transparent 68%),
+      radial-gradient(820px 420px at 96% -6%, hsl(var(--gold) / 0.12), transparent 66%);
     background-repeat: no-repeat;
   }
 
   .shell-elevation {
-    box-shadow: 0 1px 2px rgba(15, 30, 50, .04), 0 24px 48px -40px rgba(15, 30, 50, .45);
+    box-shadow: 0 1px 2px rgba(26, 34, 44, .04), 0 28px 56px -44px rgba(26, 34, 44, .5);
+  }
+
+  /* Editorial: filete dorado y antetítulo en versalitas */
+  .gold-rule {
+    display: block;
+    height: 1px;
+    width: 28px;
+    flex: none;
+    background: linear-gradient(90deg, hsl(var(--gold)), hsl(var(--gold) / .18));
+  }
+
+  .eyebrow {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .display-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -.012em;
+    line-height: 1.12;
   }
 }
 
 /* Panel de control — editorial moderno, lectura descansada */
 .ed-panel {
-  --ed-ink: #152130;
-  --ed-muted: #64717f;
-  --ed-line: #e2e9f2;
-  --ed-line-soft: #edf2f8;
+  --ed-ink: #1b232e;
+  --ed-muted: #6b6862;
+  --ed-line: #e5ded2;
+  --ed-line-soft: #f0eade;
   --ed-card: #ffffff;
-  --ed-accent: #1f3f63;
-  --ed-accent-ink: #17324e;
-  --ed-accent-soft: #e9f0f8;
+  --ed-accent: #1f3e5c;
+  --ed-accent-ink: #1b3a57;
+  --ed-accent-soft: #ebf1f7;
   --ed-gold: #9a7c2e;
-  --ed-surface-soft: #f6f9fc;
-  --ed-chip: #e8f0f9;
+  --ed-surface-soft: #faf7f1;
+  --ed-chip: #e9eff6;
   --ed-chip-ink: #1d4267;
-  --ed-tabs: #edf2f8;
+  --ed-tabs: #f0eade;
   --ed-raised: #ffffff;
-  --ed-switch: #d3dce7;
-  --ed-shadow: 0 1px 2px rgba(15, 30, 50, .05), 0 12px 28px -22px rgba(15, 30, 50, .35);
-  background: #f3f6fa;
+  --ed-switch: #ddd6c9;
+  --ed-shadow: 0 1px 2px rgba(26, 34, 44, .05), 0 12px 28px -22px rgba(26, 34, 44, .35);
+  background: #f7f4ee;
   color: var(--ed-ink);
   font-family: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
   font-size: 15px;

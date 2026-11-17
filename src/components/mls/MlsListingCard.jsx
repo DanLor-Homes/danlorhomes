@@ -12,7 +12,7 @@ export default function MlsListingCard({ listing, onOpen }) {
   return (
     <article
       onClick={() => onOpen(listing)}
-      className="card-surface group flex cursor-pointer flex-col overflow-hidden transition-colors hover:border-primary/40"
+      className="card-surface card-hover group flex cursor-pointer flex-col overflow-hidden"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
         {photo ? (

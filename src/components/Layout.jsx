@@ -87,12 +87,12 @@ const NAV = NAV_GROUPS.flatMap((group) => group.items);
 function Brand() {
   return (
     <Link to="/" className="group flex items-center gap-3 px-1 py-1">
-      <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 ring-1 ring-primary/15 transition-transform duration-300 group-hover:scale-[1.03]">
-        <img src={brandLogo} alt="DAN&LOR HOMES" className="h-8 w-8 rounded-lg object-contain" />
+      <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-card ring-1 ring-border/80 transition-transform duration-300 group-hover:scale-[1.03]">
+        <img src={brandLogo} alt="DAN&LOR HOMES" className="h-8 w-8 rounded-md object-contain" />
       </span>
-      <span className="leading-tight">
-        <span className="block font-heading text-[15px] font-extrabold tracking-tight">DAN&amp;LOR HOMES</span>
-        <span className="block text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+      <span className="min-w-0 leading-tight">
+        <span className="block truncate font-display text-[16px] font-medium tracking-[0.06em]">DAN&amp;LOR HOMES</span>
+        <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
           Servicios inmobiliarios
         </span>
       </span>
@@ -108,11 +108,11 @@ function NavItem({ to, label, icon: Icon, onNavigate }) {
       onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          'group relative flex items-center gap-3 rounded-xl px-2.5 py-2.5 text-[14px] font-medium outline-none transition-all duration-200',
+          'group relative flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-[14px] font-medium outline-none transition-colors duration-200',
           'focus-visible:ring-2 focus-visible:ring-ring/60',
           isActive
-            ? 'bg-card text-foreground shadow-sm ring-1 ring-border/70'
-            : 'text-muted-foreground hover:bg-card/60 hover:text-foreground'
+            ? 'bg-card text-foreground shadow-sm ring-1 ring-border/80'
+            : 'text-muted-foreground hover:bg-card/70 hover:text-foreground'
         )
       }
     >
@@ -120,7 +120,7 @@ function NavItem({ to, label, icon: Icon, onNavigate }) {
         <>
           <span
             className={cn(
-              'absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary transition-all duration-200',
+              'absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 rounded-r-full bg-gold transition-all duration-200',
               isActive ? 'opacity-100' : 'opacity-0'
             )}
           />
@@ -144,7 +144,8 @@ function NavItems({ onNavigate }) {
     <nav className="flex flex-col gap-5">
       {NAV_GROUPS.map((group) => (
         <div key={group.label}>
-          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="mb-2 flex items-center gap-2 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            <span className="gold-rule" />
             {group.label}
           </p>
           <div className="flex flex-col gap-0.5">
@@ -229,10 +230,8 @@ export default function Layout() {
               </SheetContent>
             </Sheet>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                DAN&amp;LOR HOMES
-              </p>
-              <h2 className="truncate font-heading text-[17px] font-semibold leading-tight">
+              <p className="eyebrow hidden text-[10px] sm:block">DAN&amp;LOR HOMES</p>
+              <h2 className="truncate font-display text-[18px] font-medium leading-tight tracking-[-0.01em]">
                 {current?.label || 'Dashboard'}
               </h2>
             </div>
@@ -291,7 +290,7 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8 print:max-w-none print:p-0">
+        <main className="mx-auto w-full max-w-[1360px] px-4 py-7 sm:px-6 lg:px-9 lg:py-10 print:max-w-none print:p-0">
           <Outlet />
         </main>
       </div>
